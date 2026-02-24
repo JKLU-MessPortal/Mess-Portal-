@@ -1,141 +1,198 @@
-# 🍔 JKLU Mess Management Portal
+🍔 JKLU Mess Management Portal
 
-A full-stack web application designed to digitize the mess entry system at JKLU. This project replaces physical ID cards with a secure **QR Code–based Digital Pass**, integrating **Microsoft Azure Authentication** for students and a **real-time QR scanner** for mess staff.
+A full-stack MERN web application that digitizes the JKLU mess entry system using QR-based Digital Mess Pass + Microsoft Azure Authentication.
 
----
+This project replaces physical ID cards with a secure, real-time QR verification system for students and mess staff.
 
-## 🚀 Features
+🌟 Project Overview
 
-### 🎓 For Students
-- **Secure Login:** One-click authentication using **JKLU Outlook ID** (Microsoft Azure AD)
-- **Digital Mess Card:** Auto-generates a unique QR Code based on the student’s database ID
-- **Live Dashboard:** Displays student profile, roll number, and meal eligibility status
-- **Responsive Design:** Works seamlessly on mobile and desktop devices
+This system provides:
 
-### 👨‍🍳 For Mess Staff
-- **Built-in QR Scanner:** Dedicated scanning interface available at `/scan`
-- **Real-time Validation:** Instantly verifies student validity and meal status
-- **Meal Logging:** Automatically records entries (Breakfast, Lunch, Snacks, Dinner) in MongoDB
-- **Time-Based Logic:** Automatically detects the current meal based on system time
+• Secure Microsoft login for students
+• Auto-generated Digital Mess QR Pass
+• Real-time QR scanner for mess staff
+• Automatic meal logging in MongoDB
+• Duplicate entry prevention
+• Time-based meal detection
 
----
+🚀 Features
+🎓 Student Features
 
-## 🛠️ Tech Stack
+Microsoft Outlook Login (Azure AD)
 
-### Frontend
-- React.js (Vite)
-- Material UI (MUI)
-- Tailwind CSS
-- MSAL (Microsoft Authentication Library)
-- `@yudiel/react-qr-scanner`
-- Axios
+Digital QR Mess Pass
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB Atlas
-- Mongoose
-- CORS
-- Dotenv
+Live Dashboard with profile & meal eligibility
 
----
+Mobile responsive UI
 
-## ⚙️ Installation & Setup
+👨‍🍳 Mess Staff Features
 
-Follow the steps below to run the project locally.
+Dedicated QR Scanner page /scan
 
----
+Real-time QR validation
 
-### 1️⃣ Clone the Repository
+Automatic meal entry logging
 
-```bash
-git clone https://github.com/JKLU-MessPortal/JKLU-Mess-Portal
-cd mess-management-portal
-2️⃣ Backend Setup (Run the Server)
-Open a terminal and navigate to the backend folder:
+Time-based meal detection
 
-cd server
-npm install
-Create .env file in server/
+Duplicate entry prevention
+
+🛠️ Tech Stack
+Frontend
+
+React.js (Vite)
+
+Material UI
+
+Tailwind CSS
+
+MSAL (Microsoft Authentication)
+
+Axios
+
+QR Scanner Library
+
+Backend
+
+Node.js
+
+Express.js
+
+MongoDB Atlas
+
+Mongoose
+
+CORS + Dotenv
+
+📂 Project Structure
+Mess-Portal/
+│
+├── frontend/            # React Client
+│   ├── src/components
+│   ├── src/pages
+│   ├── authConfig.js
+│   └── App.jsx
+│
+├── server/              # Express Backend
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   └── index.js
+│
+└── README.md
+
+⚙️ Running Project Locally (FOR TEAM)
+
+This is the MOST IMPORTANT SECTION for your teammates.
+
+1️⃣ Clone Repository
+git clone https://github.com/JKLU-MessPortal/Mess-Portal-.git
+cd Mess-Portal-
+
+🔐 Environment Variables Setup
+
+Since .env files are private, each developer must create them manually.
+
+Create Backend ENV
+
+Create file:
+server/.env
+
+Paste:
+
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
-Start the backend server
-node index.js
-✅ Expected output:
+JWT_SECRET=your_secret_key
 
-🚀 Server is running on Port 5000
-✅ MongoDB Connected
-3️⃣ Frontend Setup (Run the Client)
-Open a new terminal (keep backend running):
+Create Frontend ENV
+
+Create file:
+frontend/.env
+
+Paste:
+
+VITE_CLIENT_ID=your_microsoft_azure_client_id
+VITE_AUTHORITY=https://login.microsoftonline.com/common
+VITE_API_URL=http://localhost:5000
+
+▶️ Run Backend Server
+cd server
+npm install
+npm run dev
+
+
+Expected output:
+
+Server running on port 5000
+MongoDB Connected
+
+💻 Run Frontend App
+
+Open new terminal:
 
 cd frontend
 npm install
-Create .env file in frontend/
-VITE_CLIENT_ID=your_microsoft_azure_client_id
-VITE_AUTHORITY=https://login.microsoftonline.com/common
-Start the React app
 npm run dev
-🌐 Open your browser and visit:
 
-http://localhost:3000
-📱 Usage Guide
-🔐 Student Login
-Open http://localhost:3000
+
+Open browser:
+
+http://localhost:5173
+
+📱 How To Use
+Student Login
+
+Open app
 
 Click Sign in with Outlook
 
-Use a valid @jklu.edu.in email ID
+Login using @jklu.edu.in
 
-📊 Dashboard
-View your Digital QR Pass
+Mess Scanner
 
-See profile details and meal eligibility
+Open:
 
-📷 Mess Staff Scanning
-Navigate to http://localhost:3000/scan
+http://localhost:5173/scan
 
-Allow camera permissions
 
-Scan the student’s QR code
+Allow camera → scan QR.
 
-Scan Results
-✅ Green Check: Entry approved
-
-❌ Red Cross: Duplicate entry or invalid QR
-
-📂 Project Structure
-mess-management-portal/
-│
-├── frontend/               # React Client
-│   ├── src/
-│   │   ├── components/     # Reusable UI Components
-│   │   ├── pages/          # Login, Dashboard, Scanner
-│   │   ├── authConfig.js   # MSAL Configuration
-│   │   └── App.jsx         # Routing Logic
-│   └── ...
-│
-├── server/                 # Node.js Backend
-│   ├── controllers/        # Auth & Scan Logic
-│   ├── models/             # Mongoose Models (User, MealLog)
-│   ├── routes/             # API Routes
-│   └── index.js            # Server Entry Point
-│
-└── README.md               # Documentation
 🔗 API Endpoints
 Method	Endpoint	Description
-POST	/api/auth/microsoft-login	Authenticate user via Microsoft Azure
-POST	/api/mess/scan	Verify QR & log meal entry
-GET	/api/auth/users	Fetch all users (Dev only)
+POST	/api/auth/microsoft-login	Azure login
+POST	/api/mess/scan	QR verification
+GET	/api/auth/users	Get users (dev)
 🛡️ Security Features
-Domain Restriction: Only @jklu.edu.in emails are allowed
 
-Duplicate Prevention: Students cannot scan twice for the same meal on the same day
+Only @jklu.edu.in emails allowed
 
-Server-side Validation: All checks handled securely in backend
+Duplicate meal entry prevention
+
+Backend validation for all scans
+
+No secrets stored in repo
+
+👨‍💻 Development Scripts
+Backend
+npm run dev
+npm start
+
+Frontend
+npm run dev
+npm run build
 
 🤝 Contributing
-Contributions are welcome!
-Fork the repository, create a feature branch, and submit a pull request.
+
+Create new branch
+
+git checkout -b feature-name
+
+
+Commit changes
+
+Create Pull Request
 
 📄 License
-This project is licensed under the MIT License.
+
+MIT License

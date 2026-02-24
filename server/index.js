@@ -1,4 +1,6 @@
-const messRoutes = require('./routes/messRoutes'); // <--- ADD THIS AT TOP
+const adminRoutes = require('./routes/adminRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const messRoutes = require('./routes/messRoutes');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -33,7 +35,9 @@ connectDB();
 // --- 3. USE YOUR ROUTES HERE ---
 // This tells the server: "If a URL starts with /api/auth, go to authRoutes"
 app.use('/api/auth', authRoutes);
-app.use('/api/mess', messRoutes); // <--- ADD THIS LINE TO USE MESS ROUTES
+app.use('/api/mess', messRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/admin', adminRoutes);
 
 
 // Simple Test Route

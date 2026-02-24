@@ -64,7 +64,7 @@ export default function AuthGate() {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "rgb(255, 0, 0)", // Red background
-        backgroundImage: `url('https://jklu.edu.in/wp-content/uploads/2022/07/JKLU-Logo.png')`,
+        backgroundImage: `url('https://mma.prnewswire.com/media/654758/JK_Lakshmipat_University_Logo.jpg')`,
         backgroundSize: "cover",
       }}
     >
