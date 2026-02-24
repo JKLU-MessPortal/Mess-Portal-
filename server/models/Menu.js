@@ -1,18 +1,20 @@
 const mongoose = require('mongoose');
 
 const MenuSchema = new mongoose.Schema({
-  date: { type: Date, required: true },
-  mealType: { 
+  dayOfWeek: { 
     type: String, 
-    enum: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'], 
+    enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     required: true 
   },
-  items: [String], // Array of strings: ["Dal", "Rice", "Paneer"]
-  nutrition: {
-    calories: Number,
-    protein: Number,
-    carbs: Number
+  mealType: { 
+    type: String, 
+    enum: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'],
+    required: true 
+  },
+  items: { 
+    type: [String], // Example: ["Rajma", "Rice", "Roti", "Salad"]
+    required: true 
   }
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model('Menu', MenuSchema);
