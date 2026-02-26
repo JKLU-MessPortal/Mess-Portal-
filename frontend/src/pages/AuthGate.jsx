@@ -1,4 +1,5 @@
 import React from "react";
+import messImage from "../images/mess.jpeg";
 import { Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
@@ -56,61 +57,90 @@ export default function AuthGate() {
     }
   };
 
-  return (
+   return (
     <Box
       sx={{
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgb(255, 0, 0)", // Red background
-        backgroundImage: `url('https://mma.prnewswire.com/media/654758/JK_Lakshmipat_University_Logo.jpg')`,
-        backgroundSize: "cover",
+        
+        // --- FIX STARTS HERE ---
+        // 1. Use the imported variable, not the long text string
+        backgroundImage: `url(${messImage})`, 
+        // 2. "cover" scales the image to fill the whole screen
+        backgroundSize: "cover", 
+        // 3. Keeps the image centered
+        backgroundPosition: "center",
+        // 4. Prevents the "tiling" effect
+        backgroundRepeat: "no-repeat",
+        // --- FIX ENDS HERE ---
       }}
-    >
+     >
       <Container maxWidth="xs">
         <Paper
           elevation={10}
           sx={{
+            
             padding: "40px 20px",
+            height: "400px",
+            width: "400px",
             textAlign: "center",
+            backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyOyKn5i71GaoKjTcL3sBWriHa_NRPQio_Mw&s')`,
+            backgroundSize: "-",
             backgroundColor: "rgb(255, 255, 127)", // Yellow background
             borderRadius: "15px",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+            border: "2px solid orange",
+            boxShadow: "0 10px 30px orange", // Orange shadow
+              "&:hover": {
+                color: "black",
+                transform: "skew(0deg) scale(1.10)",
+                boxShadow: "0 20px 100px black",
+                transition: "all 0.3s ease",
+                border: "2px solid black",
+              },
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "#000" }}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "black", }}>
             Login Page
           </Typography>
-          
-          <Typography variant="h6" sx={{ mb: 4, color: "#333", fontSize: "16px", fontWeight: "bold" }}>
+
+          <Typography variant="h6" sx={{ mb: 4, color: "black", fontSize: "16px", fontWeight: "bold", }}>
             JKLU Mess Portal
           </Typography>
 
           <Box sx={{ mb: 3 }}>
-            <Typography variant="body2" sx={{ textAlign: "center", color: "#666", mb: 3 }}>
+            <Typography variant="body2" sx={{ textAlign: "center", color: "black", mb: 3 }}>
               Please use your @jklu.edu.in ID
             </Typography>
           </Box>
-
+          
           <Button
             fullWidth
             variant="contained"
             onClick={handleLogin}
             sx={{
-              backgroundColor: "#2f2f2f",
-              color: "white",
-              padding: "12px",
-              fontWeight: "bold",
-              "&:hover": {
-                backgroundColor: "#000",
+            backgroundColor: "orange",
+            color: "black",
+            padding: "12px",
+            fontWeight: "bold",
+            border: "2px solid black",
+            // Add transition for smooth hover effect
+            "&:hover": {
+              backgroundColor: "black",
+              color: "orange",
+              transform: "skew(10deg) scale(1.10)",
+              boxShadow: "0 5px 15px orange",
+              transform: "translate(5px)", 
+              transition: "all 0.3s ease",
+              border: "2px solid orange",
               },
             }}
           >
             Sign in with Outlook
           </Button>
-          
-          <Typography variant="caption" sx={{ mt: 3, display: "block", color: "#555" }}>
+            
+          <Typography variant="caption" sx={{ mt: 3, display: "block", color: "black",fontWeight: "bold", }}>
             Secure Authentication via Microsoft Azure
           </Typography>
         </Paper>
