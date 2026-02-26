@@ -8,6 +8,7 @@ import AuthGate from "./pages/AuthGate";
 import Dashboard from "./pages/Dashboard";
 import Scanner from "./pages/Scanner";
 import AdminDashboard from "./pages/AdminDashboard";
+import History from "./pages/History";
 
 // --- IMPORT COMPONENTS ---
 import PrivateRoute from "./components/PrivateRoute";
@@ -20,28 +21,28 @@ function App() {
         <Route path="/" element={<AuthGate />} />
 
         {/* Student Dashboard */}
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
-          } 
+          }
         />
 
         {/* Staff Scanner Route */}
         <Route path="/scan" element={<Scanner />} />
 
         {/* Admin Route */}
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <PrivateRoute>
               <AdminDashboard />
             </PrivateRoute>
-          } 
+          }
         />
-        
+        <Route path="/history" element={<History />} />
       </Routes>
     </BrowserRouter>
   );
