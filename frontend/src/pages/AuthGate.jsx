@@ -37,7 +37,7 @@ export default function AuthGate() {
       // 4. SAVE & REDIRECT
       if (res.status === 200) {
         console.log("Database Saved:", res.data);
-        
+
         // Save the user data we got from the DATABASE (includes ID and Role)
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("isAuthenticated", "true");
