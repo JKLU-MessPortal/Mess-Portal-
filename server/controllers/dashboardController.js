@@ -116,3 +116,16 @@ exports.toggleMeal = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update booking" });
   }
 };
+exports.getStudentHistory = async (req, res) => {
+  try {
+    const { studentId } = req.query;
+    
+    // Find all bookings for this student, sorted by newest date first
+    const history = await MealBooking.find({ studentId }).sort({ date: -1 });
+    
+    res.status(200).json({ success: true, history });
+  } catch (error) {
+    console.error("History Error:", error);
+    res.status(500).json({ success: false, message: "Failed to load history" });
+  }
+};

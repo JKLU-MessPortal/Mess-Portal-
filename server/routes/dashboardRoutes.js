@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { getDashboardData, toggleMeal } = require('../controllers/dashboardController');
 
-// URL: http://localhost:5000/api/dashboard/data
+const { getDashboardData, toggleMeal, getStudentHistory } = require('../controllers/dashboardController');
+
 router.get('/data', getDashboardData);
-
-// URL: http://localhost:5000/api/dashboard/toggle
 router.post('/toggle', toggleMeal);
+router.get('/history', getStudentHistory); // Now this will work!
 
 module.exports = router;
