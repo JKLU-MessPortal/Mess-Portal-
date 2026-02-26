@@ -134,6 +134,63 @@ export default function AuthGate() {
           >
             Sign in with Outlook
           </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleLogin}
+            sx={{
+              backgroundColor: "orange",
+              color: "black",
+              padding: "12px",
+              fontWeight: "bold",
+              border: "2px solid black",
+              "&:hover": {
+                backgroundColor: "black",
+                color: "orange",
+                transform: "skew(10deg) scale(1.10)",
+                boxShadow: "0 5px 15px orange",
+                transform: "translate(5px)", 
+                transition: "all 0.3s ease",
+                border: "2px solid orange",
+              },
+            }}
+          >
+            Sign in with Outlook
+          </Button>
+
+          {/* ⚡⚡⚡ PASTE THIS NEW BUTTON HERE ⚡⚡⚡ */}
+          <Button
+            fullWidth
+            onClick={() => {
+              // 1. Create a Fake User
+              const devUser = {
+                _id: "dev_user_123", 
+                name: "Developer Mode",
+                email: "dev@jklu.edu.in",
+                role: "student" // CHANGE THIS TO 'admin' OR 'accountant' TO TEST THOSE ROLES
+              };
+              // 2. Save to Browser Memory
+              localStorage.setItem("user", JSON.stringify(devUser));
+              localStorage.setItem("isAuthenticated", "true");
+              // 3. Jump to Dashboard
+              navigate("/dashboard");
+            }}
+            sx={{
+              marginTop: "15px", // Spacing from the top button
+              backgroundColor: "#222",
+              color: "#0f0", // Matrix Green
+              border: "1px dashed #0f0",
+              fontWeight: "bold",
+              "&:hover": { backgroundColor: "black", borderColor: "white", color: "white" }
+            }}
+          >
+            ⚡ DEV MODE (Skip Login)
+          </Button>
+          {/* ⚡⚡⚡ END OF NEW BUTTON ⚡⚡⚡ */}
+            
+          <Typography variant="caption" sx={{ mt: 3, display: "block", color: "black",fontWeight: "bold", }}>
+            Secure Authentication via Microsoft Azure
+          </Typography>
             
           <Typography variant="caption" sx={{ mt: 3, display: "block", color: "black",fontWeight: "bold", }}>
             Secure Authentication via Microsoft Azure
