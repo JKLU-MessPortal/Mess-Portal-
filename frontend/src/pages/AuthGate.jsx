@@ -82,7 +82,8 @@ export default function AuthGate() {
             width: "400px",
             textAlign: "center",
             backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyOyKn5i71GaoKjTcL3sBWriHa_NRPQio_Mw&s')`,
-            backgroundSize: "-",
+            backgroundSize: "contain",
+            backgroundPosition: "center calc(100% - -120px)",
             backgroundColor: "rgb(255, 255, 127)", // Yellow background
             borderRadius: "15px",
             border: "2px solid orange",
@@ -97,18 +98,12 @@ export default function AuthGate() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "black", }}>
-            Login Page
+            Login 
           </Typography>
 
           <Typography variant="h6" sx={{ mb: 4, color: "black", fontSize: "16px", fontWeight: "bold", }}>
             JKLU Mess Portal
           </Typography>
-
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="body2" sx={{ textAlign: "center", color: "black", mb: 3 }}>
-              Please use your @jklu.edu.in ID
-            </Typography>
-          </Box>
           
           <Button
             fullWidth
