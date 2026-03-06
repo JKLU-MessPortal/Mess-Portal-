@@ -1,0 +1,94 @@
+/* ========================
+   AuthGate (Login) Page Styles
+   ======================== */
+
+/* --- Full-Screen Background Page --- */
+/* Background image is set dynamically via sx prop using the imported image variable */
+.authgate-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* --- Login Card (Paper) --- */
+.authgate-card {
+  padding: 40px 20px;
+  height: 400px;
+  width: 400px;
+  text-align: center;
+  background-size: contain;
+  background-position: center calc(100% + 120px);
+  background-color: rgb(255, 255, 127) !important; /* Yellow */
+  border-radius: 15px !important;
+  border: 2px solid orange !important;
+  box-shadow: 0 10px 30px orange !important;
+  transition: all 0.3s ease;
+}
+
+.authgate-card:hover {
+  color: black;
+  transform: scale(1.1);
+  box-shadow: 0 20px 100px black !important;
+  border: 2px solid black !important;
+}
+
+/* --- Card Title --- */
+.authgate-title {
+  font-weight: bold !important;
+  margin-bottom: 8px !important;
+  color: black !important;
+}
+
+/* --- Card Subtitle --- */
+.authgate-subtitle {
+  margin-bottom: 32px !important;
+  color: black !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+/* --- Sign In Button --- */
+.authgate-btn {
+  background-color: orange !important;
+  color: black !important;
+  padding: 12px !important;
+  font-weight: bold !important;
+  border: 2px solid black !important;
+  transition: all 0.3s ease;
+}
+
+.authgate-btn:hover {
+  background-color: black !important;
+  color: orange !important;
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px orange !important;
+  border: 2px solid orange !important;
+}
+
+/* --- Dev Mode Button --- */
+.authgate-btn-dev {
+  margin-top: 15px !important;
+  background-color: #222 !important;
+  color: #0f0 !important; /* Matrix green */
+  border: 1px dashed #0f0 !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease;
+}
+
+.authgate-btn-dev:hover {
+  background-color: black !important;
+  border-color: white !important;
+  color: white !important;
+}
+
+/* --- Caption Text --- */
+.authgate-caption {
+  margin-top: 12px !important;
+  display: block !important;
+  color: black !important;
+  font-weight: bold !important;
+}
