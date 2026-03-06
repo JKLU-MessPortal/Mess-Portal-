@@ -24,7 +24,7 @@ export default function AdminDashboard() {
   const [ledger, setLedger] = useState([]);
   const [openStudentIndex, setOpenStudentIndex] = useState(null);
 
-  // 🚨 NAYA STATE: Reviews ke liye
+  // Reviews ke liye state
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -47,6 +47,7 @@ export default function AdminDashboard() {
 
   const fetchAdminData = async () => {
     try {
+      // 1. Fetch Headcount
       const resStats = await axios.get(
         "http://localhost:5000/api/admin/headcount",
       );
@@ -55,6 +56,7 @@ export default function AdminDashboard() {
         setTotalSaved(resStats.data.totalSaved);
       }
 
+      // 2. Fetch Ledger
       const resLedger = await axios.get(
         "http://localhost:5000/api/admin/ledger",
       );
@@ -62,7 +64,7 @@ export default function AdminDashboard() {
         setLedger(resLedger.data.ledger);
       }
 
-      // 🚨 NAYA CODE: Reviews fetch karna
+      // 3. Fetch Reviews
       const resReviews = await axios.get(
         "http://localhost:5000/api/reviews/all",
       );
@@ -82,19 +84,23 @@ export default function AdminDashboard() {
         .split(",")
         .map((item) => item.trim())
         .filter((item) => item !== "");
+        
+      // 🚨 FIX: URL ko /api/admin/menu kar diya gaya hai
       const res = await axios.post(
-        "http://localhost:5000/api/admin/update-menu",
+        "http://localhost:5000/api/admin/menu",
         {
           dayOfWeek: day,
           mealType: meal,
           items: itemsArray,
         },
       );
+      
       if (res.data.success) {
         setStatusMsg(`✅ Success: ${meal} on ${day} has been updated!`);
         setFoodItems("");
       }
     } catch (error) {
+      console.error(error);
       setStatusMsg("❌ Failed to update menu.");
     }
   };
@@ -357,7 +363,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- 🚨 NAYA SECTION: REVIEWS & FEEDBACK --- */}
+        {/* --- REVIEWS & FEEDBACK SECTION --- */}
         {canSeeReviews && (
           <div className="admin-card card-purple-top">
             <div className="ledger-header-flex">
