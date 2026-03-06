@@ -1,6 +1,7 @@
+const User = require('../models/User'); 
 const Menu = require('../models/Menu');
 const MealBooking = require('../models/MealBooking');
-const User = require('../models/User'); // NEW: We bring in the User database!
+const Notice = require('../models/Notice');
 
 // 1. Update the Menu
 exports.updateMenu = async (req, res) => {
@@ -43,62 +44,67 @@ exports.getHeadcount = async (req, res) => {
   }
 };
 
-// 3. THE "UNIVERSAL MATCH" REFUND LEDGER (Matches ID, Email, OR Roll Number)
+// 3. Get Refund Ledger (Real-World Match Version)
 exports.getRefundLedger = async (req, res) => {
   try {
-    console.log("--- STARTING UNIVERSAL MATCH ---");
-
-    // 1. Fetch ALL cancellations
+    // 1. Database se saari cancellations aur saare users ka data nikalo
     const cancellations = await MealBooking.find({ status: 'Cancelled' });
-    
-    // 2. Fetch ALL users
-    const allUsers = await User.find({});
+    const allUsers = await User.find({}); // Ye sabhi bachon ke asli naam layega
 
     const ledger = {};
 
     cancellations.forEach(booking => {
-      // Skip broken records
-      if (!booking.studentId) return;
+      let rawId = booking.studentId ? booking.studentId.toString().trim() : "Unknown_ID";
 
-      const bookingRef = booking.studentId.toString();
-
-      // 🔍 THE UNIVERSAL SEARCH 🔍
-      // We look for a user who matches by ID, OR Email, OR Roll Number
+      // 2. Booking ID ko Asli User Database se Match karo (Naam aur Email nikalne ke liye)
       const student = allUsers.find(user => 
-        user._id.toString() === bookingRef || 
-        user.email === bookingRef || 
-        user.rollNumber === bookingRef
+        user._id.toString() === rawId || 
+        user.email === rawId || 
+        user.rollNumber === rawId
       );
 
-      // If we found the student (by any method), add to ledger
-      if (student) {
-        const sId = student._id.toString();
-
-        if (!ledger[sId]) {
-          ledger[sId] = {
-            name: student.name,
-            email: student.email,
-            totalCancelled: 0,
-            meals: []
-          };
-        }
-
-        ledger[sId].totalCancelled++;
-        
-        // Format Date
-        const dateStr = new Date(booking.date).toLocaleDateString('en-US', { 
-          weekday: 'short', month: 'short', day: 'numeric' 
-        });
-        
-        ledger[sId].meals.push(`${dateStr} - ${booking.mealType}`);
+      // 3. Ledger mein student ki details save karo
+      if (!ledger[rawId]) {
+        ledger[rawId] = {
+          // 🚨 YE HAI MAGIC: Agar student mila toh uska naam aur email show karo!
+          name: student ? student.name : `Unlinked Account (ID: ${rawId})`,
+          email: student ? student.email : "Email unavailable",
+          totalCancelled: 0,
+          meals: []
+        };
       }
+
+      ledger[rawId].totalCancelled++;
+      const dateStr = new Date(booking.date).toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric'
+      });
+      ledger[rawId].meals.push(`${dateStr} - ${booking.mealType}`);
     });
 
-    console.log("--- FINISHED MATCHING ---");
+    // 4. Frontend ko Real Data bhej do
     res.status(200).json({ success: true, ledger: Object.values(ledger) });
 
   } catch (error) {
     console.error("Ledger Error:", error);
-    res.status(500).json({ success: false, message: "Failed to load refund ledger." });
+    res.status(500).json({ success: false, message: "Failed to load ledger." });
+  }
+};
+// 4. Update Global Notice (Admin Power)
+exports.updateNotice = async (req, res) => {
+  try {
+    await Notice.deleteMany({});
+    const newNotice = await Notice.create({ message: req.body.message });
+    res.status(200).json({ success: true, message: "Notice updated!", notice: newNotice });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to update notice." });
+  }
+};
+
+exports.getNotice = async (req, res) => {
+  try {
+    const notice = await Notice.findOne(); 
+    res.status(200).json({ success: true, notice });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to get notice." });
   }
 };

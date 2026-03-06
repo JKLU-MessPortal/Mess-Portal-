@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import axios from "axios";
-import { CheckCircle, XCircle, RefreshCw } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
+import "./Scanner.css";
 
 const MessScanner = () => {
   const [scanResult, setScanResult] = useState(null);
@@ -54,14 +55,14 @@ const MessScanner = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
-      <h1 className="text-2xl font-bold mb-4">JKLU Mess Scanner</h1>
+    <div className="scanner-page">
+      <h1 className="scanner-title">JKLU Mess Scanner</h1>
 
       {/* --- CAMERA WINDOW --- */}
-      <div className="relative w-full max-w-sm aspect-square bg-black rounded-xl overflow-hidden border-4 border-gray-700 shadow-2xl">
+      <div className="scanner-window">
         {status === "idle" && (
-          <Scanner 
-            onScan={handleScan} 
+          <Scanner
+            onScan={handleScan}
             components={{ audio: false, torch: true }}
             styles={{ container: { width: "100%", height: "100%" } }}
           />
@@ -69,20 +70,17 @@ const MessScanner = () => {
 
         {/* --- OVERLAYS FOR SUCCESS / ERROR --- */}
         {status === "success" && (
-          <div className="absolute inset-0 bg-green-500/90 flex flex-col items-center justify-center animate-in fade-in">
-            <CheckCircle size={80} className="text-white mb-2" />
-            <h2 className="text-2xl font-bold text-white text-center">{message}</h2>
+          <div className="scanner-overlay-success">
+            <CheckCircle size={80} className="scanner-icon" />
+            <h2 className="scanner-overlay-text">{message}</h2>
           </div>
         )}
 
         {status === "error" && (
-          <div className="absolute inset-0 bg-red-500/90 flex flex-col items-center justify-center animate-in fade-in">
-            <XCircle size={80} className="text-white mb-2" />
-            <h2 className="text-2xl font-bold text-white text-center px-4">{message}</h2>
-            <button 
-              onClick={resetScanner}
-              className="mt-4 bg-white text-red-600 px-6 py-2 rounded-full font-bold shadow-lg"
-            >
+          <div className="scanner-overlay-error">
+            <XCircle size={80} className="scanner-icon" />
+            <h2 className="scanner-overlay-text">{message}</h2>
+            <button onClick={resetScanner} className="scanner-retry-btn">
               Try Again
             </button>
           </div>
@@ -90,15 +88,13 @@ const MessScanner = () => {
       </div>
 
       {/* --- STATUS TEXT --- */}
-      <div className="mt-6 p-4 bg-gray-800 rounded-lg w-full max-w-sm text-center">
-        <p className={`text-lg font-mono ${status === "loading" ? "animate-pulse text-yellow-400" : "text-gray-300"}`}>
+      <div className="scanner-status-box">
+        <p className={`scanner-status-text ${status === "loading" ? "scanner-status-loading" : ""}`}>
           {message}
         </p>
       </div>
-      
-      <p className="mt-8 text-gray-500 text-xs">
-        Ensure good lighting. Keep QR code steady.
-      </p>
+
+      <p className="scanner-hint">Ensure good lighting. Keep QR code steady.</p>
     </div>
   );
 };

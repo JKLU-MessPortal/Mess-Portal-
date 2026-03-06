@@ -1,0 +1,478 @@
+/* ========================
+   Dashboard Page Styles
+   ======================== */
+
+/* --- Page Wrapper --- */
+.dashboard-page {
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 30px 20px;
+}
+
+.dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* --- Notice Banner --- */
+.notice-banner {
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.notice-banner-icon {
+  font-size: 20px;
+}
+
+/* --- Main Two-Column Grid --- */
+.dashboard-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* --- LEFT COLUMN --- */
+.dashboard-left {
+  flex: 1 1 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- ID Card --- */
+.id-card {
+  background-color: white;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  border-top: 6px solid #3b82f6;
+}
+
+.id-card-heading {
+  margin: 0 0 5px 0;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.id-card-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 25px 0;
+}
+
+.qr-frame {
+  border: 3px dashed #e2e8f0;
+  padding: 15px;
+  border-radius: 15px;
+  display: inline-block;
+  margin-bottom: 25px;
+  background-color: #f8fafc;
+}
+
+.qr-frame img {
+  display: block;
+  width: 180px;
+  height: 180px;
+}
+
+.id-card-name {
+  font-size: 22px;
+  margin: 0 0 5px 0;
+  color: #1e293b;
+}
+
+.id-card-email {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 20px 0;
+}
+
+/* --- Skip Stats Card --- */
+.skip-stats-card {
+  background-color: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.skip-stats-card h3 {
+  margin: 0 0 15px 0;
+  color: #0f172a;
+  font-size: 18px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.skip-stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.skip-stat-label {
+  font-weight: bold;
+  color: #475569;
+}
+
+.skip-stat-note {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+/* --- RIGHT COLUMN --- */
+.dashboard-right {
+  flex: 2 1 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* --- Shared Card --- */
+.menu-card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.menu-card-bordered {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 2px solid #e2e8f0;
+}
+
+.menu-card-title {
+  margin: 0 0 20px 0;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 15px;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+/* --- Meal Grid (Today) --- */
+.meals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.meal-box-today {
+  padding: 15px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.meal-box-today h4 {
+  margin: 0 0 8px 0;
+  color: #3b82f6;
+  font-size: 16px;
+}
+
+.meal-box-today p {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.menu-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* --- Tomorrow Section Header --- */
+.tomorrow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.tomorrow-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.manage-badge {
+  font-size: 13px;
+  color: #f59e0b;
+  font-weight: bold;
+  background-color: #fef3c7;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* --- Meal Box (Tomorrow) --- */
+.meal-box-tomorrow {
+  padding: 15px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s;
+}
+
+.meal-box-tomorrow.cancelled {
+  background-color: #fee2e2;
+  border-color: #f87171;
+}
+
+.meal-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.meal-type-label {
+  margin: 0;
+  color: #3b82f6;
+  font-size: 16px;
+}
+
+.meal-type-label.cancelled {
+  color: #b91c1c;
+  text-decoration: line-through;
+}
+
+.meal-items-text {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.meal-items-text.cancelled {
+  opacity: 0.5;
+}
+
+/* --- Skip / Add Back Button --- */
+.btn-skip {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-skip:hover {
+  background-color: #dc2626;
+}
+
+.btn-add-back {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-add-back:hover {
+  background-color: #059669;
+}
+
+.cancelled-label {
+  margin: 10px 0 0 0;
+  font-size: 12px;
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+/* --- Weekly Menu Section --- */
+.weekly-section {
+  margin-top: 40px;
+  width: 100%;
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.weekly-section h3 {
+  font-size: 22px;
+  color: #1e293b;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 15px;
+}
+
+.weekly-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.day-card {
+  background-color: #f8fafc;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #e2e8f0;
+}
+
+.day-card h4 {
+  margin: 0 0 15px 0;
+  color: #0f172a;
+  font-size: 18px;
+  border-bottom: 2px solid #cbd5e1;
+  padding-bottom: 5px;
+}
+
+.day-meal-row {
+  margin-bottom: 12px;
+}
+
+.day-meal-type {
+  font-weight: bold;
+  color: #3b82f6;
+  font-size: 14px;
+  display: block;
+}
+
+.day-meal-items {
+  font-size: 14px;
+  color: #475569;
+}
+
+.weekly-empty {
+  color: #94a3b8;
+  font-style: italic;
+  text-align: center;
+}
+/* --- FOOD REVIEW SECTION STYLES --- */
+.review-section {
+  margin-top: 40px;
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border-top: 6px solid #8b5cf6; /* Purple edge */
+}
+
+.review-section h3 {
+  margin: 0 0 5px 0;
+  font-size: 22px;
+  color: #1e293b;
+}
+
+.review-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 25px 0;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 15px;
+}
+
+.review-form {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #475569;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-family: inherit;
+  font-size: 15px;
+  resize: vertical;
+}
+
+.file-input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.star-rating {
+  display: flex;
+  gap: 10px;
+  font-size: 35px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.star {
+  color: #cbd5e1; /* Gray by default */
+  transition: color 0.2s;
+}
+
+.star.active {
+  color: #fbbf24; /* Gold when active */
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+.btn-submit-review {
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-submit-review:hover {
+  background-color: #7c3aed;
+}
+
+.review-msg {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.review-msg.success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.review-msg.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
