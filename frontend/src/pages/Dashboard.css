@@ -5,7 +5,7 @@
 /* --- Page Wrapper --- */
 .dashboard-page {
   min-height: 100vh;
-  background-color: #f4f7f6;
+  background-color: #e1e0de;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   padding: 30px 20px;
 }
@@ -17,8 +17,8 @@
 
 /* --- Notice Banner --- */
 .notice-banner {
-  background-color: #fef3c7;
-  border: 1px solid #f59e0b;
+  background-color: #f6cd2a;
+  border: 1px solid #905f0a;
   border-radius: 12px;
   padding: 14px 20px;
   margin-bottom: 20px;
@@ -26,7 +26,7 @@
   align-items: center;
   gap: 12px;
   font-size: 15px;
-  color: #92400e;
+  color: #b75011;
   font-weight: 500;
 }
 
@@ -52,33 +52,32 @@
 
 /* --- ID Card --- */
 .id-card {
-  background-color: white;
+  background-color: rgb(252, 209, 115);
   padding: 40px 30px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(32, 130, 8, 0.05);
   text-align: center;
-  border-top: 6px solid #3b82f6;
+  border-top: 6px solid #ee8310;
 }
 
 .id-card-heading {
   margin: 0 0 5px 0;
-  color: #0f172a;
+  color: #010101;
   font-size: 20px;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .id-card-subtitle {
-  color: #64748b;
+  color: #040404;
   font-size: 14px;
   margin: 0 0 25px 0;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .qr-frame {
-  border: 3px dashed #e2e8f0;
-  padding: 15px;
+  background: linear-gradient(135deg,#00ffcc,#0077ff);
+  padding: 10px;
   border-radius: 15px;
-  display: inline-block;
-  margin-bottom: 25px;
-  background-color: #f8fafc;
 }
 
 .qr-frame img {
@@ -86,11 +85,35 @@
   width: 180px;
   height: 180px;
 }
-
+.qr-image {
+  filter: hue-rotate(120deg) saturate(2);
+}
 .id-card-name {
   font-size: 22px;
   margin: 0 0 5px 0;
   color: #1e293b;
+}
+.qr-frame:hover {
+  box-shadow:
+  0 0 10px #00ffcc,
+  0 0 20px #00ffcc,
+  0 0 40px #00ffcc;
+  transform: scale(1.1);
+}
+
+.qr-frame:hover::before {
+  content: "";
+  position: absolute;
+  width: 150%;
+  height: 100%;
+  background: radial-gradient(circle,#00ffcc 2px,transparent 1px);
+  background-size: 20px 20px;
+  animation: particles 3s linear infinite;
+}
+
+@keyframes particles {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50px); }
 }
 
 .id-card-email {

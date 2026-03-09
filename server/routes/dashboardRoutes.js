@@ -5,6 +5,6 @@ const { getDashboardData, toggleMeal, getStudentHistory } = require('../controll
 
 router.get('/data', getDashboardData);
 router.post('/toggle', toggleMeal);
-router.get('/history', getStudentHistory); // Now this will work!
+router.get('/history', getStudentHistory);
 
 module.exports = router;
