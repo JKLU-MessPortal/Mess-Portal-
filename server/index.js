@@ -1,3 +1,4 @@
+const reviewRoutes = require('./routes/reviewRoutes'); // Aapne pehle hi import kar liya tha! Great!
 const adminRoutes = require('./routes/adminRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const messRoutes = require('./routes/messRoutes');
@@ -19,6 +20,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// 🚨 NAYA CODE YAHAN HAI 🚨
+// Ye Frontend ko permission dega ki wo 'uploads' folder se photos dekh sake
+app.use('/uploads', express.static('uploads')); 
+
+
 // 2. Connect to MongoDB
 const connectDB = async () => {
   try {
@@ -38,6 +44,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/mess', messRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
+
+// 🚨 NAYA CODE YAHAN HAI 🚨
+// Ye naya API raasta banayega reviews aur photos save karne ke liye
+app.use('/api/reviews', reviewRoutes);
 
 
 // Simple Test Route

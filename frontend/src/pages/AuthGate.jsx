@@ -4,7 +4,8 @@ import { Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Imports Axios to talk to Backend
+import axios from "axios";
+import "./AuthGate.css";
 
 export default function AuthGate() {
   const { instance } = useMsal();
@@ -14,7 +15,7 @@ export default function AuthGate() {
     try {
       // 1. OPEN MICROSOFT POPUP
       const response = await instance.loginPopup(loginRequest);
-      const account = response.account;
+      const { account } = response;
       const email = account.username.toLowerCase(); // Microsoft calls email 'username'
 
       // 2. CHECK DOMAIN (Frontend Security)
@@ -59,98 +60,46 @@ export default function AuthGate() {
 
    return (
     <Box
+      className="authgate-page"
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        
-        // --- FIX STARTS HERE ---
-        // 1. Use the imported variable, not the long text string
-        backgroundImage: `url(${messImage})`, 
-        // 2. "cover" scales the image to fill the whole screen
-        backgroundSize: "cover", 
-        // 3. Keeps the image centered
+        backgroundImage: `url(${messImage})`,
+        backgroundSize: "cover",
         backgroundPosition: "center",
-        // 4. Prevents the "tiling" effect
         backgroundRepeat: "no-repeat",
-        // --- FIX ENDS HERE ---
       }}
      >
       <Container maxWidth="xs">
         <Paper
           elevation={10}
+          className="authgate-card"
           sx={{
-            
-            padding: "40px 20px",
-            height: "400px",
-            width: "400px",
-            textAlign: "center",
             backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyOyKn5i71GaoKjTcL3sBWriHa_NRPQio_Mw&s')`,
-            backgroundSize: "contain",
-            backgroundPosition: "center calc(100% - -120px)",
-            backgroundColor: "rgb(255, 255, 127)", // Yellow background
-            borderRadius: "15px",
-            border: "2px solid orange",
-            boxShadow: "0 10px 30px orange", // Orange shadow
-              "&:hover": {
-                color: "black",
-                transform: "skew(0deg) scale(1.10)",
-                boxShadow: "0 20px 100px black",
-                transition: "all 0.3s ease",
-                border: "2px solid black",
-              },
+            "&:hover": {
+              transform: "scale(1.10)",
+              boxShadow: "0 20px 100px black",
+              border: "2px solid black",
+            },
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "black", }}>
-            Login 
+          <Typography variant="h4" className="authgate-title">
+            Login
           </Typography>
 
-          <Typography variant="h6" sx={{ mb: 4, color: "black", fontSize: "16px", fontWeight: "bold", }}>
+          <Typography variant="h6" className="authgate-subtitle">
             JKLU Mess Portal
           </Typography>
-          
+
           <Button
             fullWidth
             variant="contained"
             onClick={handleLogin}
+            className="authgate-btn"
             sx={{
-            backgroundColor: "orange",
-            color: "black",
-            padding: "12px",
-            fontWeight: "bold",
-            border: "2px solid black",
-            // Add transition for smooth hover effect
-            "&:hover": {
-              backgroundColor: "black",
-              color: "orange",
-              transform: "skew(10deg) scale(1.10)",
-              boxShadow: "0 5px 15px orange",
-              transform: "translate(5px)", 
-              transition: "all 0.3s ease",
-              border: "2px solid orange",
-              },
-            }}
-          >
-            Sign in with Outlook
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleLogin}
-            sx={{
-              backgroundColor: "orange",
-              color: "black",
-              padding: "12px",
-              fontWeight: "bold",
-              border: "2px solid black",
               "&:hover": {
                 backgroundColor: "black",
                 color: "orange",
-                transform: "skew(10deg) scale(1.10)",
+                transform: "translateX(5px)",
                 boxShadow: "0 5px 15px orange",
-                transform: "translate(5px)", 
-                transition: "all 0.3s ease",
                 border: "2px solid orange",
               },
             }}
@@ -158,41 +107,28 @@ export default function AuthGate() {
             Sign in with Outlook
           </Button>
 
-          {/* ⚡⚡⚡ PASTE THIS NEW BUTTON HERE ⚡⚡⚡ */}
           <Button
             fullWidth
             onClick={() => {
-              // 1. Create a Fake User
               const devUser = {
-                _id: "dev_user_123", 
+                _id: "dev_user_123",
                 name: "Developer Mode",
                 email: "dev@jklu.edu.in",
-                role: "student" // CHANGE THIS TO 'admin' OR 'accountant' TO TEST THOSE ROLES
+                role: "student",
               };
-              // 2. Save to Browser Memory
               localStorage.setItem("user", JSON.stringify(devUser));
               localStorage.setItem("isAuthenticated", "true");
-              // 3. Jump to Dashboard
               navigate("/dashboard");
             }}
+            className="authgate-btn-dev"
             sx={{
-              marginTop: "15px", // Spacing from the top button
-              backgroundColor: "#222",
-              color: "#0f0", // Matrix Green
-              border: "1px dashed #0f0",
-              fontWeight: "bold",
-              "&:hover": { backgroundColor: "black", borderColor: "white", color: "white" }
+              "&:hover": { backgroundColor: "black", borderColor: "white", color: "white" },
             }}
           >
             ⚡ DEV MODE (Skip Login)
           </Button>
-          {/* ⚡⚡⚡ END OF NEW BUTTON ⚡⚡⚡ */}
-            
-          <Typography variant="caption" sx={{ mt: 3, display: "block", color: "black",fontWeight: "bold", }}>
-            Secure Authentication via Microsoft Azure
-          </Typography>
-            
-          <Typography variant="caption" sx={{ mt: 3, display: "block", color: "black",fontWeight: "bold", }}>
+
+          <Typography variant="caption" className="authgate-caption">
             Secure Authentication via Microsoft Azure
           </Typography>
         </Paper>
