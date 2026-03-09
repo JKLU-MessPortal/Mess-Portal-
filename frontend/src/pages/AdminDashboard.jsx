@@ -84,17 +84,13 @@ export default function AdminDashboard() {
         .split(",")
         .map((item) => item.trim())
         .filter((item) => item !== "");
-        
-      // 🚨 FIX: URL ko /api/admin/menu kar diya gaya hai
-      const res = await axios.post(
-        "http://localhost:5000/api/admin/menu",
-        {
-          dayOfWeek: day,
-          mealType: meal,
-          items: itemsArray,
-        },
-      );
-      
+
+      const res = await axios.post("http://localhost:5000/api/admin/menu", {
+        dayOfWeek: day,
+        mealType: meal,
+        items: itemsArray,
+      });
+
       if (res.data.success) {
         setStatusMsg(`✅ Success: ${meal} on ${day} has been updated!`);
         setFoodItems("");
@@ -152,6 +148,52 @@ export default function AdminDashboard() {
             Back to Dashboard
           </button>
         </div>
+
+        {/* --- 🚨 NAYA CODE: BROADCAST NOTICE BOARD (ADMIN ONLY) --- */}
+        {(user.role === "admin" || user.role === "contractor") && (
+          <div
+            className="admin-card"
+            style={{ marginBottom: "30px", borderTop: "6px solid #ef4444" }}
+          >
+            <h2 className="card-title">📢 Broadcast Notice</h2>
+            <p className="card-subtitle">
+              Send an alert message to all students' dashboards.
+            </p>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const msg = e.target.noticeMsg.value;
+                try {
+                  await axios.post("http://localhost:5000/api/admin/notice", {
+                    message: msg,
+                  });
+                  alert("✅ Notice sent to all students!");
+                  e.target.reset();
+                } catch (err) {
+                  alert("❌ Failed to send notice");
+                }
+              }}
+            >
+              <div className="form-group">
+                <textarea
+                  name="noticeMsg"
+                  required
+                  className="form-control"
+                  placeholder="Type important notice here (e.g. Special menu today, timings changed)..."
+                  style={{ minHeight: "80px" }}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ backgroundColor: "#ef4444" }}
+              >
+                🚀 Send Notice
+              </button>
+            </form>
+          </div>
+        )}
 
         {/* --- CONTRACTOR SECTION (Kitchen Controls) --- */}
         {canSeeKitchenControls && (
