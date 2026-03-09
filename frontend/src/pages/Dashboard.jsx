@@ -1,11 +1,54 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [notice, setNotice] = useState("");
+  // --- NAYE STATES: Review System Ke Liye ---
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [image, setImage] = useState(null);
+  const [reviewMsg, setReviewMsg] = useState("");
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setReviewMsg("Submitting...");
+
+    const formData = new FormData();
+    formData.append("studentId", user.id || user._id);
+    formData.append("studentName", user.name);
+    formData.append("rating", rating);
+    formData.append("comment", comment);
+
+    if (image) {
+      formData.append("foodImage", image); // Backend multer ka naam match hona chahiye
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/reviews/submit",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+
+      if (res.data.success) {
+        setReviewMsg("✅ Thank you! Your feedback has been sent to the Admin.");
+        setComment("");
+        setRating(5);
+        setImage(null);
+        // Box ko wapas khali karne ke liye file input ko reset karna
+        document.getElementById("imageUploadInput").value = "";
+      }
+    } catch (error) {
+      console.error("Review Error:", error);
+      setReviewMsg("❌ Failed to submit review. Please try again.");
+    }
+  };
 
   const [menuData, setMenuData] = useState({
     todayMenu: [],
@@ -19,10 +62,21 @@ export default function Dashboard() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       fetchMenu(parsedUser.id || parsedUser._id);
+
+      // ✅ Notice Fetch Karne ka code ab andar aa gaya
+      axios
+        .get("http://localhost:5000/api/admin/notice")
+        .then((res) => {
+          if (res.data.notice && res.data.notice.message) {
+            setNotice(res.data.notice.message);
+          }
+        })
+        .catch((err) => console.log("Notice Error:", err));
     } else {
       navigate("/");
     }
@@ -80,11 +134,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
   if (!user)
     return (
       <div style={{ textAlign: "center", marginTop: "50px", fontSize: "20px" }}>
@@ -93,7 +142,6 @@ export default function Dashboard() {
     );
 
   const userName = user.name || "Student";
-  const userRole = user.role || "student";
   const userEmail = user.email || "No Email";
   const userId = user.id || user._id || "NO_ID_FOUND";
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${userId}`;
@@ -108,155 +156,55 @@ export default function Dashboard() {
   ];
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f4f7f6",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        padding: "30px 20px",
-      }}
-    >
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        {/* --- NEW NAVBAR COMPONENT --- */}
+    <div className="dashboard-page">
+      <div className="dashboard-container">
         <Navbar />
 
-        {/* --- MAIN CONTENT GRID STARTS HERE --- */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "30px",
-            alignItems: "flex-start",
-          }}
-        >
+        {/* --- BROADCAST NOTICE BANNER --- */}
+        {notice && (
+          <div className="notice-banner">
+            <span className="notice-banner-icon">📢</span>
+            <span>{notice}</span>
+          </div>
+        )}
+
+        {/* --- MAIN CONTENT GRID --- */}
+        <div className="dashboard-grid">
           {/* LEFT COLUMN: ID CARD & SKIP STATS */}
-          <div
-            style={{
-              flex: "1 1 320px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "40px 30px",
-                borderRadius: "20px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-                textAlign: "center",
-                borderTop: "6px solid #3b82f6",
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 5px 0",
-                  color: "#0f172a",
-                  fontSize: "20px",
-                }}
-              >
-                JKLU MESS PASS
-              </h3>
-              <p
-                style={{
-                  color: "#64748b",
-                  fontSize: "14px",
-                  margin: "0 0 25px 0",
-                }}
-              >
-                Present this QR at the scanner
-              </p>
-              <div
-                style={{
-                  border: "3px dashed #e2e8f0",
-                  padding: "15px",
-                  borderRadius: "15px",
-                  display: "inline-block",
-                  marginBottom: "25px",
-                  backgroundColor: "#f8fafc",
-                }}
-              >
-                <img
-                  src={qrCodeUrl}
-                  alt="QR Code"
-                  style={{ display: "block", width: "180px", height: "180px" }}
-                />
+          <div className="dashboard-left">
+            {/* ID Card */}
+            <div className="id-card">
+              <h3 className="id-card-heading">JKLU MESS PASS</h3>
+              <p className="id-card-subtitle">Present this QR at the scanner</p>
+              <div className="qr-frame">
+                <img src={qrCodeUrl} alt="QR Code" />
               </div>
-              <h2
-                style={{
-                  fontSize: "22px",
-                  margin: "0 0 5px 0",
-                  color: "#1e293b",
-                }}
-              >
-                {userName}
-              </h2>
-              <p
-                style={{
-                  color: "#64748b",
-                  fontSize: "14px",
-                  margin: "0 0 20px 0",
-                }}
-              >
-                {userEmail}
-              </p>
+              <h2 className="id-card-name">{userName}</h2>
+              <p className="id-card-email">{userEmail}</p>
             </div>
 
+            {/* Skip Stats Card */}
             {menuData.skipStats && (
-              <div
-                style={{
-                  backgroundColor: "white",
-                  padding: "25px",
-                  borderRadius: "20px",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-                }}
-              >
-                <h3
-                  style={{
-                    margin: "0 0 15px 0",
-                    color: "#0f172a",
-                    fontSize: "18px",
-                    borderBottom: "2px solid #f1f5f9",
-                    paddingBottom: "10px",
-                  }}
-                >
-                  📊 Monthly Skips Remaining
-                </h3>
-                {Object.keys(menuData.skipStats).map((meal) => (
-                  <div
-                    key={meal}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "10px",
-                      fontSize: "15px",
-                    }}
-                  >
-                    <span style={{ fontWeight: "bold", color: "#475569" }}>
-                      {meal}
-                    </span>
+              <div className="skip-stats-card">
+                <h3>📊 Monthly Skips Remaining</h3>
+                {Object.keys(menuData.skipStats).map((mealType) => (
+                  <div key={mealType} className="skip-stat-row">
+                    <span className="skip-stat-label">{mealType}</span>
                     <span
                       style={{
                         color:
-                          menuData.skipStats[meal].remaining === 0
+                          menuData.skipStats[mealType].remaining === 0
                             ? "#ef4444"
                             : "#10b981",
                         fontWeight: "bold",
                       }}
                     >
-                      {menuData.skipStats[meal].remaining} /{" "}
-                      {menuData.skipStats[meal].limit}
+                      {menuData.skipStats[mealType].remaining} /{" "}
+                      {menuData.skipStats[mealType].limit}
                     </span>
                   </div>
                 ))}
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#94a3b8",
-                    marginTop: "15px",
-                    fontStyle: "italic",
-                  }}
-                >
+                <p className="skip-stat-note">
                   *Skipped meals will be credited to your rebate account at
                   month end.
                 </p>
@@ -265,122 +213,34 @@ export default function Dashboard() {
           </div>
 
           {/* RIGHT COLUMN: TODAY & TOMORROW MENUS */}
-          <div
-            style={{
-              flex: "2 1 500px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "30px",
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "30px",
-                borderRadius: "20px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 20px 0",
-                  borderBottom: "2px solid #f1f5f9",
-                  paddingBottom: "15px",
-                  fontSize: "20px",
-                  color: "#0f172a",
-                }}
-              >
+          <div className="dashboard-right">
+            {/* Today Menu Card */}
+            <div className="menu-card">
+              <h3 className="menu-card-title">
                 🍽️ Today ({menuData.todayName})
               </h3>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                  gap: "15px",
-                }}
-              >
+              <div className="meals-grid">
                 {menuData.todayMenu.length > 0 ? (
                   menuData.todayMenu.map((meal, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        padding: "15px",
-                        backgroundColor: "#f8fafc",
-                        borderRadius: "12px",
-                        border: "1px solid #e2e8f0",
-                      }}
-                    >
-                      <h4
-                        style={{
-                          margin: "0 0 8px 0",
-                          color: "#3b82f6",
-                          fontSize: "16px",
-                        }}
-                      >
-                        {meal.mealType}
-                      </h4>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "14px",
-                          color: "#475569",
-                        }}
-                      >
-                        {meal.items.join(", ")}
-                      </p>
+                    <div key={index} className="meal-box-today">
+                      <h4>{meal.mealType}</h4>
+                      <p>{meal.items.join(", ")}</p>
                     </div>
                   ))
                 ) : (
-                  <p style={{ color: "#94a3b8", fontStyle: "italic" }}>
-                    No menu uploaded for today.
-                  </p>
+                  <p className="menu-empty">No menu uploaded for today.</p>
                 )}
               </div>
             </div>
 
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "30px",
-                borderRadius: "20px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-                border: "2px solid #e2e8f0",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderBottom: "2px solid #f1f5f9",
-                  paddingBottom: "15px",
-                  marginBottom: "20px",
-                }}
-              >
-                <h3 style={{ margin: 0, fontSize: "20px", color: "#0f172a" }}>
-                  📅 Tomorrow ({menuData.tomorrowName})
-                </h3>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    color: "#f59e0b",
-                    fontWeight: "bold",
-                    backgroundColor: "#fef3c7",
-                    padding: "5px 10px",
-                    borderRadius: "20px",
-                  }}
-                >
-                  Manage Meals
-                </span>
+            {/* Tomorrow Menu Card */}
+            <div className="menu-card-bordered">
+              <div className="tomorrow-header">
+                <h3>📅 Tomorrow ({menuData.tomorrowName})</h3>
+                <span className="manage-badge">Manage Meals</span>
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                  gap: "15px",
-                }}
-              >
+              <div className="meals-grid">
                 {menuData.tomorrowMenu.length > 0 ? (
                   menuData.tomorrowMenu.map((meal, index) => {
                     const isCancelled = menuData.tomorrowBookings.some(
@@ -392,36 +252,14 @@ export default function Dashboard() {
                     return (
                       <div
                         key={index}
-                        style={{
-                          padding: "15px",
-                          backgroundColor: isCancelled ? "#fee2e2" : "#f8fafc",
-                          borderRadius: "12px",
-                          border: "1px solid",
-                          borderColor: isCancelled ? "#f87171" : "#e2e8f0",
-                          transition: "all 0.3s",
-                        }}
+                        className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""}`}
                       >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-start",
-                            marginBottom: "8px",
-                          }}
-                        >
+                        <div className="meal-box-header">
                           <h4
-                            style={{
-                              margin: 0,
-                              color: isCancelled ? "#b91c1c" : "#3b82f6",
-                              fontSize: "16px",
-                              textDecoration: isCancelled
-                                ? "line-through"
-                                : "none",
-                            }}
+                            className={`meal-type-label ${isCancelled ? "cancelled" : ""}`}
                           >
                             {meal.mealType}
                           </h4>
-
                           <button
                             onClick={() =>
                               handleToggleMeal(
@@ -429,42 +267,20 @@ export default function Dashboard() {
                                 isCancelled ? "Cancelled" : "Booked",
                               )
                             }
-                            style={{
-                              backgroundColor: isCancelled
-                                ? "#10b981"
-                                : "#ef4444",
-                              color: "white",
-                              border: "none",
-                              padding: "5px 10px",
-                              borderRadius: "6px",
-                              cursor: "pointer",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
+                            className={
+                              isCancelled ? "btn-add-back" : "btn-skip"
+                            }
                           >
                             {isCancelled ? "Add Back" : "Skip Meal"}
                           </button>
                         </div>
                         <p
-                          style={{
-                            margin: 0,
-                            fontSize: "14px",
-                            color: "#475569",
-                            opacity: isCancelled ? 0.5 : 1,
-                          }}
+                          className={`meal-items-text ${isCancelled ? "cancelled" : ""}`}
                         >
                           {meal.items.join(", ")}
                         </p>
-
                         {isCancelled && (
-                          <p
-                            style={{
-                              margin: "10px 0 0 0",
-                              fontSize: "12px",
-                              color: "#b91c1c",
-                              fontWeight: "bold",
-                            }}
-                          >
+                          <p className="cancelled-label">
                             🚫 Cancelled for Rebate
                           </p>
                         )}
@@ -472,45 +288,17 @@ export default function Dashboard() {
                     );
                   })
                 ) : (
-                  <p style={{ color: "#94a3b8", fontStyle: "italic" }}>
-                    No menu uploaded for tomorrow.
-                  </p>
+                  <p className="menu-empty">No menu uploaded for tomorrow.</p>
                 )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- FULL WEEKLY MENU SECTION (Restored!) --- */}
-        <div
-          style={{
-            marginTop: "40px",
-            width: "100%",
-            backgroundColor: "white",
-            padding: "30px",
-            borderRadius: "20px",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "22px",
-              color: "#1e293b",
-              marginBottom: "20px",
-              borderBottom: "2px solid #e2e8f0",
-              paddingBottom: "15px",
-            }}
-          >
-            🗓️ Full Weekly Meal Plan
-          </h3>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "20px",
-            }}
-          >
+        {/* --- FULL WEEKLY MENU SECTION --- */}
+        <div className="weekly-section">
+          <h3>🗓️ Full Weekly Meal Plan</h3>
+          <div className="weekly-grid">
             {allDaysOfWeek.map((day) => {
               const dayMeals = menuData.fullMenu.filter(
                 (m) => m.dayOfWeek === day,
@@ -518,39 +306,12 @@ export default function Dashboard() {
               if (dayMeals.length === 0) return null;
 
               return (
-                <div
-                  key={day}
-                  style={{
-                    backgroundColor: "#f8fafc",
-                    padding: "20px",
-                    borderRadius: "15px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
-                  <h4
-                    style={{
-                      margin: "0 0 15px 0",
-                      color: "#0f172a",
-                      fontSize: "18px",
-                      borderBottom: "2px solid #cbd5e1",
-                      paddingBottom: "5px",
-                    }}
-                  >
-                    {day}
-                  </h4>
+                <div key={day} className="day-card">
+                  <h4>{day}</h4>
                   {dayMeals.map((meal, idx) => (
-                    <div key={idx} style={{ marginBottom: "12px" }}>
-                      <span
-                        style={{
-                          fontWeight: "bold",
-                          color: "#3b82f6",
-                          fontSize: "14px",
-                          display: "block",
-                        }}
-                      >
-                        {meal.mealType}
-                      </span>
-                      <span style={{ fontSize: "14px", color: "#475569" }}>
+                    <div key={idx} className="day-meal-row">
+                      <span className="day-meal-type">{meal.mealType}</span>
+                      <span className="day-meal-items">
                         {meal.items.join(", ")}
                       </span>
                     </div>
@@ -561,17 +322,75 @@ export default function Dashboard() {
           </div>
 
           {menuData.fullMenu.length === 0 && (
-            <p
-              style={{
-                color: "#94a3b8",
-                fontStyle: "italic",
-                textAlign: "center",
-              }}
-            >
+            <p className="weekly-empty">
               The weekly menu has not been uploaded yet. Please ask an admin to
               update it.
             </p>
           )}
+          {/* --- FOOD REVIEW & COMPLAINT SECTION --- */}
+          <div className="review-section">
+            <h3>⭐ Rate Today's Meal & Feedback</h3>
+            <p className="review-subtitle">
+              Found an issue with the food? Upload a photo and let the admin
+              know.
+            </p>
+
+            <form onSubmit={handleReviewSubmit} className="review-form">
+              {/* Star Rating */}
+              <div className="form-group">
+                <label>Food Quality Rating:</label>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`star ${rating >= star ? "active" : ""}`}
+                      onClick={() => setRating(star)}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comment/Complaint Box */}
+              <div className="form-group">
+                <label>Your Comments / Complaints:</label>
+                <textarea
+                  required
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="The food was great! OR I found a bug in my dal..."
+                  className="form-control"
+                  rows="3"
+                />
+              </div>
+
+              {/* Image Upload */}
+              <div className="form-group">
+                <label>Attach Proof (Optional):</label>
+                <input
+                  type="file"
+                  id="imageUploadInput"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  className="file-input"
+                />
+              </div>
+
+              <button type="submit" className="btn-submit-review">
+                📤 Submit Feedback
+              </button>
+
+              {/* Success/Error Message */}
+              {reviewMsg && (
+                <div
+                  className={`review-msg ${reviewMsg.includes("✅") ? "success" : "error"}`}
+                >
+                  {reviewMsg}
+                </div>
+              )}
+            </form>
+          </div>
         </div>
       </div>
     </div>
