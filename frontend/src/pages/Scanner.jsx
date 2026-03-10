@@ -1,13 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // 👈 Naya import navigation ke liye
 import { Scanner } from "@yudiel/react-qr-scanner";
 import axios from "axios";
 import { CheckCircle, XCircle } from "lucide-react";
 import "./Scanner.css";
 
 const MessScanner = () => {
+  const navigate = useNavigate(); // 👈 Hook initialize kiya
+
   const [scanResult, setScanResult] = useState(null);
   const [status, setStatus] = useState("idle"); // idle, loading, success, error
   const [message, setMessage] = useState("Ready to Scan");
+
+  // 🚨 NAYA CODE: SECURITY GUARD (Role Check) 🚨
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      // Agar role admin ya contractor NAHI hai, toh bahar nikal do
+      if (parsedUser.role !== "admin" && parsedUser.role !== "contractor") {
+        alert("🚨 Access Denied: Authorized Staff Only!");
+        navigate("/dashboard"); // Student ko wapas uske dashboard bhej do
+      }
+    } else {
+      navigate("/"); // Agar login hi nahi hai, toh login page par bhejo
+    }
+  }, [navigate]);
 
   const handleScan = async (detectedCodes) => {
     if (status === "loading" || status === "success" || status === "error") return;

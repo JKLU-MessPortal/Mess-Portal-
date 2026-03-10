@@ -106,28 +106,6 @@ export default function AuthGate() {
           >
             Sign in with Outlook
           </Button>
-
-          <Button
-            fullWidth
-            onClick={() => {
-              const devUser = {
-                _id: "dev_user_123",
-                name: "Developer Mode",
-                email: "dev@jklu.edu.in",
-                role: "student",
-              };
-              localStorage.setItem("user", JSON.stringify(devUser));
-              localStorage.setItem("isAuthenticated", "true");
-              navigate("/dashboard");
-            }}
-            className="authgate-btn-dev"
-            sx={{
-              "&:hover": { backgroundColor: "black", borderColor: "white", color: "white" },
-            }}
-          >
-            ⚡ DEV MODE (Skip Login)
-          </Button>
-
           <Typography variant="caption" className="authgate-caption">
             Secure Authentication via Microsoft Azure
           </Typography>

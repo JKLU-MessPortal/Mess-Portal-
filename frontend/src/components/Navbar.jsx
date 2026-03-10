@@ -54,6 +54,18 @@ export default function Navbar() {
           📜 My History
         </button>
 
+        {/* 🚨 NAYA CODE: SECURE SCANNER BUTTON 🚨 */}
+        {(userRole === "admin" || userRole === "contractor") && (
+          <button
+            onClick={() => navigate("/scanner")}
+            className={`nav-btn ${isActive("/scanner") ? "active" : ""}`}
+            style={isActive("/scanner") ? {} : { color: "#10b981", fontWeight: "bold" }} // Highlight green when not active
+          >
+            📷 Scanner
+          </button>
+        )}
+
+        {/* STAFF BUTTON */}
         {(userRole === "admin" ||
           userRole === "contractor" ||
           userRole === "accountant") && (
