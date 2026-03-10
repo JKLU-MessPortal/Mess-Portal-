@@ -11,14 +11,23 @@ exports.scanQRCode = async (req, res) => {
       return res.status(404).json({ success: false, message: "Invalid Student ID" });
     }
 
+    // --- 🚨 FINAL BOSS SECURITY CHECK 🚨 ---
+    if (student.isBlocked) {
+      return res.status(403).json({ 
+        success: false, 
+        message: `🚨 ACCESS DENIED: ${student.name}, your Mess Pass is BLOCKED! Contact Admin.` 
+      });
+    }
+    // ---------------------------------------
+
     // 2. Determine Meal Type based on current time (Server Time)
     const currentHour = new Date().getHours();
     let mealType = "Unknown";
 
-    if (currentHour >= 7 && currentHour < 11) mealType = "Breakfast";
-    else if (currentHour >= 12 && currentHour < 16) mealType = "Lunch";
-    else if (currentHour >= 16 && currentHour < 18) mealType = "Snacks";
-    else if (currentHour >= 19 && currentHour < 22) mealType = "Dinner";
+    if (currentHour >= 8 && currentHour < 9) mealType = "Breakfast";
+    else if (currentHour >= 12 && currentHour < 14) mealType = "Lunch";
+    else if (currentHour >= 17 && currentHour < 18) mealType = "Snacks";
+    else if (currentHour >= 20 && currentHour < 22) mealType = "Dinner";
     else {
       return res.status(400).json({ success: false, message: "Mess is currently CLOSED." });
     }
