@@ -4,7 +4,7 @@
     border: border-box;
 }
 .navbar {
-  background-color: rgb(88, 200, 238);
+  background-color: white;
   padding: 10px 30px;
   border-radius: 16px;
   margin-bottom: 30px;
@@ -14,9 +14,7 @@
   transition: all 0.3s ease;
 }
 
-.navbar:hover {
-  border: 3px solid #4ba1edf2;
-}
+
 
 .navbar-left {
   display: flex;

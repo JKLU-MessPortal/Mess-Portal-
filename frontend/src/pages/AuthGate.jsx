@@ -58,7 +58,7 @@ export default function AuthGate() {
     }
   };
 
-   return (
+  return (
     <Box
       className="authgate-page"
       sx={{
@@ -67,7 +67,7 @@ export default function AuthGate() {
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
-     >
+    >
       <Container maxWidth="xs">
         <Paper
           elevation={10}
@@ -106,6 +106,7 @@ export default function AuthGate() {
           >
             Sign in with Outlook
           </Button>
+
           <Typography variant="caption" className="authgate-caption">
             Secure Authentication via Microsoft Azure
           </Typography>

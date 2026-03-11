@@ -1,0 +1,1 @@
+[[{"name":"ac-5h75chk-shard-00-01.ev4pooz.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"},{"name":"ac-5h75chk-shard-00-02.ev4pooz.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"},{"name":"ac-5h75chk-shard-00-00.ev4pooz.mongodb.net","port":27017,"priority":0,"weight":0,"type":"SRV"}],[["authSource=admin&replicaSet=atlas-pduoe3-shard-0"]]]
