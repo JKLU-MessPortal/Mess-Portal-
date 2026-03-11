@@ -107,8 +107,6 @@ export default function AuthGate() {
             Sign in with Outlook
           </Button>
 
-
-
           <Typography variant="caption" className="authgate-caption">
             Secure Authentication via Microsoft Azure
           </Typography>

@@ -1,7 +1,5 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MsalAuthenticationTemplate, useMsal } from "@azure/msal-react";
-import { InteractionType } from "@azure/msal-browser";
 
 // --- IMPORT PAGES ---
 import AuthGate from "./pages/AuthGate";
@@ -30,8 +28,15 @@ function App() {
           }
         />
 
-        {/* Staff Scanner Route */}
-        <Route path="/scan" element={<Scanner />} />
+        {/* 🚨 SECURE: Staff Scanner Route 🚨 */}
+        <Route 
+          path="/scanner" 
+          element={
+            <PrivateRoute>
+              <Scanner />
+            </PrivateRoute>
+          } 
+        />
 
         {/* Admin Route */}
         <Route
@@ -42,6 +47,8 @@ function App() {
             </PrivateRoute>
           }
         />
+        
+        {/* History Route */}
         <Route path="/history" element={<History />} />
       </Routes>
     </BrowserRouter>

@@ -27,6 +27,9 @@ export default function AdminDashboard() {
   // Reviews ke liye state
   const [reviews, setReviews] = useState([]);
 
+  // 🚨 NAYA STATE: Students ki list ke liye 🚨
+  const [students, setStudents] = useState([]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -38,14 +41,14 @@ export default function AdminDashboard() {
         navigate("/dashboard");
       } else {
         setUser(parsedUser);
-        fetchAdminData();
+        fetchAdminData(parsedUser.role); // Role pass kiya taaki data filter ho sake
       }
     } else {
       navigate("/");
     }
   }, [navigate]);
 
-  const fetchAdminData = async () => {
+  const fetchAdminData = async (role) => {
     try {
       // 1. Fetch Headcount
       const resStats = await axios.get(
@@ -70,6 +73,16 @@ export default function AdminDashboard() {
       );
       if (resReviews.data.success) {
         setReviews(resReviews.data.reviews);
+      }
+
+      // 🚨 NAYA CODE: Fetch Students (Sirf Admin ke liye) 🚨
+      if (role === "admin") {
+        const resStudents = await axios.get(
+          "http://localhost:5000/api/admin/students",
+        );
+        if (resStudents.data.success) {
+          setStudents(resStudents.data.students);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch admin data", error);
@@ -123,6 +136,33 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
+  // 🚨 NAYA CODE: Block / Unblock function 🚨
+  const handleToggleBlock = async (studentId, currentStatus) => {
+    try {
+      const newStatus = !currentStatus; // Agar block hai toh unblock (false), nahi toh block (true)
+
+      const res = await axios.post(
+        "http://localhost:5000/api/admin/students/block",
+        {
+          studentId,
+          isBlocked: newStatus,
+        },
+      );
+
+      if (res.data.success) {
+        // UI mein student ka status turant update kar do bina page refresh kiye
+        setStudents(
+          students.map((s) =>
+            s._id === studentId ? { ...s, isBlocked: newStatus } : s,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update status", error);
+      alert("Error updating student status.");
+    }
+  };
+
   if (!user)
     return (
       <div style={{ textAlign: "center", marginTop: "50px" }}>
@@ -149,7 +189,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* --- 🚨 NAYA CODE: BROADCAST NOTICE BOARD (ADMIN ONLY) --- */}
+        {/* --- BROADCAST NOTICE BOARD --- */}
         {(user.role === "admin" || user.role === "contractor") && (
           <div
             className="admin-card"
@@ -159,7 +199,6 @@ export default function AdminDashboard() {
             <p className="card-subtitle">
               Send an alert message to all students' dashboards.
             </p>
-
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -195,6 +234,117 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* --- 🚨 NAYA CODE: STUDENT MANAGEMENT SECTION (ADMIN ONLY) 🚨 --- */}
+        {user.role === "admin" && (
+          <div
+            className="admin-card"
+            style={{ marginBottom: "30px", borderTop: "6px solid #3b82f6" }}
+          >
+            <h2 className="card-title">🛡️ Student Management</h2>
+            <p className="card-subtitle">
+              Block or unblock students from accessing the mess.
+            </p>
+
+            {students.length === 0 ? (
+              <p className="empty-msg">No students found.</p>
+            ) : (
+              <div style={{ overflowX: "auto", marginTop: "15px" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    textAlign: "left",
+                  }}
+                >
+                  <thead>
+                    <tr
+                      style={{
+                        backgroundColor: "#f8fafc",
+                        borderBottom: "2px solid #cbd5e1",
+                      }}
+                    >
+                      <th style={{ padding: "12px" }}>Name</th>
+                      <th style={{ padding: "12px" }}>Email</th>
+                      <th style={{ padding: "12px" }}>Status</th>
+                      <th style={{ padding: "12px" }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {students.map((student) => (
+                      <tr
+                        key={student._id}
+                        style={{ borderBottom: "1px solid #e2e8f0" }}
+                      >
+                        <td
+                          style={{
+                            padding: "12px",
+                            fontWeight: "bold",
+                            color: "#334155",
+                          }}
+                        >
+                          {student.name}
+                        </td>
+                        <td style={{ padding: "12px", color: "#64748b" }}>
+                          {student.email}
+                        </td>
+                        <td style={{ padding: "12px" }}>
+                          {student.isBlocked ? (
+                            <span
+                              style={{
+                                backgroundColor: "#fee2e2",
+                                color: "#991b1b",
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                fontWeight: "bold",
+                                fontSize: "12px",
+                              }}
+                            >
+                              🚫 Blocked
+                            </span>
+                          ) : (
+                            <span
+                              style={{
+                                backgroundColor: "#dcfce7",
+                                color: "#166534",
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                fontWeight: "bold",
+                                fontSize: "12px",
+                              }}
+                            >
+                              ✅ Active
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "12px" }}>
+                          <button
+                            onClick={() =>
+                              handleToggleBlock(student._id, student.isBlocked)
+                            }
+                            style={{
+                              padding: "6px 12px",
+                              backgroundColor: student.isBlocked
+                                ? "#10b981"
+                                : "#ef4444",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              cursor: "pointer",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {student.isBlocked ? "Unlock ✅" : "Block 🚫"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* --- CONTRACTOR SECTION (Kitchen Controls) --- */}
         {canSeeKitchenControls && (
           <div className="section-grid">
@@ -202,7 +352,6 @@ export default function AdminDashboard() {
             <div className="admin-card">
               <h2 className="card-title">Update Mess Menu</h2>
               <p className="card-subtitle">Change today's food offerings.</p>
-
               <form
                 onSubmit={handleUpdateMenu}
                 style={{ display: "flex", flexDirection: "column" }}
@@ -276,7 +425,6 @@ export default function AdminDashboard() {
               <p className="card-subtitle">
                 Live headcount of meals skipped to avoid food wastage.
               </p>
-
               <div className="stats-grid">
                 {Object.keys(stats).map((mealType) => (
                   <div key={mealType} className="stat-box">
@@ -332,7 +480,6 @@ export default function AdminDashboard() {
                   List of students who cancelled meals this month.
                 </p>
               </div>
-
               <button
                 onClick={handleExportCSV}
                 className="btn-export"
@@ -348,7 +495,6 @@ export default function AdminDashboard() {
               <div className="accordion-container">
                 {ledger.map((student, idx) => {
                   const isOpen = openStudentIndex === idx;
-
                   return (
                     <div key={idx} className="accordion-item">
                       <div
@@ -447,9 +593,7 @@ export default function AdminDashboard() {
                         {"☆".repeat(5 - review.rating)}
                       </div>
                     </div>
-
                     <p className="review-comment">"{review.comment}"</p>
-
                     {review.image && (
                       <div className="review-proof">
                         <p className="proof-label">📸 Attached Proof:</p>
