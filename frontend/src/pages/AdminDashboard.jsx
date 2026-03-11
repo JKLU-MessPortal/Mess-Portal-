@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   // Reviews ke liye state
   const [reviews, setReviews] = useState([]);
 
-  // 🚨 NAYA STATE: Students ki list ke liye 🚨
+  //  NAYA STATE: Students ki list ke liye 
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
         setReviews(resReviews.data.reviews);
       }
 
-      // 🚨 NAYA CODE: Fetch Students (Sirf Admin ke liye) 🚨
+      //  NAYA CODE: Fetch Students (Sirf Admin ke liye) 
       if (role === "admin") {
         const resStudents = await axios.get(
           "http://localhost:5000/api/admin/students",
@@ -136,7 +136,7 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
-  // 🚨 NAYA CODE: Block / Unblock function 🚨
+  // Block / Unblock function 
   const handleToggleBlock = async (studentId, currentStatus) => {
     try {
       const newStatus = !currentStatus; // Agar block hai toh unblock (false), nahi toh block (true)
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- 🚨 NAYA CODE: STUDENT MANAGEMENT SECTION (ADMIN ONLY) 🚨 --- */}
+        {/* ---  NAYA CODE: STUDENT MANAGEMENT SECTION (ADMIN ONLY)  --- */}
         {user.role === "admin" && (
           <div
             className="admin-card"

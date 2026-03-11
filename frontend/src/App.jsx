@@ -28,7 +28,6 @@ function App() {
           }
         />
 
-        {/* 🚨 SECURE: Staff Scanner Route 🚨 */}
         <Route 
           path="/scanner" 
           element={
