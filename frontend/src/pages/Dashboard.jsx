@@ -37,7 +37,7 @@ export default function Dashboard() {
       );
 
       if (res.data.success) {
-        setReviewMsg("✅ Thank you! Your feedback has been sent to the Admin.");
+        setReviewMsg(" Thank you! Your feedback has been sent to the Admin.");
         setComment("");
         setRating(5);
         setImage(null);
@@ -46,7 +46,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Review Error:", error);
-      setReviewMsg("❌ Failed to submit review. Please try again.");
+      setReviewMsg(" Failed to submit review. Please try again.");
     }
   };
 
@@ -127,7 +127,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        alert("❌ " + error.response.data.message);
+        alert( + error.response.data.message);
       } else {
         alert("An error occurred.");
       }
@@ -163,7 +163,7 @@ export default function Dashboard() {
         {/* --- BROADCAST NOTICE BANNER --- */}
         {notice && (
           <div className="notice-banner">
-            <span className="notice-banner-icon">📢</span>
+            <span className="notice-banner-icon"></span>
             <span>{notice}</span>
           </div>
         )}
@@ -186,7 +186,7 @@ export default function Dashboard() {
             {/* Skip Stats Card */}
             {menuData.skipStats && (
               <div className="skip-stats-card">
-                <h3>📊 Monthly Skips Remaining</h3>
+                <h3> Monthly Skips Remaining</h3>
                 {Object.keys(menuData.skipStats).map((mealType) => (
                   <div key={mealType} className="skip-stat-row">
                     <span className="skip-stat-label">{mealType}</span>
@@ -217,7 +217,7 @@ export default function Dashboard() {
             {/* Today Menu Card */}
             <div className="menu-card">
               <h3 className="menu-card-title">
-                🍽️ Today ({menuData.todayName})
+                 Today ({menuData.todayName})
               </h3>
               <div className="meals-grid">
                 {menuData.todayMenu.length > 0 ? (
@@ -236,7 +236,7 @@ export default function Dashboard() {
             {/* Tomorrow Menu Card */}
             <div className="menu-card-bordered">
               <div className="tomorrow-header">
-                <h3>📅 Tomorrow ({menuData.tomorrowName})</h3>
+                <h3> Tomorrow ({menuData.tomorrowName})</h3>
                 <span className="manage-badge">Manage Meals</span>
               </div>
 
@@ -281,7 +281,7 @@ export default function Dashboard() {
                         </p>
                         {isCancelled && (
                           <p className="cancelled-label">
-                            🚫 Cancelled for Rebate
+                             Cancelled for Rebate
                           </p>
                         )}
                       </div>
@@ -297,7 +297,7 @@ export default function Dashboard() {
 
         {/* --- FULL WEEKLY MENU SECTION --- */}
         <div className="weekly-section">
-          <h3>🗓️ Full Weekly Meal Plan</h3>
+          <h3> Full Weekly Meal Plan</h3>
           <div className="weekly-grid">
             {allDaysOfWeek.map((day) => {
               const dayMeals = menuData.fullMenu.filter(
@@ -378,7 +378,7 @@ export default function Dashboard() {
               </div>
 
               <button type="submit" className="btn-submit-review">
-                📤 Submit Feedback
+                 Submit Feedback
               </button>
 
               {/* Success/Error Message */}
