@@ -10,26 +10,15 @@ const UserSchema = new mongoose.Schema({
     required: true, 
     unique: true 
   },
-  rollNumber: { 
-    type: String, 
-    required: true 
-  },
-  password: { 
-    type: String, 
-    default: "" // <--- FIXED: No longer required!
-  },
   authProvider: { 
     type: String, 
-    default: "local" 
+    default: "microsoft" // 'local' ki jagah default microsoft kar diya
   },
   role: { 
     type: String, 
-    enum: ['student', 'admin', 'mess_staff'], 
+    // 🚨 ADMIN DASHBOARD WALE ROLES MATCH KAR DIYE 🚨
+    enum: ['student', 'admin', 'contractor', 'accountant'], 
     default: 'student' 
-  },
-  qrToken: { 
-    type: String, 
-    default: '' 
   },
   isBlocked: {
     type: Boolean,

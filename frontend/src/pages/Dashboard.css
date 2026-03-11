@@ -1,497 +1,537 @@
-/* ========================
-   Dashboard Page Styles
-   ======================== */
+* {
+    box-sizing: border-box;
+}
 
-/* --- Page Wrapper --- */
 .dashboard-page {
-  min-height: 100vh;
-  background-color: #e1e0de;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  padding: 30px 20px;
+    min-height: 100vh;
+    background-color: #e1e0de;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px 20px;
 }
 
 .dashboard-container {
-  max-width: 1100px;
-  margin: 0 auto;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
-/* --- Notice Banner --- */
 .notice-banner {
-  background-color: #f6cd2a;
-  border: 1px solid #905f0a;
-  border-radius: 12px;
-  padding: 14px 20px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 15px;
-  color: #b75011;
-  font-weight: 500;
+    background-color: #f6cd2a;
+    border: 1px solid #905f0a;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: #b75011;
+    font-weight: 500;
 }
 
 .notice-banner-icon {
-  font-size: 20px;
+    font-size: 20px;
 }
 
-/* --- Main Two-Column Grid --- */
 .dashboard-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: flex-start;
 }
 
-/* --- LEFT COLUMN --- */
 .dashboard-left {
-  flex: 1 1 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* --- ID Card --- */
 .id-card {
-  background-color: rgb(252, 209, 115);
-  padding: 40px 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(32, 130, 8, 0.05);
-  text-align: center;
-  border-top: 6px solid #ee8310;
+    background-color: rgb(252, 209, 115);
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(32, 130, 8, 0.05);
+    text-align: center;
+    border-top: 6px solid #ee8310;
 }
 
 .id-card-heading {
-  margin: 0 0 5px 0;
-  color: #010101;
-  font-size: 20px;
-  font-family: 'Courier New', Courier, monospace;
+    margin: 0 0 5px 0;
+    color: #010101;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .id-card-subtitle {
-  color: #040404;
-  font-size: 14px;
-  margin: 0 0 25px 0;
-  font-family: 'Courier New', Courier, monospace;
+    color: #040404;
+    font-size: 14px;
+    margin: 0 0 25px 0;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .qr-frame {
-  background: linear-gradient(135deg,#00ffcc,#0077ff);
-  padding: 10px;
-  border-radius: 15px;
-  display: inline-block;
+    background: linear-gradient(135deg, #00ffcc, #0077ff);
+    padding: 10px;
+    border-radius: 15px;
+    display: inline-block;
+    position: relative;
 }
 
 .qr-frame img {
-  display: block;
-  width: 180px;
-  height: 180px;
-}
-.qr-image {
-  filter: hue-rotate(120deg) saturate(2);
-}
-.id-card-name {
-  font-size: 22px;
-  margin: 0 0 5px 0;
-  color: #1e293b;
-}
-.qr-frame:hover {
-  box-shadow:
-  0 0 10px #00ffcc,
-  0 0 20px #00ffcc,
-  0 0 40px #00ffcc;
-  transform: scale(1.1);
+    display: block;
+    width: 180px;
+    height: 180px;
 }
 
-.qr-frame:hover::before {
-  content: "";
-  position: absolute;
-  width: 150%;
-  height: 100%;
-  background-size: 20px 20px;
-  animation: particles 3s linear infinite;
- 
+.qr-image {
+    filter: hue-rotate(120deg) saturate(2);
+}
+
+.id-card-name {
+    font-size: 22px;
+    margin: 0 0 5px 0;
+    color: #1e293b;
+}
+
+.qr-frame:hover {
+    box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+    transform: scale(1.1);
 }
 
 .id-card-email {
-  color: #64748b;
-  font-size: 14px;
-  margin: 0 0 20px 0;
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 20px 0;
 }
 
-/* --- Skip Stats Card --- */
 .skip-stats-card {
-  background-color: white;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .skip-stats-card h3 {
-  margin: 0 0 15px 0;
-  color: #0f172a;
-  font-size: 18px;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 10px;
+    margin: 0 0 15px 0;
+    color: #0f172a;
+    font-size: 18px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
 }
 
 .skip-stat-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 15px;
 }
 
 .skip-stat-label {
-  font-weight: bold;
-  color: #475569;
+    font-weight: bold;
+    color: #475569;
 }
 
 .skip-stat-note {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-top: 15px;
-  font-style: italic;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 15px;
+    font-style: italic;
 }
 
-/* --- RIGHT COLUMN --- */
 .dashboard-right {
-  flex: 2 1 500px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+    flex: 2 1 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
-/* --- Shared Card --- */
 .menu-card {
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .menu-card-bordered {
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 2px solid #e2e8f0;
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 2px solid #e2e8f0;
 }
 
 .menu-card-title {
-  margin: 0 0 20px 0;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 15px;
-  font-size: 20px;
-  color: #0f172a;
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+    font-size: 20px;
+    color: #0f172a;
 }
 
-/* --- Meal Grid (Today) --- */
 .meals-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
 }
 
 .meal-box-today {
-  padding: 15px;
-  background-color: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
 }
 
 .meal-box-today h4 {
-  margin: 0 0 8px 0;
-  color: #c71c1c;
-  font-size: 16px;
+    margin: 0 0 8px 0;
+    color: #c71c1c;
+    font-size: 16px;
 }
 
 .meal-box-today p {
-  margin: 0;
-  font-size: 14px;
-  color: #475569;
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
 }
 
 .menu-empty {
-  color: #94a3b8;
-  font-style: italic;
+    color: #94a3b8;
+    font-style: italic;
 }
 
-/* --- Tomorrow Section Header --- */
 .tomorrow-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 15px;
-  margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .tomorrow-header h3 {
-  margin: 0;
-  font-size: 20px;
-  color: #0f172a;
+    margin: 0;
+    font-size: 20px;
+    color: #0f172a;
 }
 
 .manage-badge {
-  font-size: 13px;
-  color: #f59e0b;
-  font-weight: bold;
-  background-color: #fef3c7;
-  padding: 5px 10px;
-  border-radius: 20px;
+    font-size: 13px;
+    color: #f59e0b;
+    font-weight: bold;
+    background-color: #fef3c7;
+    padding: 5px 10px;
+    border-radius: 20px;
 }
 
-/* --- Meal Box (Tomorrow) --- */
 .meal-box-tomorrow {
-  padding: 15px;
-  background-color: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
 }
 
 .meal-box-tomorrow.cancelled {
-  background-color: #fee2e2;
-  border-color: #f87171;
+    background-color: #fee2e2;
+    border-color: #f87171;
 }
 
 .meal-box-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
 }
 
 .meal-type-label {
-  margin: 0;
-  color: #c71c1c;
-  font-size: 16px;
+    margin: 0;
+    color: #c71c1c;
+    font-size: 16px;
 }
 
 .meal-type-label.cancelled {
-  color: #b91c1c;
-  text-decoration: line-through;
+    color: #b91c1c;
+    text-decoration: line-through;
 }
 
 .meal-items-text {
-  margin: 0;
-  font-size: 14px;
-  color: #475569;
+    margin: 0;
+    font-size: 14px;
+    color: #475569;
 }
 
 .meal-items-text.cancelled {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
-/* --- Skip / Add Back Button --- */
 .btn-skip {
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  transition: background-color 0.2s;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.2s;
 }
 
 .btn-skip:hover {
-  background-color: #dc2626;
+    background-color: #dc2626;
 }
 
 .btn-add-back {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  transition: background-color 0.2s;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.2s;
 }
 
 .btn-add-back:hover {
-  background-color: #059669;
+    background-color: #059669;
 }
 
 .cancelled-label {
-  margin: 10px 0 0 0;
-  font-size: 12px;
-  color: #b91c1c;
-  font-weight: bold;
+    margin: 10px 0 0 0;
+    font-size: 12px;
+    color: #b91c1c;
+    font-weight: bold;
 }
 
-/* --- Weekly Menu Section --- */
 .weekly-section {
-  margin-top: 40px;
-  width: 100%;
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    margin-top: 40px;
+    width: 100%;
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .weekly-section h3 {
-  font-size: 22px;
-  color: #000000;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 15px;
+    font-size: 22px;
+    color: #000000;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
 }
 
 .weekly-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
 }
 
 .day-card {
-  background-color: #f8fafc;
-  padding: 20px;
-  border-radius: 15px;
-  border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #e2e8f0;
 }
 
 .day-card h4 {
-  margin: 0 0 15px 0;
-  color: #2e33cb;
-  font-size: 18px;
-  border-bottom: 2px solid #cbd5e1;
-  padding-bottom: 5px;
+    margin: 0 0 15px 0;
+    color: #2e33cb;
+    font-size: 18px;
+    border-bottom: 2px solid #cbd5e1;
+    padding-bottom: 5px;
 }
 
 .day-meal-row {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 .day-meal-type {
-  font-weight: bold;
-  color: #c71c1c;
-  font-size: 14px;
-  display: block;
+    font-weight: bold;
+    color: #c71c1c;
+    font-size: 14px;
+    display: block;
 }
 
 .day-meal-items {
-  font-size: 14px;
-  color: #475569;
+    font-size: 14px;
+    color: #475569;
 }
 
 .weekly-empty {
-  color: #94a3b8;
-  font-style: italic;
-  text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+    text-align: center;
 }
-/* --- FOOD REVIEW SECTION STYLES --- */
+
 .review-section {
-  margin-top: 40px;
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border-top: 6px solid #8b5cf6; /* Purple edge */
+    margin-top: 40px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border-top: 6px solid #8b5cf6; 
 }
 
 .review-section h3 {
-  margin: 0 0 5px 0;
-  font-size: 22px;
-  color: #1e293b;
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    color: #1e293b;
 }
 
 .review-subtitle {
-  color: #64748b;
-  font-size: 14px;
-  margin: 0 0 25px 0;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 15px;
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 25px 0;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
 }
 
 .review-form {
-  max-width: 600px;
+    max-width: 600px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #475569;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #475569;
 }
 
 .form-control {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-family: inherit;
-  font-size: 15px;
-  resize: vertical;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+    font-size: 15px;
+    resize: vertical;
 }
 
 .file-input {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: #f8fafc;
-  border: 1px dashed #94a3b8;
-  border-radius: 8px;
-  cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #f8fafc;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 .star-rating {
-  display: flex;
-  gap: 10px;
-  font-size: 35px;
-  cursor: pointer;
-  user-select: none;
+    display: flex;
+    gap: 10px;
+    font-size: 35px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .star {
-  color: #cbd5e1; /* Gray by default */
-  transition: color 0.2s;
+    color: #cbd5e1; 
+    transition: color 0.2s;
 }
 
 .star.active {
-  color: #fbbf24; /* Gold when active */
+    color: #fbbf24; 
 }
 
 .star:hover {
-  transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 .btn-submit-review {
-  background-color: #8b5cf6;
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
+    background-color: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+    max-width: 250px;
 }
 
 .btn-submit-review:hover {
-  background-color: #7c3aed;
+    background-color: #7c3aed;
 }
 
 .review-msg {
-  margin-top: 15px;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
 }
 
 .review-msg.success {
-  background-color: #dcfce7;
-  color: #166534;
+    background-color: #dcfce7;
+    color: #166534;
 }
 
 .review-msg.error {
-  background-color: #fee2e2;
-  color: #991b1b;
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+@media screen and (max-width: 768px) {
+    .dashboard-grid {
+        flex-direction: column;
+    }
+    
+    .dashboard-left, .dashboard-right {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+    
+    .weekly-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .dashboard-page {
+        padding: 15px 10px;
+    }
+    
+    .id-card, .menu-card, .menu-card-bordered, .skip-stats-card, .weekly-section, .review-section {
+        padding: 20px 15px;
+    }
+    
+    .qr-frame img {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .id-card-heading {
+        font-size: 18px;
+    }
+    
+    .id-card-name {
+        font-size: 20px;
+    }
+    
+    .meals-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .weekly-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tomorrow-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .star-rating {
+        font-size: 30px;
+    }
+    
+    .btn-submit-review {
+        max-width: 100%;
+    }
 }

@@ -1,93 +1,121 @@
-/* ========================
-   History Page Styles
-   ======================== */
+* {
+    box-sizing: border-box;
+}
 
 .history-page {
-  min-height: 100vh;
-  background-color: #f4f7f6;
-  padding: 30px 20px;
-  font-family: sans-serif;
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    padding: 30px 20px;
+    font-family: sans-serif;
 }
 
 .history-wrapper {
-  max-width: 1000px;
-  margin: 0 auto;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-/* --- Card --- */
 .history-card {
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .history-card h2 {
-  margin: 0 0 20px 0;
-  color: #1e293b;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 15px;
+    margin: 0 0 20px 0;
+    color: #1e293b;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
 }
 
-/* --- Empty State --- */
 .history-empty {
-  text-align: center;
-  padding: 40px;
-  color: #94a3b8;
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
 }
 
 .history-empty p {
-  font-size: 18px;
-  margin: 0;
+    font-size: 18px;
+    margin: 0;
 }
 
-/* --- Table --- */
 .history-table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .history-table thead tr {
-  background-color: #f8fafc;
-  text-align: left;
+    background-color: #f8fafc;
+    text-align: left;
 }
 
 .history-table thead th {
-  padding: 15px;
-  color: #64748b;
-  font-weight: 600;
+    padding: 15px;
+    color: #64748b;
+    font-weight: 600;
 }
 
 .history-table tbody tr {
-  border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .history-table tbody td {
-  padding: 15px;
+    padding: 15px;
 }
 
 .history-date {
-  font-weight: bold;
-  color: #334155;
+    font-weight: bold;
+    color: #334155;
 }
 
-/* --- Meal Type Badge --- */
 .meal-badge {
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  background-color: #eff6ff;
-  color: #3b82f6;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #eff6ff;
+    color: #3b82f6;
 }
 
-/* --- Status Text --- */
 .status-cancelled {
-  color: #ef4444;
-  font-weight: bold;
+    color: #ef4444;
+    font-weight: bold;
 }
 
 .status-booked {
-  color: #10b981;
-  font-weight: bold;
+    color: #10b981;
+    font-weight: bold;
+}
+
+@media screen and (max-width: 768px) {
+    .history-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .history-page {
+        padding: 15px 10px;
+    }
+    
+    .history-card {
+        padding: 20px 15px;
+        border-radius: 15px;
+    }
+    
+    .history-card h2 {
+        font-size: 20px;
+    }
+    
+    .history-table thead th, .history-table tbody td {
+        padding: 12px 10px;
+        font-size: 14px;
+    }
+    
+    .meal-badge {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
 }
