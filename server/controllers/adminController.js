@@ -89,6 +89,7 @@ exports.getRefundLedger = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to load ledger." });
   }
 };
+
 // 4. Update Global Notice (Admin Power)
 exports.updateNotice = async (req, res) => {
   try {
@@ -106,5 +107,48 @@ exports.getNotice = async (req, res) => {
     res.status(200).json({ success: true, notice });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to get notice." });
+  }
+};
+
+// --- 🚨 FINAL BOSS FEATURES 🚨 ---
+
+// 5. Get All Students List
+exports.getAllStudents = async (req, res) => {
+  try {
+    // Sirf students ko nikalega, admin ya contractor ko block list mein nahi dikhayega
+    const students = await User.find({ role: 'student' }).select('-password');
+    res.status(200).json({ success: true, students });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// 6. Toggle Student Block Status
+exports.toggleBlockStatus = async (req, res) => {
+  try {
+    const { studentId, isBlocked } = req.body; 
+
+    // Database mein student ko update karo
+    const updatedStudent = await User.findByIdAndUpdate(
+      studentId, 
+      { isBlocked: isBlocked }, 
+      { new: true } 
+    ).select('-password');
+
+    if (!updatedStudent) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    const statusMsg = isBlocked ? "Blocked 🚫" : "Unblocked ✅";
+    res.status(200).json({ 
+      success: true, 
+      message: `Student successfully ${statusMsg}`, 
+      student: updatedStudent 
+    });
+
+  } catch (error) {
+    console.error("Error toggling block status:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
