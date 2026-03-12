@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import messImage from "../images/mess.jpeg";
 import { Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useMsal } from "@azure/msal-react";
@@ -10,36 +10,43 @@ import "./AuthGate.css";
 export default function AuthGate() {
   const { instance } = useMsal();
   const navigate = useNavigate();
+  
+  //  NAYA STATE: Double-click rokne ke liye
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async () => {
+    // Agar process pehle se chal raha hai, toh wapas return kar do
+    if (isLoggingIn) return; 
+    
+    setIsLoggingIn(true); // Button ko disable mode mein daalo
+
     try {
       // 1. OPEN MICROSOFT POPUP
       const response = await instance.loginPopup(loginRequest);
       const { account } = response;
-      const email = account.username.toLowerCase(); // Microsoft calls email 'username'
+      const email = account.username.toLowerCase(); 
 
       // 2. CHECK DOMAIN (Frontend Security)
       if (!email.endsWith("@jklu.edu.in")) {
         alert("Access Denied: Only @jklu.edu.in emails are allowed.");
         await instance.logoutPopup();
+        setIsLoggingIn(false);
         return;
       }
 
       console.log("Microsoft Login Success. Sending to Backend...");
 
       // 3. SEND TO BACKEND (The Bridge)
-      // This connects the Frontend (Port 3000) to the Backend (Port 5000)
       const res = await axios.post("http://localhost:5000/api/auth/microsoft-login", {
         name: account.name,
         email: email,
-        rollNumber: email.split("@")[0], // Extract roll number from email
+        // UPDATE: rollNumber yahan se hata diya kyunki DB se delete kar diya tha
       });
 
       // 4. SAVE & REDIRECT
       if (res.status === 200) {
         console.log("Database Saved:", res.data);
 
-        // Save the user data we got from the DATABASE (includes ID and Role)
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("isAuthenticated", "true");
 
@@ -50,11 +57,16 @@ export default function AuthGate() {
     } catch (error) {
       console.error("Login Error:", error);
       if (error.response) {
-        // This prints the exact error from the backend (e.g., 404 or 500)
         alert(`Server Error: ${error.response.status} - ${error.response.data.message || "Unknown Error"}`);
       } else {
-        alert("Network Error: Ensure your Backend (node index.js) is running on Port 5000.");
+        // MSAL popup close karne par jo error aata hai usko silent rakha hai
+        if (error.name !== "BrowserAuthError") {
+            alert("Network Error: Ensure your Backend (node index.js) is running on Port 5000.");
+        }
       }
+    } finally {
+      // Success ho ya Error, aakhir mein button ko wapas enable kar do
+      setIsLoggingIn(false);
     }
   };
 
@@ -93,6 +105,7 @@ export default function AuthGate() {
             fullWidth
             variant="contained"
             onClick={handleLogin}
+            disabled={isLoggingIn} 
             className="authgate-btn"
             sx={{
               "&:hover": {
@@ -104,7 +117,7 @@ export default function AuthGate() {
               },
             }}
           >
-            Sign in with Outlook
+            {isLoggingIn ? "Redirecting..." : "Sign in with Outlook"}
           </Button>
 
           <Typography variant="caption" className="authgate-caption">

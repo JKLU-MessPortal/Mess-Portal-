@@ -1,52 +1,47 @@
-const reviewRoutes = require('./routes/reviewRoutes'); // Aapne pehle hi import kar liya tha! Great!
-const adminRoutes = require('./routes/adminRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
-const messRoutes = require('./routes/messRoutes');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-// --- 1. IMPORT YOUR ROUTES HERE ---
+// Import Routes
 const authRoutes = require('./routes/authRoutes'); 
+const reviewRoutes = require('./routes/reviewRoutes'); 
+const adminRoutes = require('./routes/adminRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const messRoutes = require('./routes/messRoutes');
 
 const app = express();
 
 // Middleware
 app.use(cors({
-    origin: "http://localhost:3000", // Allow your React Frontend
+    origin: "http://localhost:5173", // Updated to match your Vite frontend port
     methods: "GET,POST,PUT,DELETE",
     credentials: true
 }));
 app.use(express.json());
 
-// Ye Frontend ko permission dega ki wo 'uploads' folder se photos dekh sake
+// Allow Frontend to access the 'uploads' folder for photos
 app.use('/uploads', express.static('uploads')); 
 
-
-// 2. Connect to MongoDB
+// Connect to MongoDB
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`❌ Error: ${error.message}`);
+    console.error(`Error: ${error.message}`);
     process.exit(1); 
   }
 };
 
 connectDB();
 
-// --- 3. USE YOUR ROUTES HERE ---
-// This tells the server: "If a URL starts with /api/auth, go to authRoutes"
+// Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/mess', messRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
-
-// Ye naya API raasta banayega reviews aur photos save karne ke liye
 app.use('/api/reviews', reviewRoutes);
-
 
 // Simple Test Route
 app.get('/', (req, res) => {
@@ -60,5 +55,5 @@ app.get('/', (req, res) => {
 // Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
