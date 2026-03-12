@@ -127,7 +127,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        alert( + error.response.data.message);
+        alert(+error.response.data.message);
       } else {
         alert("An error occurred.");
       }
@@ -160,11 +160,14 @@ export default function Dashboard() {
       <div className="dashboard-container">
         <Navbar />
 
-        {/* --- BROADCAST NOTICE BANNER --- */}
+        {/* --- BROADCAST NOTICE BOARD --- */}
         {notice && (
           <div className="notice-banner">
-            <span className="notice-banner-icon"></span>
-            <span>{notice}</span>
+            <div className="notice-banner-icon">📢</div>
+            <p className="notice-text-content">
+              <span className="notice-badge">Alert Notice</span>
+              {notice}
+            </p>
           </div>
         )}
 
@@ -216,17 +219,26 @@ export default function Dashboard() {
           <div className="dashboard-right">
             {/* Today Menu Card */}
             <div className="menu-card">
-              <h3 className="menu-card-title">
-                 Today ({menuData.todayName})
-              </h3>
+              <h3 className="menu-card-title">Today ({menuData.todayName})</h3>
               <div className="meals-grid">
                 {menuData.todayMenu.length > 0 ? (
-                  menuData.todayMenu.map((meal, index) => (
-                    <div key={index} className="meal-box-today">
-                      <h4>{meal.mealType}</h4>
-                      <p>{meal.items.join(", ")}</p>
-                    </div>
-                  ))
+                  //  UPDATE: Sort Today's Menu
+                  [...menuData.todayMenu]
+                    .sort((a, b) => {
+                      const order = {
+                        Breakfast: 1,
+                        Lunch: 2,
+                        Snacks: 3,
+                        Dinner: 4,
+                      };
+                      return order[a.mealType] - order[b.mealType];
+                    })
+                    .map((meal, index) => (
+                      <div key={index} className="meal-box-today">
+                        <h4>{meal.mealType}</h4>
+                        <p>{meal.items.join(", ")}</p>
+                      </div>
+                    ))
                 ) : (
                   <p className="menu-empty">No menu uploaded for today.</p>
                 )}
@@ -242,51 +254,62 @@ export default function Dashboard() {
 
               <div className="meals-grid">
                 {menuData.tomorrowMenu.length > 0 ? (
-                  menuData.tomorrowMenu.map((meal, index) => {
-                    const isCancelled = menuData.tomorrowBookings.some(
-                      (b) =>
-                        b.mealType === meal.mealType &&
-                        b.status === "Cancelled",
-                    );
+                  //  UPDATE: Sort Tomorrow's Menu
+                  [...menuData.tomorrowMenu]
+                    .sort((a, b) => {
+                      const order = {
+                        Breakfast: 1,
+                        Lunch: 2,
+                        Snacks: 3,
+                        Dinner: 4,
+                      };
+                      return order[a.mealType] - order[b.mealType];
+                    })
+                    .map((meal, index) => {
+                      const isCancelled = menuData.tomorrowBookings.some(
+                        (b) =>
+                          b.mealType === meal.mealType &&
+                          b.status === "Cancelled",
+                      );
 
-                    return (
-                      <div
-                        key={index}
-                        className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""}`}
-                      >
-                        <div className="meal-box-header">
-                          <h4
-                            className={`meal-type-label ${isCancelled ? "cancelled" : ""}`}
-                          >
-                            {meal.mealType}
-                          </h4>
-                          <button
-                            onClick={() =>
-                              handleToggleMeal(
-                                meal.mealType,
-                                isCancelled ? "Cancelled" : "Booked",
-                              )
-                            }
-                            className={
-                              isCancelled ? "btn-add-back" : "btn-skip"
-                            }
-                          >
-                            {isCancelled ? "Add Back" : "Skip Meal"}
-                          </button>
-                        </div>
-                        <p
-                          className={`meal-items-text ${isCancelled ? "cancelled" : ""}`}
+                      return (
+                        <div
+                          key={index}
+                          className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""}`}
                         >
-                          {meal.items.join(", ")}
-                        </p>
-                        {isCancelled && (
-                          <p className="cancelled-label">
-                             Cancelled for Rebate
+                          <div className="meal-box-header">
+                            <h4
+                              className={`meal-type-label ${isCancelled ? "cancelled" : ""}`}
+                            >
+                              {meal.mealType}
+                            </h4>
+                            <button
+                              onClick={() =>
+                                handleToggleMeal(
+                                  meal.mealType,
+                                  isCancelled ? "Cancelled" : "Booked",
+                                )
+                              }
+                              className={
+                                isCancelled ? "btn-add-back" : "btn-skip"
+                              }
+                            >
+                              {isCancelled ? "Add Back" : "Skip Meal"}
+                            </button>
+                          </div>
+                          <p
+                            className={`meal-items-text ${isCancelled ? "cancelled" : ""}`}
+                          >
+                            {meal.items.join(", ")}
                           </p>
-                        )}
-                      </div>
-                    );
-                  })
+                          {isCancelled && (
+                            <p className="cancelled-label">
+                              Cancelled for Rebate
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })
                 ) : (
                   <p className="menu-empty">No menu uploaded for tomorrow.</p>
                 )}
@@ -308,14 +331,25 @@ export default function Dashboard() {
               return (
                 <div key={day} className="day-card">
                   <h4>{day}</h4>
-                  {dayMeals.map((meal, idx) => (
-                    <div key={idx} className="day-meal-row">
-                      <span className="day-meal-type">{meal.mealType}</span>
-                      <span className="day-meal-items">
-                        {meal.items.join(", ")}
-                      </span>
-                    </div>
-                  ))}
+                  {/*  UPDATE: Sort Full Weekly Menu */}
+                  {[...dayMeals]
+                    .sort((a, b) => {
+                      const order = {
+                        Breakfast: 1,
+                        Lunch: 2,
+                        Snacks: 3,
+                        Dinner: 4,
+                      };
+                      return order[a.mealType] - order[b.mealType];
+                    })
+                    .map((meal, idx) => (
+                      <div key={idx} className="day-meal-row">
+                        <span className="day-meal-type">{meal.mealType}</span>
+                        <span className="day-meal-items">
+                          {meal.items.join(", ")}
+                        </span>
+                      </div>
+                    ))}
                 </div>
               );
             })}
@@ -378,7 +412,7 @@ export default function Dashboard() {
               </div>
 
               <button type="submit" className="btn-submit-review">
-                 Submit Feedback
+                Submit Feedback
               </button>
 
               {/* Success/Error Message */}
