@@ -48,3 +48,40 @@ exports.microsoftLogin = async (req, res) => {
 exports.registerUser = async (req, res) => {
     res.status(200).json({ message: "Manual registration disabled for now." });
 };
+
+// --- 3. Get Student Settings ---
+exports.getSettings = async (req, res) => {
+  try {
+    const { studentId } = req.query;
+    if (!studentId) return res.status(400).json({ message: 'studentId is required.' });
+
+    const user = await User.findById(studentId).select('name email rollNumber dietaryPreference residencyStatus foodAllergies');
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    res.status(200).json({ success: true, settings: user });
+  } catch (error) {
+    console.error('getSettings Error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};
+
+// --- 4. Update Student Settings ---
+exports.updateSettings = async (req, res) => {
+  try {
+    const { studentId, name, rollNumber, dietaryPreference, residencyStatus, foodAllergies } = req.body;
+    if (!studentId) return res.status(400).json({ message: 'studentId is required.' });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      studentId,
+      { name, rollNumber, dietaryPreference, residencyStatus, foodAllergies },
+      { new: true, runValidators: true }
+    ).select('name email rollNumber dietaryPreference residencyStatus foodAllergies');
+
+    if (!updatedUser) return res.status(404).json({ message: 'User not found.' });
+
+    res.status(200).json({ success: true, message: 'Settings saved successfully!', user: updatedUser });
+  } catch (error) {
+    console.error('updateSettings Error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};

@@ -54,6 +54,14 @@ export default function Navbar() {
           📜 My History
         </button>
 
+        {/* Settings – visible to all logged-in users */}
+        <button
+          onClick={() => navigate("/settings")}
+          className={`nav-btn ${isActive("/settings") ? "active" : ""}`}
+        >
+          ⚙️ Settings
+        </button>
+
         {/* 🚨 NAYA CODE: SECURE SCANNER BUTTON 🚨 */}
         {(userRole === "admin" || userRole === "contractor") && (
           <button

@@ -68,6 +68,12 @@
     border: 2px solid black;
 }
 
+.nav-btn.active {
+    background-color: #fde68a;
+    border: 2px solid #ee8310;
+    color: #92400e;
+}
+
 .staff-btn {
     color: black;
 }

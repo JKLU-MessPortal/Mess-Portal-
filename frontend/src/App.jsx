@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Scanner from "./pages/Scanner";
 import AdminDashboard from "./pages/AdminDashboard";
 import History from "./pages/History";
+import Settings from "./pages/Settings";
 
 // --- IMPORT COMPONENTS ---
 import PrivateRoute from "./components/PrivateRoute";
@@ -49,6 +50,16 @@ function App() {
         
         {/* History Route */}
         <Route path="/history" element={<History />} />
+
+        {/* Settings Route */}
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
