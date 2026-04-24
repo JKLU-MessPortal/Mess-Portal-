@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const HostellerRegistry = require('../models/HostellerRegistry');
 
 // --- 1. Microsoft Login Logic ---
 exports.microsoftLogin = async (req, res) => {
@@ -12,6 +13,10 @@ exports.microsoftLogin = async (req, res) => {
       });
     }
 
+    // Check Hosteller Registry to determine residency status
+    const isRegisteredHosteller = await HostellerRegistry.findOne({ email: email.toLowerCase() });
+    const residencyStatus = isRegisteredHosteller ? 'Hosteller' : 'Day-Scholar';
+
     // Check if user exists
     let user = await User.findOne({ email });
 
@@ -20,11 +25,18 @@ exports.microsoftLogin = async (req, res) => {
       user = await User.create({
         name: name,
         email: email,
-        rollNumber: rollNumber || email.split('@')[0], 
-        password: "", // No password for Microsoft users
+        rollNumber: isRegisteredHosteller ? isRegisteredHosteller.rollNumber : (rollNumber || email.split('@')[0]),
         authProvider: "microsoft",
-        role: "student"
+        role: "student",
+        residencyStatus,
       });
+    } else {
+      // Refresh residency status on every login so registry changes take immediate effect
+      user = await User.findByIdAndUpdate(
+        user._id,
+        { residencyStatus },
+        { new: true }
+      );
     }
 
     res.status(200).json({
@@ -34,7 +46,8 @@ exports.microsoftLogin = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        residencyStatus: user.residencyStatus,
       }
     });
 

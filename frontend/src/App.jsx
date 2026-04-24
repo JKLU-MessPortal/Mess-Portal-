@@ -8,6 +8,7 @@ import Scanner from "./pages/Scanner";
 import AdminDashboard from "./pages/AdminDashboard";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
+import StudentManagement from "./pages/StudentManagement";
 
 // --- IMPORT COMPONENTS ---
 import PrivateRoute from "./components/PrivateRoute";
@@ -57,6 +58,16 @@ function App() {
           element={
             <PrivateRoute>
               <Settings />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Student Management Route (Admin only) */}
+        <Route
+          path="/student-management"
+          element={
+            <PrivateRoute>
+              <StudentManagement />
             </PrivateRoute>
           }
         />

@@ -10,6 +10,7 @@ export default function Navbar() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userName = user ? user.name.split(" ")[0] : "Student";
   const userRole = user ? user.role : "student";
+  const isStaff = ["admin", "contractor", "accountant"].includes(userRole);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -47,20 +48,24 @@ export default function Navbar() {
           🏠 Home
         </button>
 
-        <button
-          onClick={() => navigate("/history")}
-          className={`nav-btn ${isActive("/history") ? "active" : ""}`}
-        >
-          📜 My History
-        </button>
+        {/* Student-only: History & Settings */}
+        {!isStaff && (
+          <>
+            <button
+              onClick={() => navigate("/history")}
+              className={`nav-btn ${isActive("/history") ? "active" : ""}`}
+            >
+              📜 My History
+            </button>
 
-        {/* Settings – visible to all logged-in users */}
-        <button
-          onClick={() => navigate("/settings")}
-          className={`nav-btn ${isActive("/settings") ? "active" : ""}`}
-        >
-          ⚙️ Settings
-        </button>
+            <button
+              onClick={() => navigate("/settings")}
+              className={`nav-btn ${isActive("/settings") ? "active" : ""}`}
+            >
+              ⚙️ Settings
+            </button>
+          </>
+        )}
 
         {/* 🚨 NAYA CODE: SECURE SCANNER BUTTON 🚨 */}
         {(userRole === "admin" || userRole === "contractor") && (
@@ -86,6 +91,17 @@ export default function Navbar() {
             ⚙️ Staff
           </button>
         )}
+
+        {/* STUDENT MANAGEMENT – Admin only */}
+        {userRole === "admin" && (
+          <button
+            onClick={() => navigate("/student-management")}
+            className={`nav-btn ${isActive("/student-management") ? "active" : ""}`}
+          >
+            👥 Students
+          </button>
+        )}
+
 
         <button onClick={handleLogout} className="logout-btn">
           Logout

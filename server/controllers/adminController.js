@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Menu = require('../models/Menu');
 const MealBooking = require('../models/MealBooking');
 const Notice = require('../models/Notice');
+const HostellerRegistry = require('../models/HostellerRegistry');
+
 
 // 1. Update the Menu
 exports.updateMenu = async (req, res) => {
@@ -149,6 +151,83 @@ exports.toggleBlockStatus = async (req, res) => {
 
   } catch (error) {
     console.error("Error toggling block status:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ──────────────────────────────────────────────
+// 7. Get All Registered Hostellers
+// ──────────────────────────────────────────────
+exports.getHostellers = async (req, res) => {
+  try {
+    const hostellers = await HostellerRegistry.find({}).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, hostellers });
+  } catch (error) {
+    console.error("getHostellers Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ──────────────────────────────────────────────
+// 8. Register a New Hosteller
+// ──────────────────────────────────────────────
+exports.registerHosteller = async (req, res) => {
+  try {
+    const { email, rollNumber, addedBy } = req.body;
+
+    if (!email || !rollNumber) {
+      return res.status(400).json({ success: false, message: "Email and Roll Number are required." });
+    }
+
+    if (!email.endsWith('@jklu.edu.in')) {
+      return res.status(400).json({ success: false, message: "Only @jklu.edu.in emails are allowed." });
+    }
+
+    // Upsert: if already exists, update rollNumber; otherwise create new
+    const entry = await HostellerRegistry.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { email: email.toLowerCase(), rollNumber, addedBy: addedBy || 'admin' },
+      { new: true, upsert: true, runValidators: true }
+    );
+
+    // If the student has already logged in before, update their residencyStatus too
+    await User.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { residencyStatus: 'Hosteller', rollNumber }
+    );
+
+    res.status(200).json({ success: true, message: `✅ ${email} registered as Hosteller.`, entry });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ success: false, message: "This email is already registered as a Hosteller." });
+    }
+    console.error("registerHosteller Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ──────────────────────────────────────────────
+// 9. De-register a Hosteller (by email)
+// ──────────────────────────────────────────────
+exports.deregisterHosteller = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: "Email is required." });
+
+    const deleted = await HostellerRegistry.findOneAndDelete({ email: email.toLowerCase() });
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Email not found in Hosteller registry." });
+    }
+
+    // Update the student's residency status to Day-Scholar if they exist
+    await User.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { residencyStatus: 'Day-Scholar' }
+    );
+
+    res.status(200).json({ success: true, message: `🗑️ ${email} removed from Hosteller registry.` });
+  } catch (error) {
+    console.error("deregisterHosteller Error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

@@ -8,19 +8,26 @@ const {
   updateNotice, 
   getNotice,
   getAllStudents,
-  toggleBlockStatus
+  toggleBlockStatus,
+  getHostellers,
+  registerHosteller,
+  deregisterHosteller,
 } = require('../controllers/adminController');
 
 router.post('/menu', updateMenu);
 router.get('/headcount', getHeadcount);
 router.get('/ledger', getRefundLedger);
 
-
 router.post('/notice', updateNotice); 
 router.get('/notice', getNotice);     
 
-// Admin saare students ko dekh sake
+// Student list & block management
 router.get('/students', getAllStudents);
-// Admin kisi student ka block status change kar sake
 router.post('/students/block', toggleBlockStatus);
+
+// Hosteller Registry
+router.get('/hostellers', getHostellers);
+router.post('/hostellers/register', registerHosteller);
+router.delete('/hostellers/deregister', deregisterHosteller);
+
 module.exports = router;
