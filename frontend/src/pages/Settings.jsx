@@ -12,11 +12,6 @@ const DIETARY_OPTIONS = [
   { value: "Strict-Vegetarian (Jain Food)", label: "🌿 Strict-Vegetarian (Jain Food)" },
 ];
 
-const RESIDENCY_OPTIONS = [
-  { value: "", label: "-- Select Status --" },
-  { value: "Hosteller", label: "🏠 Hosteller" },
-  { value: "Day-Scholar", label: "🚌 Day-Scholar" },
-];
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -24,14 +19,16 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ text: "", type: "" });
 
-  // Form fields
+  // Editable form fields (student controls these)
   const [form, setForm] = useState({
-    name: "",
-    rollNumber: "",
     dietaryPreference: "",
-    residencyStatus: "",
     foodAllergies: "",
   });
+
+  // Read-only fields — admin-controlled or fetched from Microsoft OAuth
+  const [name, setName] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
+  const [residencyStatus, setResidencyStatus] = useState("");
 
   // Read-only email pulled from stored user
   const [email, setEmail] = useState("");
@@ -53,13 +50,15 @@ export default function Settings() {
       .then((res) => {
         if (res.data.success) {
           const s = res.data.settings;
+          // Populate editable fields
           setForm({
-            name: s.name || "",
-            rollNumber: s.rollNumber || "",
             dietaryPreference: s.dietaryPreference || "",
-            residencyStatus: s.residencyStatus || "",
             foodAllergies: s.foodAllergies || "",
           });
+          // Populate admin-locked / OAuth-locked fields (read-only)
+          setName(s.name || "");
+          setRollNumber(s.rollNumber || "Not assigned yet");
+          setResidencyStatus(s.residencyStatus || "Not assigned yet");
         }
       })
       .catch((err) => console.error("Settings fetch error:", err))
@@ -80,16 +79,14 @@ export default function Settings() {
     const studentId = storedUser.id || storedUser._id;
 
     try {
+      // Only send editable fields — name, rollNumber and residencyStatus are locked
       const res = await axios.put("http://localhost:5000/api/auth/settings", {
         studentId,
-        ...form,
+        dietaryPreference: form.dietaryPreference,
+        foodAllergies: form.foodAllergies,
       });
 
       if (res.data.success) {
-        // Sync name back into localStorage so Navbar reflects change
-        const updatedUser = { ...storedUser, name: form.name };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-
         setStatusMsg({ text: "✅ Settings saved successfully!", type: "success" });
       }
     } catch (err) {
@@ -137,37 +134,33 @@ export default function Settings() {
             </div>
 
             <div className="settings-fields-grid">
-              {/* Full Name */}
+              {/* Full Name — Read-only, from Microsoft OAuth */}
               <div className="settings-field">
-                <label htmlFor="name" className="settings-label">
-                  Full Name <span className="required-star">*</span>
+                <label className="settings-label">
+                  Full Name
+                  <span className="readonly-badge">From Microsoft</span>
                 </label>
                 <input
-                  id="name"
-                  name="name"
                   type="text"
-                  required
-                  className="settings-input"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
+                  className="settings-input settings-input-readonly"
+                  value={name}
+                  readOnly
+                  title="Your name is fetched from your Microsoft account and cannot be changed here."
                 />
               </div>
 
-              {/* Roll Number */}
+              {/* Roll Number — Read-only, set by Admin */}
               <div className="settings-field">
-                <label htmlFor="rollNumber" className="settings-label">
-                  Roll Number <span className="required-star">*</span>
+                <label className="settings-label">
+                  Roll Number
+                  <span className="readonly-badge">Set by Admin</span>
                 </label>
                 <input
-                  id="rollNumber"
-                  name="rollNumber"
                   type="text"
-                  required
-                  className="settings-input"
-                  value={form.rollNumber}
-                  onChange={handleChange}
-                  placeholder="e.g. 22BTECH10001"
+                  className="settings-input settings-input-readonly"
+                  value={rollNumber}
+                  readOnly
+                  title="Your roll number is assigned by the admin and cannot be changed here."
                 />
               </div>
 
@@ -195,28 +188,23 @@ export default function Settings() {
             </div>
 
             <div className="settings-fields-grid">
-              {/* Hosteller / Day-Scholar */}
+              {/* Residency Status — Read-only, set by Admin */}
               <div className="settings-field">
-                <label htmlFor="residencyStatus" className="settings-label">
-                  Residency Status <span className="required-star">*</span>
+                <label className="settings-label">
+                  Residency Status
+                  <span className="readonly-badge">Set by Admin</span>
                 </label>
-                <div className="settings-select-wrapper">
-                  <select
-                    id="residencyStatus"
-                    name="residencyStatus"
-                    required
-                    className="settings-select"
-                    value={form.residencyStatus}
-                    onChange={handleChange}
-                  >
-                    {RESIDENCY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="select-arrow">▾</span>
-                </div>
+                <input
+                  type="text"
+                  className={`settings-input settings-input-readonly settings-input-residency--${residencyStatus.toLowerCase().replace(/[^a-z]/g, "-")}`}
+                  value={
+                    residencyStatus === "Hosteller" ? "🏠 Hosteller" :
+                    residencyStatus === "Day-Scholar" ? "🚌 Day-Scholar" :
+                    residencyStatus
+                  }
+                  readOnly
+                  title="Your residency status is determined by the admin registration and cannot be changed here."
+                />
               </div>
 
               {/* Dietary Preference */}

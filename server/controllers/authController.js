@@ -79,14 +79,15 @@ exports.getSettings = async (req, res) => {
 };
 
 // --- 4. Update Student Settings ---
+// NOTE: name (Microsoft OAuth), rollNumber and residencyStatus (admin-controlled) are intentionally excluded.
 exports.updateSettings = async (req, res) => {
   try {
-    const { studentId, name, rollNumber, dietaryPreference, residencyStatus, foodAllergies } = req.body;
+    const { studentId, dietaryPreference, foodAllergies } = req.body;
     if (!studentId) return res.status(400).json({ message: 'studentId is required.' });
 
     const updatedUser = await User.findByIdAndUpdate(
       studentId,
-      { name, rollNumber, dietaryPreference, residencyStatus, foodAllergies },
+      { dietaryPreference, foodAllergies },
       { new: true, runValidators: true }
     ).select('name email rollNumber dietaryPreference residencyStatus foodAllergies');
 

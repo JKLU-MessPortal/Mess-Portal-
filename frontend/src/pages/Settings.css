@@ -199,6 +199,28 @@
   box-shadow: none;
 }
 
+/* Colour-coded residency status badges */
+.settings-input-residency--hosteller {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #86efac;
+  font-weight: 600;
+}
+
+.settings-input-residency--day-scholar {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  font-weight: 600;
+}
+
+.settings-input-residency--not-assigned-yet {
+  background-color: #f8fafc;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  font-style: italic;
+}
+
 /* ── Select Dropdown ── */
 .settings-select-wrapper {
   position: relative;
