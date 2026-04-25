@@ -12,6 +12,7 @@ const {
   getHostellers,
   registerHosteller,
   deregisterHosteller,
+  updateUserRole,
 } = require('../controllers/adminController');
 
 router.post('/menu', updateMenu);
@@ -29,5 +30,8 @@ router.post('/students/block', toggleBlockStatus);
 router.get('/hostellers', getHostellers);
 router.post('/hostellers/register', registerHosteller);
 router.delete('/hostellers/deregister', deregisterHosteller);
+
+// User Role Management
+router.put('/users/role', updateUserRole);
 
 module.exports = router;

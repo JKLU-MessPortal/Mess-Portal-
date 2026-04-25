@@ -546,6 +546,62 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Role Select Dropdown ── */
+.sm-role-select {
+  padding: 7px 32px 7px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #1e293b;
+  background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2364748b' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 130px;
+}
+
+.sm-role-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  background-color: white;
+}
+
+/* ── Save Role Button ── */
+.sm-btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 16px;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: not-allowed;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.sm-btn-save--active {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: white;
+  border-color: #16a34a;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.3);
+}
+
+.sm-btn-save--active:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(22, 163, 74, 0.4);
+}
+
+.sm-btn-save:disabled { opacity: 0.65; cursor: not-allowed; }
+
 /* ── Responsive ── */
 @media screen and (max-width: 640px) {
   .sm-page { padding: 15px 12px; }
@@ -567,4 +623,6 @@
   .sm-title { font-size: 22px; }
 
   .sm-btn-primary { width: 100%; justify-content: center; }
+
+  .sm-role-select { min-width: 100px; }
 }

@@ -231,3 +231,40 @@ exports.deregisterHosteller = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+// ──────────────────────────────────────────────
+// 10. Update a User's Role (Admin Only)
+// ──────────────────────────────────────────────
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+
+    if (!userId || !role) {
+      return res.status(400).json({ success: false, message: "userId and role are required." });
+    }
+
+    const validRoles = ['student', 'admin', 'contractor', 'accountant', 'controller'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ success: false, message: `Invalid role. Must be one of: ${validRoles.join(', ')}` });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { role } },
+      { new: true, strict: false }
+    ).select('name email role');
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `✅ Role updated to "${role}" for ${updatedUser.name}`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("updateUserRole Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

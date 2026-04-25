@@ -32,11 +32,15 @@ exports.microsoftLogin = async (req, res) => {
       });
     } else {
       // Refresh residency status on every login so registry changes take immediate effect
-      user = await User.findByIdAndUpdate(
+      // Use $set with strict:false to bypass enum validation for existing invalid values,
+      // then re-fetch the full fresh document so the returned role is always current.
+      await User.findByIdAndUpdate(
         user._id,
-        { residencyStatus },
-        { new: true }
+        { $set: { residencyStatus } },
+        { new: false, strict: false }
       );
+      // Re-fetch the user so we always return the LATEST data from DB (including role changes)
+      user = await User.findById(user._id);
     }
 
     res.status(200).json({
