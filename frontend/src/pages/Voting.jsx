@@ -242,7 +242,9 @@ export default function Voting() {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ sort, status: viewMode });
+      // "archive" tab → query DB for status:"resolved"; "active" tab → "active"
+      const dbStatus = viewMode === "archive" ? "resolved" : "active";
+      const params = new URLSearchParams({ sort, status: dbStatus });
       if (catFilter !== "All") params.append("category", catFilter);
       if (search.trim())       params.append("search", search.trim());
       const res = await axios.get(`${API}?${params}`);
