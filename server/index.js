@@ -9,6 +9,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const messRoutes = require('./routes/messRoutes');
+const pollRoutes = require('./routes/pollRoutes');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/mess', messRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/polls', pollRoutes);
 
 // Simple Test Route
 app.get('/', (req, res) => {

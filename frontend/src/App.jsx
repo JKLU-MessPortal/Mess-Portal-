@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
 import StudentManagement from "./pages/StudentManagement";
+import Voting from "./pages/Voting";
 
 // --- IMPORT COMPONENTS ---
 import PrivateRoute from "./components/PrivateRoute";
@@ -68,6 +69,16 @@ function App() {
           element={
             <PrivateRoute>
               <StudentManagement />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Voting / Polls Route (Hosteliers + Admin) */}
+        <Route
+          path="/voting"
+          element={
+            <PrivateRoute>
+              <Voting />
             </PrivateRoute>
           }
         />

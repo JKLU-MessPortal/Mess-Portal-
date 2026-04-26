@@ -67,6 +67,17 @@ export default function Navbar() {
           </>
         )}
 
+        {/* Polls — Hosteliers + Admin/Staff */}
+        {(isStaff || user?.residencyStatus === "Hosteller") && (
+          <button
+            onClick={() => navigate("/voting")}
+            className={`nav-btn ${isActive("/voting") ? "active" : ""}`}
+            style={isActive("/voting") ? {} : { color: "#8b5cf6", fontWeight: "bold" }}
+          >
+            🗳️ Polls
+          </button>
+        )}
+
         {/* 🚨 NAYA CODE: SECURE SCANNER BUTTON 🚨 */}
         {(userRole === "admin" || userRole === "contractor") && (
           <button
