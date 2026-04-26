@@ -173,6 +173,23 @@ export default function Dashboard() {
     "Sunday",
   ];
 
+  const handleSharePass = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'JKLU Mess Pass',
+          text: `Here is my JKLU Mess Pass: ${userName} (${userId})`,
+          url: qrCodeUrl,
+        });
+      } catch (error) {
+        console.log('Error sharing pass:', error);
+      }
+    } else {
+      navigator.clipboard.writeText(qrCodeUrl);
+      alert("QR Code link copied to clipboard! (Your browser does not support native sharing)");
+    }
+  };
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-container">
@@ -204,6 +221,26 @@ export default function Dashboard() {
                   </div>
                   <h2 className="id-card-name">{userName}</h2>
                   <p className="id-card-email">{userEmail}</p>
+                  <button 
+                    onClick={handleSharePass} 
+                    style={{ 
+                      marginTop: '15px', 
+                      background: '#f1f5f9', 
+                      border: '1px solid #cbd5e1', 
+                      padding: '8px 16px', 
+                      borderRadius: '8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 'bold', 
+                      color: '#475569',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      width: '100%'
+                    }}
+                  >
+                    📤 Share Pass
+                  </button>
                 </div>
 
                 {/* Skip Stats Card - Only for Hostellers */}
