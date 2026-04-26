@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import NonVegBookingModal from "../components/NonVegBookingModal";
 import "./Dashboard.css";
 
 // ── Shared helpers ──────────────────────────────────────────────
@@ -70,6 +71,8 @@ export default function Dashboard() {
   const [notice, setNotice] = useState("");
   const [adminStats, setAdminStats] = useState(null);
   const [nutritionMap, setNutritionMap] = useState({});
+  // Non-veg booking modal state
+  const [nvModal, setNvModal] = useState(null); // { item, mealType, tomorrowDate }
 
   // ── Complaint Box state ──────────────────────────────────────
   const [complaintText, setComplaintText]   = useState("");
@@ -472,9 +475,30 @@ export default function Dashboard() {
                             ))}
                             {meal.nonVegItems && meal.nonVegItems.length > 0 && (
                               <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #fecdd3' }}>
-                                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b91c1c', marginBottom: '4px' }}>🔴 Non-Veg (Extra Charge)</div>
-                                {meal.nonVegItems.map((item, i) => (
-                                  <DishNutritionPanel key={i} dishName={item} nutritionMap={nutritionMap} />
+                                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b91c1c', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  🔴 Non-Veg — Extra Charge
+                                </div>
+                                {meal.nonVegItems.map((nvItem, i) => (
+                                  <div key={i} style={{ marginBottom: '6px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', padding: '7px 10px' }}>
+                                      <span style={{ fontSize: '0.82rem', color: '#9f1239', fontWeight: 600, flex: 1 }}>🍗 {nvItem}</span>
+                                      <span style={{ fontSize: '0.72rem', color: '#b91c1c', fontWeight: 700, marginRight: '6px' }}>₹{nvItem.toLowerCase().includes('egg') || ['omelette','omlette','anda','bhurji'].some(k => nvItem.toLowerCase().includes(k)) ? 30 : 120}</span>
+                                      {!isStaff && !isCancelled && (
+                                        <button
+                                          onClick={() => setNvModal({ item: nvItem, mealType: meal.mealType, tomorrowDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] })}
+                                          style={{
+                                            background: 'linear-gradient(135deg,#ef4444,#b91c1c)',
+                                            color: 'white', border: 'none', borderRadius: '6px',
+                                            padding: '4px 10px', fontSize: '0.72rem', fontWeight: 700,
+                                            cursor: 'pointer', fontFamily: 'inherit',
+                                            boxShadow: '0 2px 6px rgba(239,68,68,0.3)'
+                                          }}
+                                        >
+                                          Book
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             )}
@@ -492,6 +516,18 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+          {/* Non-Veg Booking Modal */}
+          {nvModal && user && (
+            <NonVegBookingModal
+              item={nvModal.item}
+              mealType={nvModal.mealType}
+              tomorrowDate={nvModal.tomorrowDate}
+              user={user}
+              onClose={() => setNvModal(null)}
+              onSuccess={() => setNvModal(null)}
+            />
+          )}
 
           {/* ── COMPLAINT BOX ── */}
           {!isStaff && (

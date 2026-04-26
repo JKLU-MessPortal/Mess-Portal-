@@ -11,6 +11,7 @@ const messRoutes = require('./routes/messRoutes');
 const pollRoutes = require('./routes/pollRoutes');
 const nutritionRoutes = require('./routes/nutritionRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/polls', pollRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/complaints', complaintRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Simple Test Route
 app.get('/', (req, res) => {
