@@ -8,47 +8,38 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [notice, setNotice] = useState("");
-  // --- NAYE STATES: Review System Ke Liye ---
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [image, setImage] = useState(null);
-  const [reviewMsg, setReviewMsg] = useState("");
   const [adminStats, setAdminStats] = useState(null);
-  const handleReviewSubmit = async (e) => {
+
+  // ── Complaint Box state ──────────────────────────────────────
+  const [complaintText, setComplaintText]   = useState("");
+  const [complaintImage, setComplaintImage] = useState(null);
+  const [complaintMsg, setComplaintMsg]     = useState("");
+  const [submitting, setSubmitting]         = useState(false);
+
+  const handleComplaintSubmit = async (e) => {
     e.preventDefault();
-    setReviewMsg("Submitting...");
-
-    const formData = new FormData();
-    formData.append("studentId", user.id || user._id);
-    formData.append("studentName", user.name);
-    formData.append("rating", rating);
-    formData.append("comment", comment);
-
-    if (image) {
-      formData.append("foodImage", image); // Backend multer ka naam match hona chahiye
-    }
-
+    if (!complaintText.trim()) return;
+    setSubmitting(true);
+    setComplaintMsg("");
+    const fd = new FormData();
+    fd.append("studentId",   user.id || user._id);
+    fd.append("studentName", user.name);
+    fd.append("text",        complaintText.trim());
+    if (complaintImage) fd.append("image", complaintImage);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/reviews/submit",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
-
+      const res = await axios.post("http://localhost:5000/api/complaints", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       if (res.data.success) {
-        setReviewMsg(" Thank you! Your feedback has been sent to the Admin.");
-        setComment("");
-        setRating(5);
-        setImage(null);
-        // Box ko wapas khali karne ke liye file input ko reset karna
-        document.getElementById("imageUploadInput").value = "";
+        setComplaintMsg("✅ Complaint submitted! The admin will review it shortly.");
+        setComplaintText("");
+        setComplaintImage(null);
+        const fi = document.getElementById("complaint-file-input");
+        if (fi) fi.value = "";
       }
-    } catch (error) {
-      console.error("Review Error:", error);
-      setReviewMsg(" Failed to submit review. Please try again.");
-    }
+    } catch {
+      setComplaintMsg("❌ Failed to submit. Please try again.");
+    } finally { setSubmitting(false); }
   };
 
   const [menuData, setMenuData] = useState({
@@ -449,72 +440,58 @@ export default function Dashboard() {
           </div>
         </div>
 
-          {/* --- FOOD REVIEW & COMPLAINT SECTION --- */}
+          {/* ── COMPLAINT BOX ── */}
           {!isStaff && (
-            <div className="review-section">
-              <h3>⭐ Rate Today's Meal & Feedback</h3>
-              <p className="review-subtitle">
-                Found an issue with the food? Upload a photo and let the admin
-                know.
-              </p>
-
-              <form onSubmit={handleReviewSubmit} className="review-form">
-                {/* Star Rating */}
-                <div className="form-group">
-                  <label>Food Quality Rating:</label>
-                  <div className="star-rating">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <span
-                        key={star}
-                        className={`star ${rating >= star ? "active" : ""}`}
-                        onClick={() => setRating(star)}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
+            <div className="complaint-section">
+              <div className="complaint-header">
+                <span className="complaint-icon">🚨</span>
+                <div>
+                  <h3 className="complaint-title">Complaint Box</h3>
+                  <p className="complaint-subtitle">Report any food quality, hygiene or service issues. The admin will be notified immediately.</p>
                 </div>
+              </div>
 
-                {/* Comment/Complaint Box */}
-                <div className="form-group">
-                  <label>Your Comments / Complaints:</label>
+              <form onSubmit={handleComplaintSubmit} className="complaint-form">
+                <div className="complaint-field">
+                  <label className="complaint-label">Describe your complaint <span className="complaint-req">(required)</span></label>
                   <textarea
                     required
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="The food was great! OR I found a bug in my dal..."
-                    className="form-control"
-                    rows="3"
+                    value={complaintText}
+                    onChange={e => setComplaintText(e.target.value)}
+                    placeholder="e.g. Found a foreign object in the dal, food was undercooked, unhygienic counter..."
+                    className="complaint-textarea"
+                    rows={4}
                   />
                 </div>
 
-                {/* Image Upload */}
-                <div className="form-group">
-                  <label>Attach Proof (Optional):</label>
+                <div className="complaint-field">
+                  <label className="complaint-label">Attach proof <span className="complaint-optional">(optional — max 8 MB)</span></label>
+                  <label className="complaint-file-label" htmlFor="complaint-file-input">
+                    <span className="complaint-file-icon">📎</span>
+                    {complaintImage ? complaintImage.name : "Click to upload a photo"}
+                  </label>
                   <input
+                    id="complaint-file-input"
                     type="file"
-                    id="imageUploadInput"
                     accept="image/*"
-                    onChange={(e) => setImage(e.target.files[0])}
-                    className="file-input"
+                    className="complaint-file-hidden"
+                    onChange={e => setComplaintImage(e.target.files[0] || null)}
                   />
                 </div>
 
-                <button type="submit" className="btn-submit-review">
-                  Submit Feedback
+                <button type="submit" className="complaint-submit" disabled={submitting || !complaintText.trim()}>
+                  {submitting ? "Submitting…" : "🚨 Submit Complaint"}
                 </button>
 
-                {/* Success/Error Message */}
-                {reviewMsg && (
-                  <div
-                    className={`review-msg ${reviewMsg.includes("✅") ? "success" : "error"}`}
-                  >
-                    {reviewMsg}
+                {complaintMsg && (
+                  <div className={`complaint-msg ${complaintMsg.includes("✅") ? "complaint-msg--ok" : "complaint-msg--err"}`}>
+                    {complaintMsg}
                   </div>
                 )}
               </form>
             </div>
           )}
+
       </div>
     </div>
   );

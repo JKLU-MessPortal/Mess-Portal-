@@ -5,12 +5,12 @@ require('dotenv').config();
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes'); 
-const reviewRoutes = require('./routes/reviewRoutes'); 
 const adminRoutes = require('./routes/adminRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const messRoutes = require('./routes/messRoutes');
 const pollRoutes = require('./routes/pollRoutes');
 const nutritionRoutes = require('./routes/nutritionRoutes');
+const complaintRoutes = require('./routes/complaintRoutes');
 
 const app = express();
 
@@ -43,9 +43,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/mess', messRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/reviews', reviewRoutes);
 app.use('/api/polls', pollRoutes);
 app.use('/api/nutrition', nutritionRoutes);
+app.use('/api/complaints', complaintRoutes);
 
 // Simple Test Route
 app.get('/', (req, res) => {
