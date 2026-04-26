@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import DishSearchInput from "../components/DishSearchInput";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -10,9 +11,9 @@ export default function AdminDashboard() {
 
   // Form State
   const [day, setDay] = useState("Monday");
-  const [meal, setMeal] = useState("Breakfast")
-  const [foodItems, setFoodItems] = useState("");
-  const [nonVegFoodItems, setNonVegFoodItems] = useState("");
+  const [meal, setMeal] = useState("Breakfast");
+  const [vegDishes, setVegDishes] = useState([]);      // array of dish name strings
+  const [nonVegDishes, setNonVegDishes] = useState([]); // array of dish name strings
   const [statusMsg, setStatusMsg] = useState("");
 
   // Data State
@@ -59,12 +60,18 @@ export default function AdminDashboard() {
 
   const handleUpdateMenu = async (e) => {
     e.preventDefault();
+    if (vegDishes.length === 0) { setStatusMsg("❌ Add at least one veg item."); return; }
     setStatusMsg("Updating...");
     try {
-      const itemsArray = foodItems.split(",").map((i) => i.trim()).filter((i) => i !== "");
-      const nonVegArray = nonVegFoodItems.split(",").map((i) => i.trim()).filter((i) => i !== "");
-      const res = await axios.post("http://localhost:5000/api/admin/menu", { dayOfWeek: day, mealType: meal, items: itemsArray, nonVegItems: nonVegArray });
-      if (res.data.success) { setStatusMsg("✅ Success: " + meal + " on " + day + " updated!"); setFoodItems(""); setNonVegFoodItems(""); }
+      const res = await axios.post("http://localhost:5000/api/admin/menu", {
+        dayOfWeek: day, mealType: meal,
+        items: vegDishes,
+        nonVegItems: nonVegDishes,
+      });
+      if (res.data.success) {
+        setStatusMsg("✅ Success: " + meal + " on " + day + " updated!");
+        setVegDishes([]); setNonVegDishes([]);
+      }
     } catch { setStatusMsg("❌ Failed to update menu."); }
   };
 
@@ -172,7 +179,7 @@ export default function AdminDashboard() {
           {/* ══ UPDATE MENU ══ */}
           {activeSection === "menu" && canSeeKitchenControls && (
             <div className="admin-card">
-              <form onSubmit={handleUpdateMenu} style={{ display: "flex", flexDirection: "column" }}>
+              <form onSubmit={handleUpdateMenu} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
                 <div className="form-group">
                   <label className="form-label">Select Day</label>
                   <select value={day} onChange={(e) => setDay(e.target.value)} className="form-control">
@@ -185,27 +192,24 @@ export default function AdminDashboard() {
                     {["Breakfast","Lunch","Snacks","Dinner"].map(m => <option key={m}>{m}</option>)}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">🟢 Veg Items (comma separated)</label>
-                  <textarea
-                    value={foodItems}
-                    onChange={(e) => setFoodItems(e.target.value)}
-                    placeholder="e.g. Paneer, Naan, Rice, Dal, Salad"
-                    required
-                    className="form-control"
-                    style={{ minHeight: "80px" }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" style={{ color: '#dc2626' }}>🔴 Non-Veg Items (comma separated, leave blank if none)</label>
-                  <textarea
-                    value={nonVegFoodItems}
-                    onChange={(e) => setNonVegFoodItems(e.target.value)}
-                    placeholder="e.g. Egg Curry, Omelette, Chicken Gravy (optional)"
-                    className="form-control"
-                    style={{ minHeight: "80px", borderColor: nonVegFoodItems ? '#fca5a5' : undefined }}
-                  />
-                </div>
+
+                {/* 🟢 Veg Items — fuzzy dish search */}
+                <DishSearchInput
+                  label="🟢 Veg Items"
+                  selectedDishes={vegDishes}
+                  onAdd={(name) => setVegDishes(prev => prev.includes(name) ? prev : [...prev, name])}
+                  onRemove={(name) => setVegDishes(prev => prev.filter(d => d !== name))}
+                />
+
+                {/* 🔴 Non-Veg Items — fuzzy dish search (chicken / egg / mutton only) */}
+                <DishSearchInput
+                  label="🔴 Non-Veg Items (optional)"
+                  selectedDishes={nonVegDishes}
+                  nonVeg={true}
+                  onAdd={(name) => setNonVegDishes(prev => prev.includes(name) ? prev : [...prev, name])}
+                  onRemove={(name) => setNonVegDishes(prev => prev.filter(d => d !== name))}
+                />
+
                 <button type="submit" className="btn-primary">🍽️ Update Menu</button>
                 {statusMsg && (
                   <div className={`status-msg ${statusMsg.includes("✅") ? "success" : "error"}`}>

@@ -1,0 +1,145 @@
+/* ============================================================
+   DishSearchInput Component Styles
+   ============================================================ */
+
+.dsi-root { display: flex; flex-direction: column; gap: 8px; }
+
+.dsi-label { font-size: 13px; font-weight: 700; color: #374151; }
+
+/* ── Tags ── */
+.dsi-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.dsi-tag {
+  display: flex; align-items: center; gap: 6px;
+  background: #f0fdf4; color: #166534; border: 1.5px solid #86efac;
+  padding: 4px 10px; border-radius: 99px;
+  font-size: 13px; font-weight: 600;
+}
+.dsi-tag-remove {
+  background: none; border: none; cursor: pointer;
+  color: #4ade80; font-size: 11px; padding: 0; line-height: 1;
+  transition: color .15s;
+}
+.dsi-tag-remove:hover { color: #dc2626; }
+
+/* ── Input Row ── */
+.dsi-input-row { position: relative; }
+.dsi-input-wrap {
+  position: relative; display: flex; align-items: center;
+}
+.dsi-search-icon { position: absolute; left: 12px; font-size: 15px; pointer-events: none; }
+.dsi-input {
+  width: 100%; padding: 11px 40px 11px 36px;
+  border: 1.5px solid #d1d5db; border-radius: 10px;
+  font-size: 14px; font-family: inherit; color: #111827;
+  background: #f9fafb; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.dsi-input:focus {
+  border-color: #ee8310; box-shadow: 0 0 0 3px rgba(238,131,16,.12);
+  background: white;
+}
+.dsi-spin {
+  position: absolute; right: 36px;
+  width: 16px; height: 16px;
+  border: 2px solid #e5e7eb; border-top-color: #ee8310;
+  border-radius: 50%; animation: dsi-spin .65s linear infinite;
+}
+.dsi-clear {
+  position: absolute; right: 10px;
+  background: #e5e7eb; border: none; border-radius: 50%;
+  width: 22px; height: 22px; font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #6b7280; transition: background .2s;
+}
+.dsi-clear:hover { background: #d1d5db; }
+
+/* ── Dropdown ── */
+.dsi-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+  background: white; border: 1.5px solid #e5e7eb; border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  overflow: hidden; max-height: 280px; overflow-y: auto;
+}
+.dsi-no-results {
+  padding: 14px 16px; font-size: 13px; color: #9ca3af; text-align: center;
+}
+.dsi-option {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border: none; background: none; cursor: pointer;
+  text-align: left; transition: background .15s; border-bottom: 1px solid #f3f4f6;
+  font-family: inherit;
+}
+.dsi-option:last-child { border-bottom: none; }
+.dsi-option:hover { background: #fff7ed; }
+.dsi-option--selected { background: #f0fdf4; }
+.dsi-option--selected .dsi-option-name::after { content: " ✓"; color: #22c55e; font-weight: 800; }
+.dsi-option--others { border-top: 2px dashed #fed7aa; background: #fff7ed; }
+.dsi-option--others:hover { background: #ffedd5; }
+.dsi-option--others span:first-child { color: #c2410c; font-weight: 700; font-size: 13px; }
+.dsi-option-name { font-size: 14px; font-weight: 600; color: #111827; }
+.dsi-option-meta { font-size: 12px; color: #9ca3af; white-space: nowrap; }
+
+/* ── Custom Form ── */
+.dsi-custom-form {
+  background: #fffbf5; border: 2px solid #fed7aa;
+  border-radius: 14px; padding: 18px; margin-top: 8px;
+  animation: dsi-fade-in .2s ease;
+}
+.dsi-custom-form-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; font-size: 15px; font-weight: 700; color: #92400e;
+}
+.dsi-custom-close {
+  background: #fed7aa; border: none; border-radius: 7px;
+  padding: 4px 10px; font-size: 13px; cursor: pointer; color: #92400e;
+  transition: background .2s;
+}
+.dsi-custom-close:hover { background: #fbbf24; }
+.dsi-custom-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.dsi-custom-field { display: flex; flex-direction: column; gap: 5px; }
+.dsi-custom-field--full { grid-column: 1 / -1; }
+.dsi-custom-field label { font-size: 12px; font-weight: 600; color: #374151; }
+.dsi-req { color: #ef4444; }
+.dsi-custom-input {
+  padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px;
+  font-size: 13px; font-family: inherit; color: #111827; background: white;
+  outline: none; transition: border-color .2s;
+}
+.dsi-custom-input:focus { border-color: #ee8310; }
+
+.dsi-toggle-row { display: flex; gap: 12px; }
+.dsi-toggle {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 14px; border-radius: 8px; border: 1.5px solid #e5e7eb;
+  cursor: pointer; font-size: 13px; font-weight: 600; color: #6b7280;
+  background: white; transition: all .2s; user-select: none;
+}
+.dsi-toggle input { display: none; }
+.dsi-toggle--active { background: #fff7ed; border-color: #fb923c; color: #c2410c; }
+
+.dsi-custom-err {
+  background: #fee2e2; color: #991b1b; border-radius: 8px;
+  padding: 10px 14px; font-size: 13px; font-weight: 600; margin-top: 8px;
+}
+.dsi-custom-actions {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;
+}
+.dsi-btn-cancel {
+  padding: 9px 18px; background: #f3f4f6; border: none; border-radius: 9px;
+  font-size: 13px; font-weight: 600; color: #6b7280; cursor: pointer;
+  font-family: inherit;
+}
+.dsi-btn-save {
+  padding: 9px 22px; background: linear-gradient(135deg, #ee8310, #f59e0b);
+  color: white; border: none; border-radius: 9px; font-size: 13px;
+  font-weight: 700; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 12px rgba(238,131,16,.3); transition: transform .15s;
+}
+.dsi-btn-save:hover:not(:disabled) { transform: translateY(-1px); }
+.dsi-btn-save:disabled { opacity: .7; cursor: not-allowed; }
+
+/* ── Animations ── */
+@keyframes dsi-spin { to { transform: rotate(360deg); } }
+@keyframes dsi-fade-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
