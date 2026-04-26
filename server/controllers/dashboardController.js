@@ -107,7 +107,7 @@ exports.toggleMeal = async (req, res) => {
 
     res.status(200).json({ 
       success: true, 
-      message: `${mealType} has been successfully ${status === 'Cancelled' ? 'Skipped' : 'Added Back'}!`,
+      message: `${mealType} has been successfully ${status === 'Cancelled' ? 'Skipped' : status === 'Paid' ? 'Purchased' : 'Added Back'}!`,
       booking 
     });
 

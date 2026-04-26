@@ -50,6 +50,35 @@ exports.scanQRCode = async (req, res) => {
       });
     }
 
+    // --- 🚨 FINAL BOSS LOGIC: Residency Checks 🚨 ---
+    const MealBooking = require('../models/MealBooking');
+    const todayBooking = await MealBooking.findOne({
+      studentId: studentId,
+      date: startOfDay,
+      mealType: mealType
+    });
+
+    if (student.residencyStatus === 'Day-Scholar') {
+      // Day scholars MUST have a 'Paid' status to eat
+      if (!todayBooking || todayBooking.status !== 'Paid') {
+        return res.status(403).json({
+          success: false,
+          message: `❌ MEAL NOT PURCHASED! Day-Scholars must buy a ticket for ${mealType}.`,
+          studentName: student.name
+        });
+      }
+    } else {
+      // Hostellers MUST NOT have a 'Cancelled' status
+      if (todayBooking && todayBooking.status === 'Cancelled') {
+        return res.status(403).json({
+          success: false,
+          message: `❌ CANCELLED MEAL! You skipped ${mealType} for rebate today.`,
+          studentName: student.name
+        });
+      }
+    }
+    // ------------------------------------------------
+
     // 4. Mark as Eaten (Save to DB)
     await MealLog.create({
       studentId: studentId,

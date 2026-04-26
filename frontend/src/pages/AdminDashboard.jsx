@@ -10,7 +10,7 @@ export default function AdminDashboard() {
 
   // Form State
   const [day, setDay] = useState("Monday");
-  const [meal, setMeal] = useState("Breakfast");
+  const [meal, setMeal] = useState("Breakfast")
   const [foodItems, setFoodItems] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
@@ -20,7 +20,6 @@ export default function AdminDashboard() {
   const [ledger, setLedger] = useState([]);
   const [openStudentIndex, setOpenStudentIndex] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [students, setStudents] = useState([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -52,11 +51,6 @@ export default function AdminDashboard() {
 
       const resReviews = await axios.get("http://localhost:5000/api/reviews/all");
       if (resReviews.data.success) setReviews(resReviews.data.reviews);
-
-      if (role === "admin") {
-        const resStudents = await axios.get("http://localhost:5000/api/admin/students");
-        if (resStudents.data.success) setStudents(resStudents.data.students);
-      }
     } catch (error) {
       console.error("Failed to fetch admin data", error);
     }
@@ -81,14 +75,6 @@ export default function AdminDashboard() {
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
-  const handleToggleBlock = async (studentId, currentStatus) => {
-    try {
-      const newStatus = !currentStatus;
-      const res = await axios.post("http://localhost:5000/api/admin/students/block", { studentId, isBlocked: newStatus });
-      if (res.data.success) setStudents(students.map((s) => s._id === studentId ? { ...s, isBlocked: newStatus } : s));
-    } catch { alert("Error updating student status."); }
-  };
-
   if (!user) return <div className="admin-loading">Loading Admin Portal...</div>;
 
   const canSeeKitchenControls = user.role === "admin" || user.role === "contractor";
@@ -98,7 +84,6 @@ export default function AdminDashboard() {
   // Nav items based on role
   const navItems = [
     ...(canSeeKitchenControls ? [{ id: "broadcast", icon: "📢", label: "Broadcast Notice" }] : []),
-    ...(user.role === "admin" ? [{ id: "students", icon: "🛡️", label: "Student Management" }] : []),
     ...(canSeeKitchenControls ? [{ id: "menu", icon: "🍽️", label: "Update Menu" }] : []),
     ...(canSeeKitchenControls ? [{ id: "headcount", icon: "📊", label: "Kitchen Headcount" }] : []),
     ...(canSeeFinancials ? [{ id: "ledger", icon: "💰", label: "Refund Ledger" }] : []),
@@ -108,7 +93,6 @@ export default function AdminDashboard() {
   // Section title/subtitle map
   const sectionMeta = {
     broadcast:  { title: "📢 Broadcast Notice",         sub: "Send an alert message to all students' dashboards." },
-    students:   { title: "🛡️ Student Management",       sub: "Block or unblock students from accessing the mess." },
     menu:       { title: "🍽️ Update Mess Menu",          sub: "Change today's food offerings for any day." },
     headcount:  { title: "📊 Tomorrow's Kitchen Headcount", sub: "Live headcount of meals skipped to help avoid food wastage." },
     ledger:     { title: "💰 Monthly Refund Ledger",    sub: "List of students who cancelled meals this month." },
@@ -180,55 +164,6 @@ export default function AdminDashboard() {
                   🚀 Send Notice to All Students
                 </button>
               </form>
-            </div>
-          )}
-
-          {/* ══ STUDENT MANAGEMENT ══ */}
-          {activeSection === "students" && user.role === "admin" && (
-            <div className="admin-card card-blue-top">
-              {students.length === 0 ? (
-                <p className="empty-msg">No students found.</p>
-              ) : (
-                <div className="student-table-wrap">
-                  <table className="student-table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {students.map((student) => (
-                        <tr key={student._id}>
-                          <td>
-                            <div className="student-name-cell">
-                              <div className="student-avatar">{student.name.charAt(0).toUpperCase()}</div>
-                              {student.name}
-                            </div>
-                          </td>
-                          <td className="student-email-cell">{student.email}</td>
-                          <td>
-                            {student.isBlocked
-                              ? <span className="status-badge-blocked">Blocked</span>
-                              : <span className="status-badge-active">Active</span>
-                            }
-                          </td>
-                          <td>
-                            <button
-                              onClick={() => handleToggleBlock(student._id, student.isBlocked)}
-                              className={student.isBlocked ? "btn-unblock" : "btn-block"}
-                            >
-                              {student.isBlocked ? "✅ Unblock" : "🚫 Block"}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
             </div>
           )}
 

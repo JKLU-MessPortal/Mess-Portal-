@@ -17,7 +17,7 @@ const MealBookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Booked', 'Cancelled'],
+    enum: ['Booked', 'Cancelled', 'Paid'],
     default: 'Booked'
   }
 });

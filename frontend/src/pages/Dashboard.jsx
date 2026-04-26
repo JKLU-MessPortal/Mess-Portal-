@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [comment, setComment] = useState("");
   const [image, setImage] = useState(null);
   const [reviewMsg, setReviewMsg] = useState("");
+  const [adminStats, setAdminStats] = useState(null);
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setReviewMsg("Submitting...");
@@ -77,6 +78,20 @@ export default function Dashboard() {
           }
         })
         .catch((err) => console.log("Notice Error:", err));
+
+      const role = parsedUser.role || "student";
+      const staff = ["admin", "contractor", "accountant"].includes(role);
+      
+      if (staff) {
+        axios.get("http://localhost:5000/api/admin/headcount").then(res => {
+          if (res.data.success) {
+            setAdminStats({
+              stats: res.data.stats,
+              totalHostellers: res.data.totalHostellers
+            });
+          }
+        }).catch(err => console.log("Admin Stats Error:", err));
+      }
     } else {
       navigate("/");
     }
@@ -144,6 +159,9 @@ export default function Dashboard() {
   const userName = user.name || "Student";
   const userEmail = user.email || "No Email";
   const userId = user.id || user._id || "NO_ID_FOUND";
+  const userRole = user.role || "student";
+  const isStaff = ["admin", "contractor", "accountant"].includes(userRole);
+  const isHosteller = user.residencyStatus === "Hosteller";
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${userId}`;
   const allDaysOfWeek = [
     "Monday",
@@ -175,42 +193,87 @@ export default function Dashboard() {
         <div className="dashboard-grid">
           {/* LEFT COLUMN: ID CARD & SKIP STATS */}
           <div className="dashboard-left">
-            {/* ID Card */}
-            <div className="id-card">
-              <h3 className="id-card-heading">JKLU MESS PASS</h3>
-              <p className="id-card-subtitle">Present this QR at the scanner</p>
-              <div className="qr-frame">
-                <img src={qrCodeUrl} alt="QR Code" />
-              </div>
-              <h2 className="id-card-name">{userName}</h2>
-              <p className="id-card-email">{userEmail}</p>
-            </div>
-
-            {/* Skip Stats Card */}
-            {menuData.skipStats && (
-              <div className="skip-stats-card">
-                <h3> Monthly Skips Remaining</h3>
-                {Object.keys(menuData.skipStats).map((mealType) => (
-                  <div key={mealType} className="skip-stat-row">
-                    <span className="skip-stat-label">{mealType}</span>
-                    <span
-                      style={{
-                        color:
-                          menuData.skipStats[mealType].remaining === 0
-                            ? "#ef4444"
-                            : "#10b981",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {menuData.skipStats[mealType].remaining} /{" "}
-                      {menuData.skipStats[mealType].limit}
-                    </span>
+            {!isStaff ? (
+              <>
+                {/* ID Card */}
+                <div className="id-card">
+                  <h3 className="id-card-heading">JKLU MESS PASS</h3>
+                  <p className="id-card-subtitle">Present this QR at the scanner</p>
+                  <div className="qr-frame">
+                    <img src={qrCodeUrl} alt="QR Code" />
                   </div>
-                ))}
-                <p className="skip-stat-note">
-                  *Skipped meals will be credited to your rebate account at
-                  month end.
-                </p>
+                  <h2 className="id-card-name">{userName}</h2>
+                  <p className="id-card-email">{userEmail}</p>
+                </div>
+
+                {/* Skip Stats Card - Only for Hostellers */}
+                {isHosteller && menuData.skipStats && (
+                  <div className="skip-stats-card">
+                    <h3> Monthly Skips Remaining</h3>
+                    {Object.keys(menuData.skipStats).map((mealType) => (
+                      <div key={mealType} className="skip-stat-row">
+                        <span className="skip-stat-label">{mealType}</span>
+                        <span
+                          style={{
+                            color:
+                              menuData.skipStats[mealType].remaining === 0
+                                ? "#ef4444"
+                                : "#10b981",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {menuData.skipStats[mealType].remaining} /{" "}
+                          {menuData.skipStats[mealType].limit}
+                        </span>
+                      </div>
+                    ))}
+                    <p className="skip-stat-note">
+                      *Skipped meals will be credited to your rebate account at
+                      month end.
+                    </p>
+                  </div>
+                )}
+                {!isHosteller && (
+                  <div className="skip-stats-card" style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    <h3 style={{ color: '#0f172a', marginBottom: '10px' }}>💳 Day-Scholar Wallet</h3>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '15px' }}>
+                      Purchase meals for tomorrow using your portal. Purchased meals will activate your QR code at the scanner.
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: '600', color: '#334155' }}>Price Per Meal:</span>
+                      <strong style={{ color: '#10b981', fontSize: '1.2rem' }}>₹50</strong>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="skip-stats-card" style={{ padding: '24px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '20px', color: '#1f2937' }}>📈 Analytics</h3>
+                {adminStats ? (
+                  <>
+                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
+                      <span style={{ display: 'block', fontSize: '0.85rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Total Hostellers</span>
+                      <strong style={{ fontSize: '1.5rem', color: '#0f172a' }}>{adminStats.totalHostellers || 0}</strong>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {Object.keys(adminStats.stats).map((mealType) => {
+                        const skipped = adminStats.stats[mealType];
+                        const expected = Math.max(0, (adminStats.totalHostellers || 0) - skipped);
+                        return (
+                          <div key={mealType} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #e2e8f0' }}>
+                            <span style={{ fontWeight: '600', color: '#334155' }}>{mealType}</span>
+                            <div style={{ textAlign: 'right' }}>
+                              <span style={{ color: '#10b981', fontWeight: 'bold', display: 'block' }}>{expected} Eating</span>
+                              <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{skipped} Skipped</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ color: '#64748b' }}>Loading analytics...</p>
+                )}
               </div>
             )}
           </div>
@@ -249,7 +312,7 @@ export default function Dashboard() {
             <div className="menu-card-bordered">
               <div className="tomorrow-header">
                 <h3> Tomorrow ({menuData.tomorrowName})</h3>
-                <span className="manage-badge">Manage Meals</span>
+                {!isStaff && <span className="manage-badge">Manage Meals</span>}
               </div>
 
               <div className="meals-grid">
@@ -271,40 +334,71 @@ export default function Dashboard() {
                           b.mealType === meal.mealType &&
                           b.status === "Cancelled",
                       );
+                      const isPaid = menuData.tomorrowBookings.some(
+                        (b) =>
+                          b.mealType === meal.mealType &&
+                          b.status === "Paid",
+                      );
 
                       return (
                         <div
                           key={index}
-                          className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""}`}
+                          className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""} ${isPaid ? "paid-box" : ""}`}
+                          style={isPaid ? { borderLeft: '4px solid #10b981', background: '#ecfdf5' } : {}}
                         >
                           <div className="meal-box-header">
                             <h4
                               className={`meal-type-label ${isCancelled ? "cancelled" : ""}`}
+                              style={isPaid ? { color: '#059669' } : {}}
                             >
                               {meal.mealType}
                             </h4>
-                            <button
-                              onClick={() =>
-                                handleToggleMeal(
-                                  meal.mealType,
-                                  isCancelled ? "Cancelled" : "Booked",
-                                )
-                              }
-                              className={
-                                isCancelled ? "btn-add-back" : "btn-skip"
-                              }
-                            >
-                              {isCancelled ? "Add Back" : "Skip Meal"}
-                            </button>
+                            {!isStaff && (
+                              isHosteller ? (
+                                <button
+                                  onClick={() =>
+                                    handleToggleMeal(
+                                      meal.mealType,
+                                      isCancelled ? "Cancelled" : "Booked",
+                                    )
+                                  }
+                                  className={
+                                    isCancelled ? "btn-add-back" : "btn-skip"
+                                  }
+                                >
+                                  {isCancelled ? "Add Back" : "Skip Meal"}
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    if (!isPaid) {
+                                      if(window.confirm(`Purchase ${meal.mealType} for ₹50?`)) {
+                                        handleToggleMeal(meal.mealType, "Paid");
+                                      }
+                                    }
+                                  }}
+                                  disabled={isPaid}
+                                  className="btn-skip"
+                                  style={isPaid ? { background: '#10b981', color: 'white', cursor: 'default', border: 'none' } : { background: '#3b82f6', color: 'white' }}
+                                >
+                                  {isPaid ? "Purchased ✅" : "Buy (₹50)"}
+                                </button>
+                              )
+                            )}
                           </div>
                           <p
                             className={`meal-items-text ${isCancelled ? "cancelled" : ""}`}
                           >
                             {meal.items.join(", ")}
                           </p>
-                          {isCancelled && (
+                          {isCancelled && isHosteller && (
                             <p className="cancelled-label">
                               Cancelled for Rebate
+                            </p>
+                          )}
+                          {isPaid && !isHosteller && (
+                            <p className="cancelled-label" style={{ color: '#059669' }}>
+                              Meal ticket ready for scanner
                             </p>
                           )}
                         </div>
@@ -362,69 +456,71 @@ export default function Dashboard() {
             </p>
           )}
           {/* --- FOOD REVIEW & COMPLAINT SECTION --- */}
-          <div className="review-section">
-            <h3>⭐ Rate Today's Meal & Feedback</h3>
-            <p className="review-subtitle">
-              Found an issue with the food? Upload a photo and let the admin
-              know.
-            </p>
+          {!isStaff && (
+            <div className="review-section">
+              <h3>⭐ Rate Today's Meal & Feedback</h3>
+              <p className="review-subtitle">
+                Found an issue with the food? Upload a photo and let the admin
+                know.
+              </p>
 
-            <form onSubmit={handleReviewSubmit} className="review-form">
-              {/* Star Rating */}
-              <div className="form-group">
-                <label>Food Quality Rating:</label>
-                <div className="star-rating">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                      key={star}
-                      className={`star ${rating >= star ? "active" : ""}`}
-                      onClick={() => setRating(star)}
-                    >
-                      ★
-                    </span>
-                  ))}
+              <form onSubmit={handleReviewSubmit} className="review-form">
+                {/* Star Rating */}
+                <div className="form-group">
+                  <label>Food Quality Rating:</label>
+                  <div className="star-rating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`star ${rating >= star ? "active" : ""}`}
+                        onClick={() => setRating(star)}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Comment/Complaint Box */}
-              <div className="form-group">
-                <label>Your Comments / Complaints:</label>
-                <textarea
-                  required
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="The food was great! OR I found a bug in my dal..."
-                  className="form-control"
-                  rows="3"
-                />
-              </div>
-
-              {/* Image Upload */}
-              <div className="form-group">
-                <label>Attach Proof (Optional):</label>
-                <input
-                  type="file"
-                  id="imageUploadInput"
-                  accept="image/*"
-                  onChange={(e) => setImage(e.target.files[0])}
-                  className="file-input"
-                />
-              </div>
-
-              <button type="submit" className="btn-submit-review">
-                Submit Feedback
-              </button>
-
-              {/* Success/Error Message */}
-              {reviewMsg && (
-                <div
-                  className={`review-msg ${reviewMsg.includes("✅") ? "success" : "error"}`}
-                >
-                  {reviewMsg}
+                {/* Comment/Complaint Box */}
+                <div className="form-group">
+                  <label>Your Comments / Complaints:</label>
+                  <textarea
+                    required
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="The food was great! OR I found a bug in my dal..."
+                    className="form-control"
+                    rows="3"
+                  />
                 </div>
-              )}
-            </form>
-          </div>
+
+                {/* Image Upload */}
+                <div className="form-group">
+                  <label>Attach Proof (Optional):</label>
+                  <input
+                    type="file"
+                    id="imageUploadInput"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                    className="file-input"
+                  />
+                </div>
+
+                <button type="submit" className="btn-submit-review">
+                  Submit Feedback
+                </button>
+
+                {/* Success/Error Message */}
+                {reviewMsg && (
+                  <div
+                    className={`review-msg ${reviewMsg.includes("✅") ? "success" : "error"}`}
+                  >
+                    {reviewMsg}
+                  </div>
+                )}
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </div>

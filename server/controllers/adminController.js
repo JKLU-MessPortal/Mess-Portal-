@@ -32,6 +32,9 @@ exports.getHeadcount = async (req, res) => {
       status: 'Cancelled'
     });
 
+    // Get total hostellers count from User collection for accurate analytics
+    const totalHostellers = await User.countDocuments({ residencyStatus: 'Hosteller' });
+
     const stats = { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 };
     cancellations.forEach(booking => {
       if (stats[booking.mealType] !== undefined) {
@@ -39,7 +42,12 @@ exports.getHeadcount = async (req, res) => {
       }
     });
 
-    res.status(200).json({ success: true, stats, totalSaved: cancellations.length });
+    res.status(200).json({ 
+      success: true, 
+      stats, 
+      totalHostellers,
+      totalSaved: cancellations.length 
+    });
   } catch (error) {
     console.error("Headcount Error:", error);
     res.status(500).json({ success: false, message: "Failed to load stats." });

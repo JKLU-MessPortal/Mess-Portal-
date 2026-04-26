@@ -6,15 +6,7 @@ import "./StudentManagement.css";
 
 const API = "http://localhost:5000/api/admin";
 
-const ROLES = ["student", "admin", "contractor", "accountant", "controller"];
 
-const ROLE_COLORS = {
-  student:    { bg: "#e8f5e9", color: "#2e7d32" },
-  admin:      { bg: "#fff3e0", color: "#e65100" },
-  contractor: { bg: "#e3f2fd", color: "#1565c0" },
-  accountant: { bg: "#f3e5f5", color: "#6a1b9a" },
-  controller: { bg: "#fce4ec", color: "#880e4f" },
-};
 
 export default function StudentManagement() {
   const navigate = useNavigate();
@@ -33,13 +25,7 @@ export default function StudentManagement() {
   const [deregMsg, setDeregMsg]         = useState({ text: "", type: "" });
   const [searchQuery, setSearchQuery]   = useState("");
 
-  // --- Role management state ---
-  const [allUsers, setAllUsers]         = useState([]);
-  const [rolesLoading, setRolesLoading] = useState(false);
-  const [roleSearch, setRoleSearch]     = useState("");
-  const [pendingRoles, setPendingRoles] = useState({}); // { userId: newRole }
-  const [savingRole, setSavingRole]     = useState("");  // userId currently being saved
-  const [roleMsg, setRoleMsg]           = useState({ text: "", type: "" });
+
 
   // --- Auth guard (admin only) ---
   useEffect(() => {
@@ -62,36 +48,9 @@ export default function StudentManagement() {
     }
   }, []);
 
-  // --- Fetch all users for role management ---
-  const fetchAllUsers = useCallback(async () => {
-    setRolesLoading(true);
-    setRoleMsg({ text: "", type: "" });
-    try {
-      // We call the existing /students endpoint which returns role:'student' users
-      // but we need ALL users — let's use a broader fetch via the existing endpoint
-      // and supplement with admin users. For now we'll fetch students then show all.
-      const res = await axios.get(`${API}/students`);
-      // Also fetch the current admin user from localStorage and include them
-      const adminUser = JSON.parse(localStorage.getItem("user"));
-      const students = res.data.students || [];
-      // Combine and deduplicate
-      const allMap = {};
-      [...students].forEach(u => { allMap[u._id] = u; });
-      // Add the admin themselves if not already present
-      if (adminUser && !allMap[adminUser.id]) {
-        allMap[adminUser.id] = { _id: adminUser.id, name: adminUser.name, email: adminUser.email, role: adminUser.role };
-      }
-      setAllUsers(Object.values(allMap));
-    } catch (e) {
-      console.error("Failed to fetch users:", e);
-      setRoleMsg({ text: "❌ Failed to load users.", type: "error" });
-    } finally {
-      setRolesLoading(false);
-    }
-  }, []);
+
 
   useEffect(() => { fetchHostellers(); }, [fetchHostellers]);
-  useEffect(() => { if (activeTab === "roles") fetchAllUsers(); }, [activeTab, fetchAllUsers]);
 
   // --- Register handler ---
   const handleRegister = async (e) => {
@@ -140,43 +99,7 @@ export default function StudentManagement() {
     }
   };
 
-  // --- Role change handler ---
-  const handleRoleChange = (userId, newRole) => {
-    setPendingRoles(prev => ({ ...prev, [userId]: newRole }));
-    setRoleMsg({ text: "", type: "" });
-  };
 
-  const handleSaveRole = async (user) => {
-    const newRole = pendingRoles[user._id];
-    if (!newRole || newRole === user.role) return;
-
-    setSavingRole(user._id);
-    setRoleMsg({ text: "", type: "" });
-    try {
-      const res = await axios.put(`${API}/users/role`, {
-        userId: user._id,
-        role: newRole,
-      });
-      if (res.data.success) {
-        setRoleMsg({ text: res.data.message, type: "success" });
-        // Update local list
-        setAllUsers(prev =>
-          prev.map(u => u._id === user._id ? { ...u, role: newRole } : u)
-        );
-        // Clear pending for this user
-        setPendingRoles(prev => {
-          const copy = { ...prev };
-          delete copy[user._id];
-          return copy;
-        });
-      }
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to update role.";
-      setRoleMsg({ text: `❌ ${msg}`, type: "error" });
-    } finally {
-      setSavingRole("");
-    }
-  };
 
   // --- Filtered lists ---
   const filtered = hostellers.filter(
@@ -185,11 +108,7 @@ export default function StudentManagement() {
       h.rollNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredUsers = allUsers.filter(
-    (u) =>
-      u.name?.toLowerCase().includes(roleSearch.toLowerCase()) ||
-      u.email?.toLowerCase().includes(roleSearch.toLowerCase())
-  );
+
 
   return (
     <div className="sm-page">
@@ -225,14 +144,6 @@ export default function StudentManagement() {
             <span className="sm-tab-icon">🗑️</span>
             De-register Hosteller
             <span className="sm-tab-badge">{hostellers.length}</span>
-          </button>
-          <button
-            id="tab-roles"
-            className={`sm-tab ${activeTab === "roles" ? "sm-tab--active" : ""}`}
-            onClick={() => { setActiveTab("roles"); }}
-          >
-            <span className="sm-tab-icon">🔑</span>
-            Manage Roles
           </button>
         </div>
 
@@ -432,136 +343,7 @@ export default function StudentManagement() {
           </div>
         )}
 
-        {/* ════════════════════════════════════
-            TAB 3 — MANAGE ROLES
-        ════════════════════════════════════ */}
-        {activeTab === "roles" && (
-          <div className="sm-card">
-            <div className="sm-card-header">
-              <span className="sm-card-icon">🔑</span>
-              <div>
-                <h2 className="sm-card-title">Manage User Roles</h2>
-                <p className="sm-card-desc">
-                  Change any user's role. The new role takes effect on their next login.
-                </p>
-              </div>
-            </div>
 
-            {/* Search */}
-            <div className="sm-search-wrapper">
-              <span className="sm-search-icon">🔍</span>
-              <input
-                type="text"
-                className="sm-search"
-                placeholder="Search by name or email..."
-                value={roleSearch}
-                onChange={(e) => setRoleSearch(e.target.value)}
-              />
-              {roleSearch && (
-                <button className="sm-search-clear" onClick={() => setRoleSearch("")}>✕</button>
-              )}
-            </div>
-
-            {roleMsg.text && (
-              <div className={`sm-msg sm-msg--${roleMsg.type}`}>{roleMsg.text}</div>
-            )}
-
-            {rolesLoading ? (
-              <div className="sm-list-loading">
-                <span className="sm-spinner sm-spinner--dark"></span>
-                <span>Loading users...</span>
-              </div>
-            ) : filteredUsers.length === 0 ? (
-              <div className="sm-empty">
-                <span className="sm-empty-icon">{roleSearch ? "🔍" : "📭"}</span>
-                <p>{roleSearch ? `No results for "${roleSearch}"` : "No users found."}</p>
-              </div>
-            ) : (
-              <div className="sm-table-wrapper">
-                <table className="sm-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>User</th>
-                      <th>Email</th>
-                      <th>Current Role</th>
-                      <th>Change To</th>
-                      <th>Save</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsers.map((u, idx) => {
-                      const currentRole = u.role || "student";
-                      const selectedRole = pendingRoles[u._id] ?? currentRole;
-                      const isDirty = selectedRole !== currentRole;
-                      const roleStyle = ROLE_COLORS[currentRole] || ROLE_COLORS.student;
-
-                      return (
-                        <tr key={u._id} className={savingRole === u._id ? "sm-row--loading" : ""}>
-                          <td className="sm-td-num">{idx + 1}</td>
-                          <td>
-                            <div className="sm-email-cell">
-                              <span className="sm-avatar">{(u.name || u.email)[0].toUpperCase()}</span>
-                              <span style={{ fontWeight: 600 }}>{u.name || "—"}</span>
-                            </div>
-                          </td>
-                          <td style={{ fontSize: "0.85rem", color: "#555" }}>{u.email}</td>
-                          <td>
-                            <span
-                              className="sm-roll-badge"
-                              style={{
-                                background: roleStyle.bg,
-                                color: roleStyle.color,
-                                fontWeight: 700,
-                                textTransform: "capitalize",
-                              }}
-                            >
-                              {currentRole}
-                            </span>
-                          </td>
-                          <td>
-                            <select
-                              className="sm-role-select"
-                              value={selectedRole}
-                              onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                            >
-                              {ROLES.map(r => (
-                                <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-                              ))}
-                            </select>
-                          </td>
-                          <td>
-                            <button
-                              className={`sm-btn-save ${isDirty ? "sm-btn-save--active" : ""}`}
-                              onClick={() => handleSaveRole(u)}
-                              disabled={!isDirty || savingRole === u._id}
-                            >
-                              {savingRole === u._id ? (
-                                <><span className="sm-spinner sm-spinner--white"></span> Saving...</>
-                              ) : (
-                                isDirty ? "💾 Save" : "✓ Saved"
-                              )}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <p className="sm-table-footer">
-                  Showing {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
-                </p>
-              </div>
-            )}
-
-            <div className="sm-info-banner" style={{ marginTop: "1rem" }}>
-              <span>⚠️</span>
-              <span>
-                Role changes take effect the <strong>next time the user logs in</strong> — their browser session will reflect the updated role automatically.
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
