@@ -4,11 +4,72 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import "./Dashboard.css";
 
+// ── Shared helpers ──────────────────────────────────────────────
+const MEAL_ICONS = { Breakfast: "🌅", Lunch: "☀️", Snacks: "🍵", Dinner: "🌙" };
+
+function NutritionBar({ label, value, max, color, unit = "g" }) {
+  const pct = Math.min(100, (value / max) * 100);
+  return (
+    <div style={{ marginBottom: "7px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", fontWeight: 600, color: "#475569", marginBottom: "2px" }}>
+        <span>{label}</span><span style={{ color }}>{value}{unit}</span>
+      </div>
+      <div style={{ background: "#f1f5f9", borderRadius: "99px", height: "5px", overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, background: color, height: "100%", borderRadius: "99px", transition: "width 0.5s ease" }} />
+      </div>
+    </div>
+  );
+}
+
+function DishNutritionPanel({ dishName, nutritionMap }) {
+  const [open, setOpen] = useState(false);
+  const query = dishName.toLowerCase().trim();
+  const match = nutritionMap[query] ||
+    Object.values(nutritionMap).find(d => d.name.toLowerCase().includes(query) || query.includes(d.name.toLowerCase()));
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          width: "100%", background: "#f8fafc", border: "1px solid #e2e8f0",
+          borderRadius: open ? "8px 8px 0 0" : "8px", padding: "6px 10px",
+          cursor: match ? "pointer" : "default", fontFamily: "inherit",
+          marginBottom: open ? 0 : "5px"
+        }}
+      >
+        <span style={{ fontSize: "0.82rem", color: "#475569", fontWeight: 500 }}>🍽️ {dishName}</span>
+        {match && <span style={{ fontSize: "0.65rem", color: open ? "#f59e0b" : "#94a3b8", fontWeight: 700 }}>{open ? "▲ Hide" : "ℹ️ Info"}</span>}
+      </button>
+      {open && match && (
+        <div style={{
+          background: "white", border: "1px solid #e2e8f0", borderTop: "none",
+          borderRadius: "0 0 8px 8px", padding: "10px", marginBottom: "5px"
+        }}>
+          <div style={{ background: "linear-gradient(135deg,#fef3c7,#fde68a)", borderRadius: "6px", padding: "7px 10px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "1.2rem" }}>🔥</span>
+            <div>
+              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#92400e" }}>{match.calories} kcal</div>
+              <div style={{ fontSize: "0.65rem", color: "#b45309" }}>per {match.quantity_unit}</div>
+            </div>
+          </div>
+          <NutritionBar label="💪 Protein" value={match.protein} max={30} color="#10b981" />
+          <NutritionBar label="🌾 Carbs" value={match.carbohydrate} max={80} color="#3b82f6" />
+          <NutritionBar label="🫒 Fat" value={match.fat} max={30} color="#f59e0b" />
+          <NutritionBar label="🌿 Fibre" value={match.fibre} max={10} color="#8b5cf6" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [notice, setNotice] = useState("");
   const [adminStats, setAdminStats] = useState(null);
+  const [nutritionMap, setNutritionMap] = useState({});
 
   // ── Complaint Box state ──────────────────────────────────────
   const [complaintText, setComplaintText]   = useState("");
@@ -59,6 +120,14 @@ export default function Dashboard() {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       fetchMenu(parsedUser.id || parsedUser._id);
+      // Fetch nutrition data for dish info panels
+      axios.get("http://localhost:5000/api/nutrition").then(res => {
+        if (res.data.success) {
+          const map = {};
+          res.data.nutrition.forEach(d => { map[d.name.toLowerCase()] = d; });
+          setNutritionMap(map);
+        }
+      }).catch(() => {});
 
       // ✅ Notice Fetch Karne ka code ab andar aa gaya
       axios
@@ -316,38 +385,22 @@ export default function Dashboard() {
                   [...menuData.todayMenu]
                     .sort((a, b) => { const o={Breakfast:1,Lunch:2,Snacks:3,Dinner:4}; return o[a.mealType]-o[b.mealType]; })
                     .map((meal, index) => (
-                      <div key={index} style={{
-                        background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px',
-                        overflow: 'hidden', marginBottom: '10px',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-                      }}>
-                        {/* Meal header */}
-                        <div style={{
-                          background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
-                          padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '8px'
-                        }}>
-                          <span style={{ fontSize: '1.1rem' }}>
-                            {meal.mealType === 'Breakfast' ? '🌅' : meal.mealType === 'Lunch' ? '☀️' : meal.mealType === 'Snacks' ? '🍵' : '🌙'}
-                          </span>
-                          <span style={{ fontWeight: 700, color: '#92400e', fontSize: '0.9rem' }}>{meal.mealType}</span>
+                      <div key={index} className="meal-box-today">
+                        <h4>
+                          {MEAL_ICONS[meal.mealType]} {meal.mealType}
                           {meal.nonVegItems && meal.nonVegItems.length > 0 && (
-                            <span style={{ marginLeft: 'auto', background: '#ef4444', color: 'white', fontSize: '0.58rem', fontWeight: 700, padding: '2px 7px', borderRadius: '999px' }}>⭐ Non-Veg</span>
+                            <span style={{ marginLeft: '8px', background: '#ef4444', color: 'white', fontSize: '0.55rem', fontWeight: 700, padding: '1px 6px', borderRadius: '999px', verticalAlign: 'middle' }}>⭐ Non-Veg</span>
                           )}
-                        </div>
-                        {/* Items */}
-                        <div style={{ padding: '8px 14px' }}>
+                        </h4>
+                        <div style={{ marginTop: '8px' }}>
                           {meal.items.map((item, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: '#166534', borderBottom: i < meal.items.length - 1 ? '1px solid #f0fdf4' : 'none' }}>
-                              <span style={{ color: '#10b981', fontSize: '0.7rem' }}>●</span>{item}
-                            </div>
+                            <DishNutritionPanel key={i} dishName={item} nutritionMap={nutritionMap} />
                           ))}
                           {meal.nonVegItems && meal.nonVegItems.length > 0 && (
                             <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #fecdd3' }}>
+                              <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b91c1c', marginBottom: '4px' }}>🔴 Non-Veg (Extra Charge)</div>
                               {meal.nonVegItems.map((item, i) => (
-                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: '#9f1239' }}>
-                                  <span style={{ color: '#ef4444', fontSize: '0.7rem' }}>●</span>{item}
-                                  <span style={{ marginLeft: 'auto', fontSize: '0.6rem', color: '#b91c1c', fontWeight: 700 }}>+₹ Extra</span>
-                                </div>
+                                <DishNutritionPanel key={i} dishName={item} nutritionMap={nutritionMap} />
                               ))}
                             </div>
                           )}
@@ -376,83 +429,59 @@ export default function Dashboard() {
                       const isPaid = menuData.tomorrowBookings.some(b => b.mealType === meal.mealType && b.status === "Paid");
 
                       return (
-                        <div key={index} style={{
-                          background: isCancelled ? '#fef2f2' : isPaid ? '#ecfdf5' : 'white',
-                          border: isCancelled ? '1px solid #fca5a5' : isPaid ? '1px solid #6ee7b7' : '1px solid #e2e8f0',
-                          borderRadius: '12px', overflow: 'hidden', marginBottom: '10px',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.05)', opacity: isCancelled ? 0.75 : 1
-                        }}>
-                          {/* Meal header */}
-                          <div style={{
-                            background: isCancelled ? 'linear-gradient(135deg,#fee2e2,#fca5a5)' : isPaid ? 'linear-gradient(135deg,#d1fae5,#6ee7b7)' : 'linear-gradient(135deg,#fef3c7,#fde68a)',
-                            padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '8px'
-                          }}>
-                            <span style={{ fontSize: '1.1rem' }}>
-                              {meal.mealType === 'Breakfast' ? '🌅' : meal.mealType === 'Lunch' ? '☀️' : meal.mealType === 'Snacks' ? '🍵' : '🌙'}
-                            </span>
-                            <span style={{ fontWeight: 700, color: isCancelled ? '#991b1b' : isPaid ? '#065f46' : '#92400e', fontSize: '0.9rem' }}>
-                              {meal.mealType}
-                            </span>
-                            {isCancelled && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', fontWeight: 700, color: '#dc2626' }}>⛔ Skipped</span>}
-                            {isPaid && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', fontWeight: 700, color: '#059669' }}>✅ Purchased</span>}
-                            {meal.nonVegItems && meal.nonVegItems.length > 0 && !isCancelled && !isPaid && (
-                              <span style={{ marginLeft: 'auto', background: '#ef4444', color: 'white', fontSize: '0.58rem', fontWeight: 700, padding: '2px 7px', borderRadius: '999px' }}>⭐ Non-Veg</span>
-                            )}
-                          </div>
-
-                          {/* Items list */}
-                          <div style={{ padding: '8px 14px' }}>
-                            {meal.items.map((item, i) => (
-                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: isCancelled ? '#94a3b8' : '#166534', borderBottom: i < meal.items.length - 1 ? '1px solid #f0fdf4' : 'none', textDecoration: isCancelled ? 'line-through' : 'none' }}>
-                                <span style={{ color: '#10b981', fontSize: '0.7rem' }}>●</span>{item}
-                              </div>
-                            ))}
-                            {meal.nonVegItems && meal.nonVegItems.length > 0 && (
-                              <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #fecdd3' }}>
-                                {meal.nonVegItems.map((item, i) => (
-                                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: '#9f1239' }}>
-                                    <span style={{ color: '#ef4444', fontSize: '0.7rem' }}>●</span>{item}
-                                    <span style={{ marginLeft: 'auto', fontSize: '0.6rem', color: '#b91c1c', fontWeight: 700 }}>+₹ Extra</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Action button */}
-                          {!isStaff && (
-                            <div style={{ padding: '0 14px 12px', display: 'flex', justifyContent: 'flex-end' }}>
-                              {isHosteller ? (
+                        <div
+                          key={index}
+                          className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""} ${isPaid ? "paid-box" : ""}`}
+                          style={isPaid ? { borderLeft: '4px solid #10b981', background: '#ecfdf5' } : {}}
+                        >
+                          <div className="meal-box-header">
+                            <h4
+                              className={`meal-type-label ${isCancelled ? "cancelled" : ""}`}
+                              style={isPaid ? { color: '#059669' } : {}}
+                            >
+                              {MEAL_ICONS[meal.mealType]} {meal.mealType}
+                              {meal.nonVegItems && meal.nonVegItems.length > 0 && !isCancelled && (
+                                <span style={{ marginLeft: '8px', background: '#ef4444', color: 'white', fontSize: '0.55rem', fontWeight: 700, padding: '1px 6px', borderRadius: '999px', verticalAlign: 'middle' }}>⭐</span>
+                              )}
+                            </h4>
+                            {!isStaff && (
+                              isHosteller ? (
                                 <button
                                   onClick={() => handleToggleMeal(meal.mealType, isCancelled ? "Cancelled" : "Booked")}
-                                  style={{
-                                    padding: '6px 14px', borderRadius: '999px', fontSize: '0.78rem',
-                                    fontWeight: 700, border: 'none', cursor: 'pointer',
-                                    background: isCancelled ? '#10b981' : '#ef4444',
-                                    color: 'white'
-                                  }}
+                                  className={isCancelled ? "btn-add-back" : "btn-skip"}
                                 >
-                                  {isCancelled ? "↩ Add Back" : "⏭ Skip Meal"}
+                                  {isCancelled ? "Add Back" : "Skip Meal"}
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => { if (!isPaid && window.confirm(`Purchase ${meal.mealType} for ₹50?`)) handleToggleMeal(meal.mealType, "Paid"); }}
                                   disabled={isPaid}
-                                  style={{
-                                    padding: '6px 14px', borderRadius: '999px', fontSize: '0.78rem',
-                                    fontWeight: 700, border: 'none',
-                                    cursor: isPaid ? 'default' : 'pointer',
-                                    background: isPaid ? '#10b981' : '#3b82f6',
-                                    color: 'white'
-                                  }}
+                                  className="btn-skip"
+                                  style={isPaid ? { background: '#10b981', color: 'white', cursor: 'default', border: 'none' } : { background: '#3b82f6', color: 'white' }}
                                 >
                                   {isPaid ? "✅ Purchased" : "🛒 Buy (₹50)"}
                                 </button>
-                              )}
-                            </div>
-                          )}
-                          {isCancelled && isHosteller && <p style={{ textAlign:'center', fontSize:'0.72rem', color:'#dc2626', paddingBottom:'8px', margin:0 }}>Cancelled for Rebate</p>}
-                          {isPaid && !isHosteller && <p style={{ textAlign:'center', fontSize:'0.72rem', color:'#059669', paddingBottom:'8px', margin:0 }}>🎫 Ticket ready for scanner</p>}
+                              )
+                            )}
+                          </div>
+
+                          {/* Dish rows with nutrition expand */}
+                          <div style={{ marginTop: '8px', opacity: isCancelled ? 0.6 : 1 }}>
+                            {meal.items.map((item, i) => (
+                              <DishNutritionPanel key={i} dishName={item} nutritionMap={nutritionMap} />
+                            ))}
+                            {meal.nonVegItems && meal.nonVegItems.length > 0 && (
+                              <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #fecdd3' }}>
+                                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#b91c1c', marginBottom: '4px' }}>🔴 Non-Veg (Extra Charge)</div>
+                                {meal.nonVegItems.map((item, i) => (
+                                  <DishNutritionPanel key={i} dishName={item} nutritionMap={nutritionMap} />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {isCancelled && isHosteller && <p className="cancelled-label">Cancelled for Rebate</p>}
+                          {isPaid && !isHosteller && <p className="cancelled-label" style={{ color: '#059669' }}>🎫 Ticket ready for scanner</p>}
                         </div>
                       );
                     })

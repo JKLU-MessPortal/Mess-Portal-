@@ -265,12 +265,13 @@ export default function MenuPage() {
 
   return (
     <div className="menu-page">
-      <div className="menu-container">
+      {/* Navbar lives in full-width 1100px wrapper — matches Dashboard */}
+      <div className="menu-page-inner">
         <Navbar />
 
         <div className="menu-hero">
           <h1 className="menu-hero-title">🍲 Mess Menu</h1>
-          <p className="menu-hero-sub">Tap a meal to see its dishes. Tap a dish to see its nutrition info.</p>
+          <p className="menu-hero-sub">Tap a meal to see its dishes · Tap a dish to see nutrition info</p>
         </div>
 
         {/* Dietary Banner */}
@@ -311,8 +312,8 @@ export default function MenuPage() {
           })}
         </div>
 
-        {/* Meal Cards */}
-        <div className="meal-cards-area">
+        {/* Meal Cards — narrower column */}
+        <div className="menu-content">
           {loading ? (
             <div className="menu-loading">Loading menu...</div>
           ) : selectedMeals.length === 0 ? (

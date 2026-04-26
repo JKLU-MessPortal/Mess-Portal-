@@ -5,12 +5,19 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fff7ed 100%);
   font-family: 'Inter', sans-serif;
+  padding: 30px 20px;
 }
 
-.menu-container {
-  max-width: 780px;
+/* Full-width wrapper — Navbar sits here, unconstrained */
+.menu-page-inner {
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 16px 60px;
+}
+
+/* Narrower content column for the cards */
+.menu-content {
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 /* ── Hero Header ── */
