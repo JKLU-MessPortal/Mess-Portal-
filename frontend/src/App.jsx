@@ -10,6 +10,7 @@ import History from "./pages/History";
 import Settings from "./pages/Settings";
 import StudentManagement from "./pages/StudentManagement";
 import Voting from "./pages/Voting";
+import MenuPage from "./pages/MenuPage";
 
 // --- IMPORT COMPONENTS ---
 import PrivateRoute from "./components/PrivateRoute";
@@ -27,6 +28,16 @@ function App() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Mess Menu */}
+        <Route
+          path="/menu"
+          element={
+            <PrivateRoute>
+              <MenuPage />
             </PrivateRoute>
           }
         />

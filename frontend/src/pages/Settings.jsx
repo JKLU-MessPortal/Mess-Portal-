@@ -88,6 +88,12 @@ export default function Settings() {
 
       if (res.data.success) {
         setStatusMsg({ text: "✅ Settings saved successfully!", type: "success" });
+        // Update localStorage so the menu filter works immediately without re-login
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+        localStorage.setItem("user", JSON.stringify({
+          ...storedUser,
+          dietaryPreference: form.dietaryPreference,
+        }));
       }
     } catch (err) {
       console.error("Settings save error:", err);

@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const [day, setDay] = useState("Monday");
   const [meal, setMeal] = useState("Breakfast")
   const [foodItems, setFoodItems] = useState("");
+  const [nonVegFoodItems, setNonVegFoodItems] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
   // Data State
@@ -61,8 +62,9 @@ export default function AdminDashboard() {
     setStatusMsg("Updating...");
     try {
       const itemsArray = foodItems.split(",").map((i) => i.trim()).filter((i) => i !== "");
-      const res = await axios.post("http://localhost:5000/api/admin/menu", { dayOfWeek: day, mealType: meal, items: itemsArray });
-      if (res.data.success) { setStatusMsg("✅ Success: " + meal + " on " + day + " updated!"); setFoodItems(""); }
+      const nonVegArray = nonVegFoodItems.split(",").map((i) => i.trim()).filter((i) => i !== "");
+      const res = await axios.post("http://localhost:5000/api/admin/menu", { dayOfWeek: day, mealType: meal, items: itemsArray, nonVegItems: nonVegArray });
+      if (res.data.success) { setStatusMsg("✅ Success: " + meal + " on " + day + " updated!"); setFoodItems(""); setNonVegFoodItems(""); }
     } catch { setStatusMsg("❌ Failed to update menu."); }
   };
 
@@ -184,14 +186,24 @@ export default function AdminDashboard() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Food Items (comma separated)</label>
+                  <label className="form-label">🟢 Veg Items (comma separated)</label>
                   <textarea
                     value={foodItems}
                     onChange={(e) => setFoodItems(e.target.value)}
-                    placeholder="e.g. Paneer, Naan, Rice, Dal"
+                    placeholder="e.g. Paneer, Naan, Rice, Dal, Salad"
                     required
                     className="form-control"
-                    style={{ minHeight: "100px" }}
+                    style={{ minHeight: "80px" }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ color: '#dc2626' }}>🔴 Non-Veg Items (comma separated, leave blank if none)</label>
+                  <textarea
+                    value={nonVegFoodItems}
+                    onChange={(e) => setNonVegFoodItems(e.target.value)}
+                    placeholder="e.g. Egg Curry, Omelette, Chicken Gravy (optional)"
+                    className="form-control"
+                    style={{ minHeight: "80px", borderColor: nonVegFoodItems ? '#fca5a5' : undefined }}
                   />
                 </div>
                 <button type="submit" className="btn-primary">🍽️ Update Menu</button>

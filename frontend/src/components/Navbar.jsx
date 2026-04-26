@@ -48,6 +48,13 @@ export default function Navbar() {
           🏠 Home
         </button>
 
+        <button
+          onClick={() => navigate("/menu")}
+          className={`nav-btn ${isActive("/menu") ? "active" : ""}`}
+        >
+          🍲 Mess Menu
+        </button>
+
         {/* Student-only: History & Settings */}
         {!isStaff && (
           <>

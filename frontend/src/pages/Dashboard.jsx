@@ -449,49 +449,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* --- FULL WEEKLY MENU SECTION --- */}
-        <div className="weekly-section">
-          <h3> Full Weekly Meal Plan</h3>
-          <div className="weekly-grid">
-            {allDaysOfWeek.map((day) => {
-              const dayMeals = menuData.fullMenu.filter(
-                (m) => m.dayOfWeek === day,
-              );
-              if (dayMeals.length === 0) return null;
-
-              return (
-                <div key={day} className="day-card">
-                  <h4>{day}</h4>
-                  {/*  UPDATE: Sort Full Weekly Menu */}
-                  {[...dayMeals]
-                    .sort((a, b) => {
-                      const order = {
-                        Breakfast: 1,
-                        Lunch: 2,
-                        Snacks: 3,
-                        Dinner: 4,
-                      };
-                      return order[a.mealType] - order[b.mealType];
-                    })
-                    .map((meal, idx) => (
-                      <div key={idx} className="day-meal-row">
-                        <span className="day-meal-type">{meal.mealType}</span>
-                        <span className="day-meal-items">
-                          {meal.items.join(", ")}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              );
-            })}
-          </div>
-
-          {menuData.fullMenu.length === 0 && (
-            <p className="weekly-empty">
-              The weekly menu has not been uploaded yet. Please ask an admin to
-              update it.
-            </p>
-          )}
           {/* --- FOOD REVIEW & COMPLAINT SECTION --- */}
           {!isStaff && (
             <div className="review-section">
@@ -558,7 +515,6 @@ export default function Dashboard() {
               </form>
             </div>
           )}
-        </div>
       </div>
     </div>
   );

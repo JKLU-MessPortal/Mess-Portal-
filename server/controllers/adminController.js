@@ -8,10 +8,10 @@ const HostellerRegistry = require('../models/HostellerRegistry');
 // 1. Update the Menu
 exports.updateMenu = async (req, res) => {
   try {
-    const { dayOfWeek, mealType, items } = req.body;
+    const { dayOfWeek, mealType, items, nonVegItems } = req.body;
     const updatedMenu = await Menu.findOneAndUpdate(
       { dayOfWeek, mealType },
-      { items },
+      { items, nonVegItems: nonVegItems || [] },
       { new: true, upsert: true } 
     );
     res.status(200).json({ success: true, message: `${mealType} for ${dayOfWeek} updated!`, menu: updatedMenu });

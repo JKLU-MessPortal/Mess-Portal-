@@ -12,8 +12,12 @@ const MenuSchema = new mongoose.Schema({
     required: true 
   },
   items: { 
-    type: [String], // Example: ["Rajma", "Rice", "Roti", "Salad"]
+    type: [String], // Veg items: ["Rajma", "Rice", "Roti", "Salad"]
     required: true 
+  },
+  nonVegItems: { 
+    type: [String], // Non-Veg items: ["Egg Curry", "Chicken", "Omelette"]
+    default: []
   }
 });
 

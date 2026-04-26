@@ -52,6 +52,7 @@ exports.microsoftLogin = async (req, res) => {
         email: user.email,
         role: user.role,
         residencyStatus: user.residencyStatus,
+        dietaryPreference: user.dietaryPreference || '',
       }
     });
 
