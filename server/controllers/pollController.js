@@ -20,19 +20,36 @@ function sortPosts(posts, sort) {
   return posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // recent
 }
 
-// 1. GET all active posts
+// 1. GET posts (active OR resolved archive) with optional search
 exports.getPosts = async (req, res) => {
   try {
-    const { sort = 'recent', category } = req.query;
-    const filter = { status: 'active' };
+    const { sort = 'recent', category, status = 'active', search } = req.query;
+
+    const filter = { status };
     if (category && category !== 'All') filter.category = category;
+    if (search && search.trim()) {
+      const re = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { title: re },
+        { description: re },
+        { createdByName: re },
+      ];
+    }
+
     const posts = await PollPost.find(filter).lean();
-    res.json({ success: true, posts: sortPosts(posts, sort) });
+
+    // Archive: always sort by resolvedAt desc; Active: use sort param
+    const sorted = status === 'resolved'
+      ? posts.sort((a, b) => new Date(b.resolvedAt) - new Date(a.resolvedAt))
+      : sortPosts(posts, sort);
+
+    res.json({ success: true, posts: sorted });
   } catch (e) {
     console.error('getPosts:', e);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
 
 // 2. CREATE post (Hosteller only)
 exports.createPost = async (req, res) => {

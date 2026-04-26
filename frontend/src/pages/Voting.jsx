@@ -123,7 +123,7 @@ function CreateModal({ onClose, onCreated, studentId }) {
 }
 
 // ── Detail Panel (right side) ─────────────────────────────
-function DetailPanel({ post, currentUser, isAdmin, onVote, onAdminResolve, onStudentResolve, onDelete, onClose }) {
+function DetailPanel({ post, currentUser, isAdmin, isArchive, onVote, onAdminResolve, onStudentResolve, onDelete, onClose }) {
   if (!post) return <div className="detail-empty"><span>👈 Select a post to see details</span></div>;
 
   const uid = currentUser.id || currentUser._id;
@@ -156,8 +156,8 @@ function DetailPanel({ post, currentUser, isAdmin, onVote, onAdminResolve, onStu
       {/* Donut Chart */}
       <DonutChart upvotes={post.upvotedBy?.length ?? 0} downvotes={post.downvotedBy?.length ?? 0} />
 
-      {/* Vote Buttons — only non-admin, active post */}
-      {!isAdmin && post.status === "active" && (
+      {/* Vote Buttons — only non-admin, active post, not archive */}
+      {!isAdmin && !isArchive && post.status === "active" && (
         <div className="detail-vote-row">
           <button onClick={() => onVote(post._id, "up")} className={`vote-btn vote-up ${hasUpvoted ? "voted" : ""}`}>
             ▲ {post.upvotedBy?.length ?? 0}
@@ -169,15 +169,23 @@ function DetailPanel({ post, currentUser, isAdmin, onVote, onAdminResolve, onStu
         </div>
       )}
 
+      {/* Archive resolved info */}
+      {isArchive && post.resolvedAt && (
+        <div className="archive-resolved-info">
+          <span>🏁</span>
+          <span>Resolved on <strong>{new Date(post.resolvedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</strong></span>
+        </div>
+      )}
+
       {/* Admin resolve button */}
-      {isAdmin && post.status === "active" && !post.adminResolved && (
+      {isAdmin && !isArchive && post.status === "active" && !post.adminResolved && (
         <button className="btn-admin-resolve" onClick={() => onAdminResolve(post._id)}>
           🔧 Mark as Fixed (Admin)
         </button>
       )}
 
       {/* Student confirm resolve */}
-      {!isAdmin && isCreator && post.adminResolved && post.status === "active" && (
+      {!isAdmin && !isArchive && isCreator && post.adminResolved && post.status === "active" && (
         <div className="resolve-confirm-box">
           <p>🔔 The mess admin has marked this as fixed!</p>
           <button className="btn-student-resolve" onClick={() => onStudentResolve(post._id)}>
@@ -186,8 +194,8 @@ function DetailPanel({ post, currentUser, isAdmin, onVote, onAdminResolve, onStu
         </div>
       )}
 
-      {/* Delete (creator only, active only) */}
-      {!isAdmin && isCreator && post.status === "active" && (
+      {/* Delete (creator only, active only, not archive) */}
+      {!isAdmin && !isArchive && isCreator && post.status === "active" && (
         <button className="btn-delete" onClick={() => onDelete(post._id)}>🗑️ Delete My Post</button>
       )}
     </div>
@@ -206,6 +214,9 @@ export default function Voting() {
   const [sort, setSort] = useState("recent");
   const [catFilter, setCatFilter] = useState("All");
   const [showMine, setShowMine] = useState(false);
+  const [viewMode, setViewMode] = useState("active");   // "active" | "archive"
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");   // raw input, debounced into search
   const [selectedPost, setSelectedPost] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -222,16 +233,23 @@ export default function Voting() {
     setIsHosteller(hosteller);
   }, [navigate]);
 
+  // Debounce searchInput → search (300 ms)
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ sort });
+      const params = new URLSearchParams({ sort, status: viewMode });
       if (catFilter !== "All") params.append("category", catFilter);
+      if (search.trim())       params.append("search", search.trim());
       const res = await axios.get(`${API}?${params}`);
       if (res.data.success) setPosts(res.data.posts);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }, [sort, catFilter]);
+  }, [sort, catFilter, viewMode, search]);
 
   useEffect(() => { if (currentUser) fetchPosts(); }, [currentUser, fetchPosts]);
 
@@ -314,7 +332,38 @@ export default function Voting() {
           )}
         </div>
 
-        {/* Sort + Filter Bar */}
+        {/* Active / Archive Tab */}
+        <div className="view-mode-bar">
+          <div className="view-mode-tabs">
+            <button
+              className={`view-tab ${viewMode === "active" ? "view-tab--active" : ""}`}
+              onClick={() => { setViewMode("active"); setSelectedPost(null); setSearchInput(""); }}>
+              🗳️ Active Posts
+            </button>
+            <button
+              className={`view-tab ${viewMode === "archive" ? "view-tab--archive" : ""}`}
+              onClick={() => { setViewMode("archive"); setSelectedPost(null); setSort("recent"); setShowMine(false); setSearchInput(""); }}>
+              🏁 Archive
+            </button>
+          </div>
+          {/* Search Bar */}
+          <div className="search-wrapper">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder={`Search ${viewMode === "archive" ? "resolved" : "active"} posts…`}
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+            />
+            {searchInput && (
+              <button className="search-clear" onClick={() => setSearchInput("")}>✕</button>
+            )}
+          </div>
+        </div>
+
+        {/* Sort + Filter Bar — hidden in archive mode */}
+        {viewMode === "active" && (
         <div className="filter-bar">
           <div className="sort-tabs">
             {[["recent", "🕒 Recent"], ["trending", "🔥 Trending"], ["top", "⬆️ Top"]].map(([val, label]) => (
@@ -331,6 +380,7 @@ export default function Voting() {
             )}
           </div>
         </div>
+        )}
 
         {/* Category chips */}
         <div className="cat-chips">
@@ -364,11 +414,11 @@ export default function Voting() {
                 const isSelected = selectedPost?._id === post._id;
                 return (
                   <div key={post._id}
-                    className={`post-card ${isSelected ? "post-card--selected" : ""} ${post.adminResolved ? "post-card--admin-resolved" : ""}`}
+                    className={`post-card ${isSelected ? "post-card--selected" : ""} ${post.adminResolved && viewMode === "active" ? "post-card--admin-resolved" : ""} ${viewMode === "archive" ? "post-card--archived" : ""}`}
                     onClick={() => setSelectedPost(isSelected ? null : post)}>
-                    {/* Left vote column */}
+                    {/* Left vote column — hidden in archive */}
                     <div className="post-vote-col" onClick={e => e.stopPropagation()}>
-                      {!isAdmin ? (
+                      {viewMode === "active" && !isAdmin ? (
                         <>
                           <button onClick={() => handleVote(post._id, "up")} className={`vote-sm up ${hasUp ? "voted" : ""}`}>▲</button>
                           <span className={`net-sm ${net > 0 ? "pos" : net < 0 ? "neg" : ""}`}>{net}</span>
@@ -384,7 +434,8 @@ export default function Voting() {
                         <span className="cat-badge-sm" style={{ background: CATEGORY_COLORS[post.category] + "22", color: CATEGORY_COLORS[post.category] }}>
                           {post.category}
                         </span>
-                        {post.adminResolved && <span className="badge-sm-resolved">🔧 Admin Fixed</span>}
+                        {viewMode === "active" && post.adminResolved && <span className="badge-sm-resolved">🔧 Admin Fixed</span>}
+                        {viewMode === "archive" && <span className="badge-sm-archived">🏁 Resolved</span>}
                       </div>
                       <h3 className="post-title">{post.title}</h3>
                       <p className="post-excerpt">{post.description.slice(0, 120)}{post.description.length > 120 ? "…" : ""}</p>
@@ -392,6 +443,9 @@ export default function Voting() {
                         <span>👤 {post.createdByName}</span>
                         <span>🕒 {timeAgo(post.createdAt)}</span>
                         <span>▲ {post.upvotedBy?.length ?? 0} · ▼ {post.downvotedBy?.length ?? 0}</span>
+                        {viewMode === "archive" && post.resolvedAt && (
+                          <span>✅ Resolved {timeAgo(post.resolvedAt)}</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -406,6 +460,7 @@ export default function Voting() {
               post={selectedPost}
               currentUser={currentUser}
               isAdmin={isAdmin}
+              isArchive={viewMode === "archive"}
               onVote={handleVote}
               onAdminResolve={handleAdminResolve}
               onStudentResolve={handleStudentResolve}
