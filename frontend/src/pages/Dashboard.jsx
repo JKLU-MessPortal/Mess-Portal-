@@ -313,21 +313,45 @@ export default function Dashboard() {
               <h3 className="menu-card-title">Today ({menuData.todayName})</h3>
               <div className="meals-grid">
                 {menuData.todayMenu.length > 0 ? (
-                  //  UPDATE: Sort Today's Menu
                   [...menuData.todayMenu]
-                    .sort((a, b) => {
-                      const order = {
-                        Breakfast: 1,
-                        Lunch: 2,
-                        Snacks: 3,
-                        Dinner: 4,
-                      };
-                      return order[a.mealType] - order[b.mealType];
-                    })
+                    .sort((a, b) => { const o={Breakfast:1,Lunch:2,Snacks:3,Dinner:4}; return o[a.mealType]-o[b.mealType]; })
                     .map((meal, index) => (
-                      <div key={index} className="meal-box-today">
-                        <h4>{meal.mealType}</h4>
-                        <p>{meal.items.join(", ")}</p>
+                      <div key={index} style={{
+                        background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px',
+                        overflow: 'hidden', marginBottom: '10px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                      }}>
+                        {/* Meal header */}
+                        <div style={{
+                          background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                          padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '8px'
+                        }}>
+                          <span style={{ fontSize: '1.1rem' }}>
+                            {meal.mealType === 'Breakfast' ? '🌅' : meal.mealType === 'Lunch' ? '☀️' : meal.mealType === 'Snacks' ? '🍵' : '🌙'}
+                          </span>
+                          <span style={{ fontWeight: 700, color: '#92400e', fontSize: '0.9rem' }}>{meal.mealType}</span>
+                          {meal.nonVegItems && meal.nonVegItems.length > 0 && (
+                            <span style={{ marginLeft: 'auto', background: '#ef4444', color: 'white', fontSize: '0.58rem', fontWeight: 700, padding: '2px 7px', borderRadius: '999px' }}>⭐ Non-Veg</span>
+                          )}
+                        </div>
+                        {/* Items */}
+                        <div style={{ padding: '8px 14px' }}>
+                          {meal.items.map((item, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: '#166534', borderBottom: i < meal.items.length - 1 ? '1px solid #f0fdf4' : 'none' }}>
+                              <span style={{ color: '#10b981', fontSize: '0.7rem' }}>●</span>{item}
+                            </div>
+                          ))}
+                          {meal.nonVegItems && meal.nonVegItems.length > 0 && (
+                            <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #fecdd3' }}>
+                              {meal.nonVegItems.map((item, i) => (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: '#9f1239' }}>
+                                  <span style={{ color: '#ef4444', fontSize: '0.7rem' }}>●</span>{item}
+                                  <span style={{ marginLeft: 'auto', fontSize: '0.6rem', color: '#b91c1c', fontWeight: 700 }}>+₹ Extra</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))
                 ) : (
@@ -345,90 +369,90 @@ export default function Dashboard() {
 
               <div className="meals-grid">
                 {menuData.tomorrowMenu.length > 0 ? (
-                  //  UPDATE: Sort Tomorrow's Menu
                   [...menuData.tomorrowMenu]
-                    .sort((a, b) => {
-                      const order = {
-                        Breakfast: 1,
-                        Lunch: 2,
-                        Snacks: 3,
-                        Dinner: 4,
-                      };
-                      return order[a.mealType] - order[b.mealType];
-                    })
+                    .sort((a, b) => { const o={Breakfast:1,Lunch:2,Snacks:3,Dinner:4}; return o[a.mealType]-o[b.mealType]; })
                     .map((meal, index) => {
-                      const isCancelled = menuData.tomorrowBookings.some(
-                        (b) =>
-                          b.mealType === meal.mealType &&
-                          b.status === "Cancelled",
-                      );
-                      const isPaid = menuData.tomorrowBookings.some(
-                        (b) =>
-                          b.mealType === meal.mealType &&
-                          b.status === "Paid",
-                      );
+                      const isCancelled = menuData.tomorrowBookings.some(b => b.mealType === meal.mealType && b.status === "Cancelled");
+                      const isPaid = menuData.tomorrowBookings.some(b => b.mealType === meal.mealType && b.status === "Paid");
 
                       return (
-                        <div
-                          key={index}
-                          className={`meal-box-tomorrow ${isCancelled ? "cancelled" : ""} ${isPaid ? "paid-box" : ""}`}
-                          style={isPaid ? { borderLeft: '4px solid #10b981', background: '#ecfdf5' } : {}}
-                        >
-                          <div className="meal-box-header">
-                            <h4
-                              className={`meal-type-label ${isCancelled ? "cancelled" : ""}`}
-                              style={isPaid ? { color: '#059669' } : {}}
-                            >
+                        <div key={index} style={{
+                          background: isCancelled ? '#fef2f2' : isPaid ? '#ecfdf5' : 'white',
+                          border: isCancelled ? '1px solid #fca5a5' : isPaid ? '1px solid #6ee7b7' : '1px solid #e2e8f0',
+                          borderRadius: '12px', overflow: 'hidden', marginBottom: '10px',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.05)', opacity: isCancelled ? 0.75 : 1
+                        }}>
+                          {/* Meal header */}
+                          <div style={{
+                            background: isCancelled ? 'linear-gradient(135deg,#fee2e2,#fca5a5)' : isPaid ? 'linear-gradient(135deg,#d1fae5,#6ee7b7)' : 'linear-gradient(135deg,#fef3c7,#fde68a)',
+                            padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '8px'
+                          }}>
+                            <span style={{ fontSize: '1.1rem' }}>
+                              {meal.mealType === 'Breakfast' ? '🌅' : meal.mealType === 'Lunch' ? '☀️' : meal.mealType === 'Snacks' ? '🍵' : '🌙'}
+                            </span>
+                            <span style={{ fontWeight: 700, color: isCancelled ? '#991b1b' : isPaid ? '#065f46' : '#92400e', fontSize: '0.9rem' }}>
                               {meal.mealType}
-                            </h4>
-                            {!isStaff && (
-                              isHosteller ? (
+                            </span>
+                            {isCancelled && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', fontWeight: 700, color: '#dc2626' }}>⛔ Skipped</span>}
+                            {isPaid && <span style={{ marginLeft: 'auto', fontSize: '0.65rem', fontWeight: 700, color: '#059669' }}>✅ Purchased</span>}
+                            {meal.nonVegItems && meal.nonVegItems.length > 0 && !isCancelled && !isPaid && (
+                              <span style={{ marginLeft: 'auto', background: '#ef4444', color: 'white', fontSize: '0.58rem', fontWeight: 700, padding: '2px 7px', borderRadius: '999px' }}>⭐ Non-Veg</span>
+                            )}
+                          </div>
+
+                          {/* Items list */}
+                          <div style={{ padding: '8px 14px' }}>
+                            {meal.items.map((item, i) => (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: isCancelled ? '#94a3b8' : '#166534', borderBottom: i < meal.items.length - 1 ? '1px solid #f0fdf4' : 'none', textDecoration: isCancelled ? 'line-through' : 'none' }}>
+                                <span style={{ color: '#10b981', fontSize: '0.7rem' }}>●</span>{item}
+                              </div>
+                            ))}
+                            {meal.nonVegItems && meal.nonVegItems.length > 0 && (
+                              <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed #fecdd3' }}>
+                                {meal.nonVegItems.map((item, i) => (
+                                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.82rem', color: '#9f1239' }}>
+                                    <span style={{ color: '#ef4444', fontSize: '0.7rem' }}>●</span>{item}
+                                    <span style={{ marginLeft: 'auto', fontSize: '0.6rem', color: '#b91c1c', fontWeight: 700 }}>+₹ Extra</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action button */}
+                          {!isStaff && (
+                            <div style={{ padding: '0 14px 12px', display: 'flex', justifyContent: 'flex-end' }}>
+                              {isHosteller ? (
                                 <button
-                                  onClick={() =>
-                                    handleToggleMeal(
-                                      meal.mealType,
-                                      isCancelled ? "Cancelled" : "Booked",
-                                    )
-                                  }
-                                  className={
-                                    isCancelled ? "btn-add-back" : "btn-skip"
-                                  }
+                                  onClick={() => handleToggleMeal(meal.mealType, isCancelled ? "Cancelled" : "Booked")}
+                                  style={{
+                                    padding: '6px 14px', borderRadius: '999px', fontSize: '0.78rem',
+                                    fontWeight: 700, border: 'none', cursor: 'pointer',
+                                    background: isCancelled ? '#10b981' : '#ef4444',
+                                    color: 'white'
+                                  }}
                                 >
-                                  {isCancelled ? "Add Back" : "Skip Meal"}
+                                  {isCancelled ? "↩ Add Back" : "⏭ Skip Meal"}
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => {
-                                    if (!isPaid) {
-                                      if(window.confirm(`Purchase ${meal.mealType} for ₹50?`)) {
-                                        handleToggleMeal(meal.mealType, "Paid");
-                                      }
-                                    }
-                                  }}
+                                  onClick={() => { if (!isPaid && window.confirm(`Purchase ${meal.mealType} for ₹50?`)) handleToggleMeal(meal.mealType, "Paid"); }}
                                   disabled={isPaid}
-                                  className="btn-skip"
-                                  style={isPaid ? { background: '#10b981', color: 'white', cursor: 'default', border: 'none' } : { background: '#3b82f6', color: 'white' }}
+                                  style={{
+                                    padding: '6px 14px', borderRadius: '999px', fontSize: '0.78rem',
+                                    fontWeight: 700, border: 'none',
+                                    cursor: isPaid ? 'default' : 'pointer',
+                                    background: isPaid ? '#10b981' : '#3b82f6',
+                                    color: 'white'
+                                  }}
                                 >
-                                  {isPaid ? "Purchased ✅" : "Buy (₹50)"}
+                                  {isPaid ? "✅ Purchased" : "🛒 Buy (₹50)"}
                                 </button>
-                              )
-                            )}
-                          </div>
-                          <p
-                            className={`meal-items-text ${isCancelled ? "cancelled" : ""}`}
-                          >
-                            {meal.items.join(", ")}
-                          </p>
-                          {isCancelled && isHosteller && (
-                            <p className="cancelled-label">
-                              Cancelled for Rebate
-                            </p>
+                              )}
+                            </div>
                           )}
-                          {isPaid && !isHosteller && (
-                            <p className="cancelled-label" style={{ color: '#059669' }}>
-                              Meal ticket ready for scanner
-                            </p>
-                          )}
+                          {isCancelled && isHosteller && <p style={{ textAlign:'center', fontSize:'0.72rem', color:'#dc2626', paddingBottom:'8px', margin:0 }}>Cancelled for Rebate</p>}
+                          {isPaid && !isHosteller && <p style={{ textAlign:'center', fontSize:'0.72rem', color:'#059669', paddingBottom:'8px', margin:0 }}>🎫 Ticket ready for scanner</p>}
                         </div>
                       );
                     })
