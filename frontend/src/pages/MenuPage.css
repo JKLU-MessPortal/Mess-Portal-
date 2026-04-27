@@ -1,6 +1,9 @@
 /* ── MenuPage.css ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+/* ═══════════════════════════════════════
+   Page Shell
+═══════════════════════════════════════ */
 .menu-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fff7ed 100%);
@@ -8,19 +11,19 @@
   padding: 30px 20px;
 }
 
-/* Full-width wrapper — Navbar sits here, unconstrained */
 .menu-page-inner {
   max-width: 1100px;
   margin: 0 auto;
 }
 
-/* Narrower content column for the cards */
 .menu-content {
   max-width: 760px;
   margin: 0 auto;
 }
 
-/* ── Hero Header ── */
+/* ═══════════════════════════════════════
+   Hero Header
+═══════════════════════════════════════ */
 .menu-hero {
   text-align: center;
   padding: 32px 0 20px;
@@ -37,7 +40,9 @@
   margin: 0;
 }
 
-/* ── Dietary Banner ── */
+/* ═══════════════════════════════════════
+   Dietary Banner
+═══════════════════════════════════════ */
 .diet-banner {
   display: flex;
   align-items: center;
@@ -51,7 +56,9 @@
   color: #166534;
 }
 
-/* ── Day Selector Tabs ── */
+/* ═══════════════════════════════════════
+   Day Selector Tabs
+═══════════════════════════════════════ */
 .day-tabs {
   display: flex;
   gap: 8px;
@@ -75,19 +82,16 @@
   min-width: 52px;
   text-align: center;
 }
-
 .day-tab:hover:not(:disabled) {
   border-color: #f59e0b;
   color: #92400e;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(245,158,11,0.15);
 }
-
 .day-tab:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
-
 .day-tab--active {
   background: linear-gradient(135deg, #f59e0b, #d97706) !important;
   border-color: transparent !important;
@@ -95,14 +99,8 @@
   box-shadow: 0 4px 16px rgba(245,158,11,0.35) !important;
   transform: translateY(-2px);
 }
-
-.day-tab--today {
-  border-color: #10b981;
-}
-
-.day-tab-abbr {
-  display: block;
-}
+.day-tab--today { border-color: #10b981; }
+.day-tab-abbr   { display: block; }
 
 /* Dot indicators */
 .day-tab-dot {
@@ -113,18 +111,32 @@
   height: 7px;
   border-radius: 50%;
 }
-.day-tab-dot--today { background: #10b981; }
+.day-tab-dot--today  { background: #10b981; }
 .day-tab-dot--nonveg { background: #ef4444; }
 
-/* ── Meal Cards Area ── */
-.meal-cards-area {
+/* ═══════════════════════════════════════
+   Loading / Empty States
+═══════════════════════════════════════ */
+.menu-loading {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  align-items: center;
+  gap: 14px;
+  padding: 60px 20px;
+  color: #64748b;
+  font-size: 1rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-
-/* ── Loading / Empty States ── */
-.menu-loading,
+.menu-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #fde68a;
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
 .menu-empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -135,8 +147,281 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* ── Responsive ── */
+/* ═══════════════════════════════════════
+   TODAY label
+═══════════════════════════════════════ */
+.today-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 18px;
+}
+.today-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+  animation: pulse 2s ease infinite;
+}
+
+/* ═══════════════════════════════════════
+   Meal Tile Grid  (Today view)
+═══════════════════════════════════════ */
+.meal-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.meal-tile {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 22px;
+  padding: 28px 20px 22px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease;
+  min-height: 150px;
+}
+.meal-tile:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+.meal-tile:active {
+  transform: scale(0.97);
+}
+
+/* Decorative glow blob */
+.meal-tile-glow {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.meal-tile-icon {
+  font-size: 2.4rem;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+.meal-tile-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.meal-tile-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.meal-tile-nonveg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.4);
+}
+.meal-tile-hint {
+  margin-top: auto;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ═══════════════════════════════════════
+   Modal Backdrop (blur overlay)
+═══════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: backdropIn 0.2s ease;
+}
+
+/* ═══════════════════════════════════════
+   Modal Card
+═══════════════════════════════════════ */
+.modal-card {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.28),
+    0 8px 24px rgba(0,0,0,0.12);
+  animation: modalSlideUp 0.28s cubic-bezier(.34,1.56,.64,1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  flex-shrink: 0;
+}
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.modal-icon {
+  font-size: 2.2rem;
+  background: rgba(255,255,255,0.25);
+  border-radius: 14px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.modal-subtitle {
+  margin: 3px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+}
+.modal-close {
+  background: rgba(255,255,255,0.22);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.modal-close:hover {
+  background: rgba(255,255,255,0.38);
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding: 18px 20px 24px;
+  flex: 1;
+}
+
+.modal-section {
+  background: #fafafa;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.modal-section:last-child {
+  margin-bottom: 0;
+}
+.modal-section-label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.modal-section-hint {
+  font-weight: 400;
+  color: #94a3b8;
+  font-size: 0.73rem;
+}
+.modal-nonveg-badge {
+  margin-left: auto;
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.modal-nonveg-warning {
+  font-size: 0.72rem;
+  color: #9f1239;
+  background: #ffe4e6;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: 0 0 10px;
+}
+
+/* ═══════════════════════════════════════
+   Animations
+═══════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+  50%       { box-shadow: 0 0 0 6px rgba(16,185,129,0.08); }
+}
+
+/* ═══════════════════════════════════════
+   Responsive
+═══════════════════════════════════════ */
 @media (max-width: 600px) {
   .menu-hero-title { font-size: 1.5rem; }
   .day-tab { padding: 8px 12px; font-size: 0.78rem; min-width: 44px; }
+  .meal-tiles-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .meal-tile { min-height: 130px; padding: 22px 16px 18px; }
+  .meal-tile-name { font-size: 1.05rem; }
+  .modal-card { max-height: 90vh; border-radius: 20px; }
+}
+
+@media (max-width: 380px) {
+  .meal-tiles-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
 }
