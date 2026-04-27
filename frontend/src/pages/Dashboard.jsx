@@ -29,39 +29,128 @@ function DishNutritionPanel({ dishName, nutritionMap }) {
     Object.values(nutritionMap).find(d => d.name.toLowerCase().includes(query) || query.includes(d.name.toLowerCase()));
 
   return (
-    <div>
+    <>
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => { if (match) setOpen(true); }}
         style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          width: "100%", background: "#f8fafc", border: "1px solid #e2e8f0",
-          borderRadius: open ? "8px 8px 0 0" : "8px", padding: "6px 10px",
+          width: "100%", background: "transparent", border: "1px solid #e2e8f0",
+          borderRadius: "8px", padding: "8px 12px",
           cursor: match ? "pointer" : "default", fontFamily: "inherit",
-          marginBottom: open ? 0 : "5px"
+          marginBottom: "6px", transition: "all 0.2s"
         }}
+        onMouseOver={(e) => { if (match) e.currentTarget.style.background = "#f8fafc"; }}
+        onMouseOut={(e) => e.currentTarget.style.background = "transparent"}
       >
-        <span style={{ fontSize: "0.82rem", color: "#475569", fontWeight: 500 }}>🍽️ {dishName}</span>
-        {match && <span style={{ fontSize: "0.65rem", color: open ? "#f59e0b" : "#94a3b8", fontWeight: 700 }}>{open ? "▲ Hide" : "ℹ️ Info"}</span>}
+        <span style={{ fontSize: "0.9rem", color: "#334155", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ opacity: 0.3, fontSize: "1rem" }}>🍽️</span> {dishName}
+        </span>
+        {match && (
+          <span style={{ 
+            fontSize: "0.75rem", color: "#64748b", fontWeight: 600, 
+            background: "#e2e8f0", padding: "4px 8px", borderRadius: "4px", 
+            display: "flex", alignItems: "center", gap: "4px" 
+          }}>
+            <span style={{fontSize: "0.8rem"}}>ℹ️</span> Info
+          </span>
+        )}
       </button>
+
       {open && match && (
-        <div style={{
-          background: "white", border: "1px solid #e2e8f0", borderTop: "none",
-          borderRadius: "0 0 8px 8px", padding: "10px", marginBottom: "5px"
-        }}>
-          <div style={{ background: "linear-gradient(135deg,#fef3c7,#fde68a)", borderRadius: "6px", padding: "7px 10px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ fontSize: "1.2rem" }}>🔥</span>
-            <div>
-              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#92400e" }}>{match.calories} kcal</div>
-              <div style={{ fontSize: "0.65rem", color: "#b45309" }}>per {match.quantity_unit}</div>
+        <>
+          {/* Blurred Backdrop */}
+          <div
+            onClick={() => setOpen(false)}
+            style={{
+              position: "fixed", inset: 0, zIndex: 1000,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+              background: "rgba(15, 23, 42, 0.55)",
+              animation: "fadeIn 0.2s ease"
+            }}
+          />
+
+          {/* Modal Card */}
+          <div style={{
+            position: "fixed", inset: 0, zIndex: 1001,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "20px", pointerEvents: "none"
+          }}>
+            <div style={{
+              background: "white", borderRadius: "20px", width: "100%", maxWidth: "380px",
+              boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
+              animation: "slideUp 0.3s ease",
+              overflow: "hidden", pointerEvents: "auto"
+            }}>
+              {/* Header */}
+              <div style={{
+                background: "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+                padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "2rem" }}>🍽️</span>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: "1.1rem", color: "#0369a1" }}>
+                      Nutrition Info
+                    </div>
+                    <div style={{ fontSize: "0.85rem", color: "#0284c7", fontWeight: 600 }}>
+                      {match.name}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setOpen(false)}
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.5rem", color: "#0369a1", opacity: 0.7 }}
+                  onMouseOver={(e) => e.target.style.opacity = 1}
+                  onMouseOut={(e) => e.target.style.opacity = 0.7}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Body */}
+              <div style={{ padding: "24px" }}>
+                <div style={{ 
+                  background: "linear-gradient(135deg,#fef3c7,#fde68a)", borderRadius: "12px", 
+                  padding: "16px 20px", marginBottom: "20px", display: "flex", alignItems: "center", 
+                  justifyContent: "space-between", border: "1px solid #fde68a" 
+                }}>
+                  <div>
+                    <div style={{ fontSize: "0.75rem", color: "#92400e", fontWeight: 700, textTransform: "uppercase" }}>Energy</div>
+                    <div style={{ fontSize: "1.8rem", fontWeight: 900, color: "#92400e" }}>{match.calories} <span style={{fontSize:"1rem", fontWeight: 700}}>kcal</span></div>
+                    <div style={{ fontSize: "0.8rem", color: "#b45309", fontWeight: 600 }}>per {match.quantity_unit}</div>
+                  </div>
+                  <span style={{ fontSize: "3rem" }}>🔥</span>
+                </div>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "24px" }}>
+                  <NutritionBar label="💪 Protein" value={match.protein} max={30} color="#10b981" />
+                  <NutritionBar label="🌾 Carbs" value={match.carbohydrate} max={80} color="#3b82f6" />
+                  <NutritionBar label="🫒 Fat" value={match.fat} max={30} color="#f59e0b" />
+                  <NutritionBar label="🌿 Fibre" value={match.fibre || 0} max={10} color="#8b5cf6" />
+                </div>
+                
+                <button
+                  onClick={() => setOpen(false)}
+                  style={{
+                    width: "100%", padding: "14px", borderRadius: "12px", border: "none",
+                    background: "#f1f5f9", color: "#475569", fontWeight: 700, fontSize: "1rem",
+                    cursor: "pointer", fontFamily: "inherit", transition: "background 0.2s"
+                  }}
+                  onMouseOver={(e) => e.target.style.background = "#e2e8f0"}
+                  onMouseOut={(e) => e.target.style.background = "#f1f5f9"}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-          <NutritionBar label="💪 Protein" value={match.protein} max={30} color="#10b981" />
-          <NutritionBar label="🌾 Carbs" value={match.carbohydrate} max={80} color="#3b82f6" />
-          <NutritionBar label="🫒 Fat" value={match.fat} max={30} color="#f59e0b" />
-          <NutritionBar label="🌿 Fibre" value={match.fibre} max={10} color="#8b5cf6" />
-        </div>
+          <style>{`
+            @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+            @keyframes slideUp { from { transform: translateY(30px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+          `}</style>
+        </>
       )}
-    </div>
+    </>
   );
 }
 
