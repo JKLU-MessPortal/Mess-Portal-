@@ -2,6 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DishSearchInput from "../components/DishSearchInput";
+import { 
+  Megaphone, 
+  Utensils, 
+  BarChart3, 
+  Wallet, 
+  AlertCircle, 
+  ChevronLeft, 
+  UserCircle, 
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Search,
+  RefreshCw,
+  Camera,
+  History,
+  Clock
+} from "lucide-react";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -112,20 +129,20 @@ export default function AdminDashboard() {
 
   // Nav items based on role
   const navItems = [
-    ...(canSeeKitchenControls ? [{ id: "broadcast", icon: "📢", label: "Broadcast Notice" }] : []),
-    ...(canSeeKitchenControls ? [{ id: "menu", icon: "🍽️", label: "Update Menu" }] : []),
-    ...(canSeeKitchenControls ? [{ id: "headcount", icon: "📊", label: "Kitchen Headcount" }] : []),
-    ...(canSeeFinancials ? [{ id: "ledger", icon: "💰", label: "Refund Ledger" }] : []),
-    { id: "complaints", icon: "🚨", label: "Complaints" },
+    ...(canSeeKitchenControls ? [{ id: "broadcast", icon: <Megaphone size={18} />, label: "Broadcast Notice" }] : []),
+    ...(canSeeKitchenControls ? [{ id: "menu", icon: <Utensils size={18} />, label: "Update Menu" }] : []),
+    ...(canSeeKitchenControls ? [{ id: "headcount", icon: <BarChart3 size={18} />, label: "Kitchen Headcount" }] : []),
+    ...(canSeeFinancials ? [{ id: "ledger", icon: <Wallet size={18} />, label: "Refund Ledger" }] : []),
+    { id: "complaints", icon: <AlertCircle size={18} />, label: "Complaints" },
   ];
 
   // Section title/subtitle map
   const sectionMeta = {
-    broadcast:  { title: "📢 Broadcast Notice",           sub: "Send an alert message to all students' dashboards." },
-    menu:       { title: "🍽️ Update Mess Menu",            sub: "Change today's food offerings for any day." },
-    headcount:  { title: "📊 Tomorrow's Kitchen Headcount", sub: "Live headcount of meals skipped to help avoid food wastage." },
-    ledger:     { title: "💰 Monthly Refund Ledger",      sub: "List of students who cancelled meals this month." },
-    complaints: { title: "🚨 Student Complaints",          sub: "Browse, search and filter complaints raised by students." },
+    broadcast:  { title: "Broadcast Notice",           sub: "Send an alert message to all students' dashboards.", icon: <Megaphone size={22} /> },
+    menu:       { title: "Update Mess Menu",            sub: "Change today's food offerings for any day.", icon: <Utensils size={22} /> },
+    headcount:  { title: "Tomorrow's Kitchen Headcount", sub: "Live headcount of meals skipped to help avoid food wastage.", icon: <BarChart3 size={22} /> },
+    ledger:     { title: "Monthly Refund Ledger",      sub: "List of students who cancelled meals this month.", icon: <Wallet size={22} /> },
+    complaints: { title: "Student Complaints",          sub: "Browse, search and filter complaints raised by students.", icon: <AlertCircle size={22} /> },
   };
 
 
@@ -136,10 +153,10 @@ export default function AdminDashboard() {
       <div className="admin-topbar">
         <div className="admin-topbar-left">
           <span className="admin-topbar-logo">JKLU <span>Mess</span> Portal</span>
-          <span className="admin-role-pill">👨‍💻 {user.role}</span>
+          <span className="admin-role-pill"><UserCircle size={14} /> {user.role}</span>
         </div>
         <button onClick={() => navigate("/dashboard")} className="btn-back">
-          ← Back to Dashboard
+          <ChevronLeft size={16} /> Back to Dashboard
         </button>
       </div>
 
@@ -164,8 +181,11 @@ export default function AdminDashboard() {
         {/* ── MAIN PANEL ── */}
         <main className="admin-main">
           <div className="section-page-title">
-            <h2>{sectionMeta[activeSection]?.title}</h2>
-            <p>{sectionMeta[activeSection]?.sub}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#1f2937" }}>
+              {sectionMeta[activeSection]?.icon}
+              <h2 style={{ margin: 0 }}>{sectionMeta[activeSection]?.title}</h2>
+            </div>
+            <p style={{ marginTop: "4px" }}>{sectionMeta[activeSection]?.sub}</p>
           </div>
 
           {/* ══ BROADCAST NOTICE ══ */}
@@ -323,8 +343,8 @@ export default function AdminDashboard() {
             <div className="admin-card card-green-top">
               <div className="ledger-header-flex">
                 <div />
-                <button onClick={handleExportCSV} className="btn-export" disabled={ledger.length === 0}>
-                  📥 Download CSV
+                <button onClick={handleExportCSV} className="btn-export" disabled={ledger.length === 0} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Download size={16} /> Download CSV
                 </button>
               </div>
               {ledger.length === 0 ? (
@@ -340,12 +360,12 @@ export default function AdminDashboard() {
                           onClick={() => setOpenStudentIndex(isOpen ? null : idx)}
                         >
                           <div>
-                            <h3 className="student-name">👤 {student.name}</h3>
+                            <h3 className="student-name"><UserCircle size={16} /> {student.name}</h3>
                             <span className="student-email">{student.email}</span>
                           </div>
                           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                             <span className="badge-red">{student.totalCancelled} Meals Skipped</span>
-                            <span style={{ fontSize: "13px", color: "#94a3b8" }}>{isOpen ? "🔼" : "🔽"}</span>
+                            <span style={{ fontSize: "13px", color: "#94a3b8" }}>{isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
                           </div>
                         </div>
                         {isOpen && (
@@ -372,7 +392,7 @@ export default function AdminDashboard() {
               {/* Filters */}
               <div className="cmp-filters">
                 <div className="cmp-search-wrap">
-                  <span className="cmp-search-icon">🔍</span>
+                  <span className="cmp-search-icon"><Search size={16} /></span>
                   <input
                     className="cmp-search"
                     type="text"
@@ -391,12 +411,12 @@ export default function AdminDashboard() {
                   className="cmp-btn-search"
                   onClick={() => fetchComplaints(complaintSearch, complaintFrom, complaintTo)}
                 >
-                  🔍 Search
+                  <Search size={16} /> Search
                 </button>
                 <button className="cmp-btn-reset" onClick={() => {
                   setComplaintSearch(""); setComplaintFrom(""); setComplaintTo("");
                   fetchComplaints("", "", "");
-                }}>↺ Reset</button>
+                }}><RefreshCw size={16} /> Reset</button>
               </div>
 
               {complaintLoading && <p className="cmp-loading">Loading complaints…</p>}
@@ -419,14 +439,14 @@ export default function AdminDashboard() {
                       <div className="cmp-info">
                         <span className="cmp-name">{c.studentName}</span>
                         <span className="cmp-date">
-                          🕐 {new Date(c.createdAt).toLocaleDateString("en-IN", {
+                          <Clock size={12} /> {new Date(c.createdAt).toLocaleDateString("en-IN", {
                             day: "numeric", month: "short", year: "numeric",
                             hour: "2-digit", minute: "2-digit"
                           })}
                         </span>
                       </div>
                       {c.image
-                        ? <span className="cmp-has-photo">📸 Photo</span>
+                        ? <span className="cmp-has-photo"><Camera size={14} /> Photo</span>
                         : <span className="cmp-no-photo">No photo</span>}
                     </div>
 

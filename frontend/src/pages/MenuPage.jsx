@@ -3,13 +3,20 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import "./MenuPage.css";
 
+import { Coffee, Sun, Utensils, Moon, Info, ChevronUp, AlertTriangle, UtensilsCrossed } from "lucide-react";
+
 const MEAL_ORDER = { Breakfast: 1, Lunch: 2, Snacks: 3, Dinner: 4 };
-const MEAL_ICONS = { Breakfast: "🌅", Lunch: "☀️", Snacks: "🍵", Dinner: "🌙" };
+const MEAL_ICONS = { 
+  Breakfast: <Coffee size={24} />, 
+  Lunch: <Sun size={24} />, 
+  Snacks: <Utensils size={24} />, 
+  Dinner: <Moon size={24} /> 
+};
 const MEAL_COLORS = {
-  Breakfast: { from: "#ff9a56", to: "#ff6b35", glow: "rgba(255,107,53,0.35)", text: "#7c2d00" },
-  Lunch:     { from: "#fbbf24", to: "#f59e0b", glow: "rgba(245,158,11,0.35)", text: "#78350f" },
-  Snacks:    { from: "#34d399", to: "#10b981", glow: "rgba(16,185,129,0.35)", text: "#064e3b" },
-  Dinner:    { from: "#818cf8", to: "#6366f1", glow: "rgba(99,102,241,0.35)", text: "#1e1b4b" },
+  Breakfast: { bg: "#fff7ed", border: "#fdba74", text: "#9a3412", icon: "#f97316" },
+  Lunch:     { bg: "#fefce8", border: "#fde047", text: "#854d0e", icon: "#eab308" },
+  Snacks:    { bg: "#f0fdf4", border: "#86efac", text: "#166534", icon: "#10b981" },
+  Dinner:    { bg: "#eef2ff", border: "#a5b4fc", text: "#3730a3", icon: "#6366f1" },
 };
 const EGG_KEYWORDS = ["egg", "omelette", "omlette", "boiled egg", "anda", "bhurji"];
 const isEggItem = (item) => EGG_KEYWORDS.some((kw) => item.toLowerCase().includes(kw));
@@ -58,8 +65,8 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
           fontFamily: "inherit", textAlign: "left"
         }}
       >
-        <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600 }}>
-          {isNonVeg ? "🍗" : "🍽️"} {dishName}
+        <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+          {isNonVeg ? <UtensilsCrossed size={16} /> : <Utensils size={16} />} {dishName}
         </span>
         {match && (
           <span style={{
@@ -144,14 +151,17 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose }) {
         <div
           className="modal-header"
           style={{
-            background: `linear-gradient(135deg, ${colors.from}, ${colors.to})`,
-            boxShadow: `0 4px 20px ${colors.glow}`
+            background: colors.bg,
+            borderBottom: `1px solid ${colors.border}`,
+            padding: "20px"
           }}
         >
           <div className="modal-header-left">
-            <span className="modal-icon">{MEAL_ICONS[meal.mealType]}</span>
+            <span className="modal-icon" style={{ color: colors.icon, background: "white", padding: "10px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {MEAL_ICONS[meal.mealType]}
+            </span>
             <div>
-              <h2 className="modal-title">{meal.mealType}</h2>
+              <h2 className="modal-title" style={{ color: colors.text }}>{meal.mealType}</h2>
               <p className="modal-subtitle">{meal.items.length} veg dish{meal.items.length !== 1 ? "es" : ""}{hasNonVeg ? ` · ${visibleNonVeg.length} non-veg` : ""}</p>
             </div>
           </div>
@@ -174,12 +184,12 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose }) {
           {/* Non-Veg Section */}
           {hasNonVeg && (
             <div className="modal-section">
-              <div className="modal-section-label" style={{ color: "#b91c1c" }}>
-                🔴 Non-Veg Items
+              <div className="modal-section-label" style={{ color: "#b91c1c", display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ width: "8px", height: "8px", background: "#ef4444", borderRadius: "50%" }}></span> Non-Veg Items
                 <span className="modal-nonveg-badge">💳 Extra Payment</span>
               </div>
               <p className="modal-nonveg-warning">
-                ⚠️ Non-veg dishes are prepared separately and charged additionally.
+                <AlertTriangle size={14} style={{ flexShrink: 0 }} /> Non-veg dishes are prepared separately and charged additionally.
               </p>
               {visibleNonVeg.map((item, i) => (
                 <DishRow key={i} dishName={item} nutritionMap={nutritionMap} isNonVeg={true} />
@@ -213,28 +223,23 @@ function MealTile({ meal, dietaryPref, nutritionMap }) {
         className="meal-tile"
         onClick={() => setOpen(true)}
         style={{
-          background: `linear-gradient(145deg, ${colors.from}, ${colors.to})`,
-          boxShadow: `0 6px 24px ${colors.glow}`,
+          background: colors.bg,
+          border: `1px solid ${colors.border}`,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          padding: "16px",
+          textAlign: "left"
         }}
         aria-label={`View ${meal.mealType} menu`}
       >
-        {/* Glow blob */}
-        <div className="meal-tile-glow" />
-
-        {/* Icon */}
-        <div className="meal-tile-icon">{MEAL_ICONS[meal.mealType]}</div>
-
-        {/* Name */}
-        <div className="meal-tile-name">{meal.mealType}</div>
-
-        {/* Dish count */}
-        <div className="meal-tile-count">
-          {meal.items.length} dish{meal.items.length !== 1 ? "es" : ""}
-          {hasNonVeg && <span className="meal-tile-nonveg-dot" title="Non-veg available" />}
+        <div className="meal-tile-icon" style={{ color: colors.icon, marginBottom: "8px" }}>{MEAL_ICONS[meal.mealType]}</div>
+        <div className="meal-tile-name" style={{ color: colors.text, fontWeight: 700, fontSize: "1.1rem" }}>{meal.mealType}</div>
+        <div className="meal-tile-count" style={{ color: colors.text, opacity: 0.8, fontSize: "0.85rem" }}>
+          {meal.items.length} dishes
+          {hasNonVeg && <span className="meal-tile-nonveg-dot" style={{ background: "#ef4444" }} title="Non-veg available" />}
         </div>
-
-        {/* Tap hint */}
-        <div className="meal-tile-hint">Tap to view menu →</div>
+        <div className="meal-tile-hint" style={{ marginTop: "auto", color: colors.text, opacity: 0.6, fontSize: "0.75rem" }}>View menu →</div>
       </button>
 
       {open && (
@@ -281,8 +286,9 @@ function MealCard({ meal, dietaryPref, nutritionMap, isToday }) {
         }}
       >
         <span style={{
-          fontSize: "1.7rem", background: "linear-gradient(135deg, #fef3c7, #fde68a)",
-          borderRadius: "12px", width: "46px", height: "46px",
+          fontSize: "1.2rem", background: "white", color: "#f59e0b",
+          border: "1px solid #fde68a",
+          borderRadius: "12px", width: "42px", height: "42px",
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
         }}>
           {MEAL_ICONS[meal.mealType]}

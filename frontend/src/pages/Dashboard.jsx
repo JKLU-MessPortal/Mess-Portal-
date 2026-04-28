@@ -5,14 +5,21 @@ import Navbar from "../components/Navbar";
 import NonVegBookingModal from "../components/NonVegBookingModal";
 import "./Dashboard.css";
 
+import { Coffee, Sun, Utensils, Moon, Info, ChevronUp, Share2, AlertTriangle, CheckCircle2, ShoppingCart, UtensilsCrossed } from "lucide-react";
+
 // ── Shared helpers ──────────────────────────────────────────────
 const MEAL_ORDER = { Breakfast: 1, Lunch: 2, Snacks: 3, Dinner: 4 };
-const MEAL_ICONS = { Breakfast: "🌅", Lunch: "☀️", Snacks: "🍵", Dinner: "🌙" };
+const MEAL_ICONS = { 
+  Breakfast: <Coffee size={24} />, 
+  Lunch: <Sun size={24} />, 
+  Snacks: <Utensils size={24} />, 
+  Dinner: <Moon size={24} /> 
+};
 const MEAL_COLORS = {
-  Breakfast: { from: "#ff9a56", to: "#ff6b35", glow: "rgba(255,107,53,0.35)", text: "#7c2d00" },
-  Lunch:     { from: "#fbbf24", to: "#f59e0b", glow: "rgba(245,158,11,0.35)", text: "#78350f" },
-  Snacks:    { from: "#34d399", to: "#10b981", glow: "rgba(16,185,129,0.35)", text: "#064e3b" },
-  Dinner:    { from: "#818cf8", to: "#6366f1", glow: "rgba(99,102,241,0.35)", text: "#1e1b4b" },
+  Breakfast: { bg: "#fff7ed", border: "#fdba74", text: "#9a3412", icon: "#f97316" },
+  Lunch:     { bg: "#fefce8", border: "#fde047", text: "#854d0e", icon: "#eab308" },
+  Snacks:    { bg: "#f0fdf4", border: "#86efac", text: "#166534", icon: "#10b981" },
+  Dinner:    { bg: "#eef2ff", border: "#a5b4fc", text: "#3730a3", icon: "#6366f1" },
 };
 const EGG_KEYWORDS = ["egg", "omelette", "omlette", "boiled egg", "anda", "bhurji"];
 const isEggItem = (item) => EGG_KEYWORDS.some((kw) => item.toLowerCase().includes(kw));
@@ -59,8 +66,8 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
           fontFamily: "inherit", textAlign: "left"
         }}
       >
-        <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600 }}>
-          {isNonVeg ? "🍗" : "🍽️"} {dishName}
+        <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+          {isNonVeg ? <UtensilsCrossed size={16} /> : <Utensils size={16} />} {dishName}
         </span>
         {match && (
           <span style={{
@@ -69,7 +76,7 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
             transition: "color 0.2s",
             display: "flex", alignItems: "center", gap: "3px"
           }}>
-            {open ? "▲ Hide" : "ℹ️ Nutrition"}
+            {open ? <ChevronUp size={14} /> : <Info size={14} />} {open ? "Hide" : "Nutrition"}
           </span>
         )}
       </button>
@@ -141,14 +148,17 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
         <div
           className="modal-header"
           style={{
-            background: `linear-gradient(135deg, ${colors.from}, ${colors.to})`,
-            boxShadow: `0 4px 20px ${colors.glow}`
+            background: colors.bg,
+            borderBottom: `1px solid ${colors.border}`,
+            padding: "20px"
           }}
         >
           <div className="modal-header-left">
-            <span className="modal-icon">{MEAL_ICONS[meal.mealType]}</span>
+            <span className="modal-icon" style={{ color: colors.icon, background: "white", padding: "10px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {MEAL_ICONS[meal.mealType]}
+            </span>
             <div>
-              <h2 className="modal-title">{meal.mealType} {isTomorrow && isCancelled && "(Cancelled)"} {isTomorrow && isPaid && "(Purchased)"}</h2>
+              <h2 className="modal-title" style={{ color: colors.text }}>{meal.mealType} {isTomorrow && isCancelled && "(Cancelled)"} {isTomorrow && isPaid && "(Purchased)"}</h2>
               <p className="modal-subtitle">{meal.items.length} veg dish{meal.items.length !== 1 ? "es" : ""}{hasNonVeg ? ` · ${visibleNonVeg.length} non-veg` : ""}</p>
             </div>
           </div>
@@ -197,12 +207,12 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
 
           {hasNonVeg && (
             <div className="modal-section" style={{ opacity: isCancelled ? 0.6 : 1 }}>
-              <div className="modal-section-label" style={{ color: "#b91c1c" }}>
-                🔴 Non-Veg Items
+              <div className="modal-section-label" style={{ color: "#b91c1c", display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ width: "8px", height: "8px", background: "#ef4444", borderRadius: "50%" }}></span> Non-Veg Items
                 <span className="modal-nonveg-badge">💳 Extra Payment</span>
               </div>
               <p className="modal-nonveg-warning">
-                ⚠️ Non-veg dishes are prepared separately and charged additionally.
+                <AlertTriangle size={14} style={{ flexShrink: 0 }} /> Non-veg dishes are prepared separately and charged additionally.
               </p>
               {visibleNonVeg.map((item, i) => (
                 <div key={i} style={{ marginBottom: "6px" }}>
@@ -212,14 +222,14 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
                        <button
                           onClick={() => setNvModal({ item: item, mealType: meal.mealType, tomorrowDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] })}
                           style={{
-                            background: 'linear-gradient(135deg,#ef4444,#b91c1c)',
+                            background: '#ef4444',
                             color: 'white', border: 'none', borderRadius: '6px',
-                            padding: '4px 10px', fontSize: '0.72rem', fontWeight: 700,
+                            padding: '6px 12px', fontSize: '0.72rem', fontWeight: 700,
                             cursor: 'pointer', fontFamily: 'inherit',
-                            boxShadow: '0 2px 6px rgba(239,68,68,0.3)'
+                            display: 'flex', alignItems: 'center', gap: '4px'
                           }}
                         >
-                          Book {item} (₹{item.toLowerCase().includes('egg') || ['omelette','omlette','anda','bhurji'].some(k => item.toLowerCase().includes(k)) ? 30 : 120})
+                          <ShoppingCart size={12} /> Book {item} (₹{item.toLowerCase().includes('egg') || ['omelette','omlette','anda','bhurji'].some(k => item.toLowerCase().includes(k)) ? 30 : 120})
                         </button>
                     </div>
                   )}
@@ -254,24 +264,29 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
         className={`meal-tile ${isCancelled ? "cancelled" : ""} ${isPaid ? "paid" : ""}`}
         onClick={() => setOpen(true)}
         style={{
-          background: `linear-gradient(145deg, ${colors.from}, ${colors.to})`,
-          boxShadow: `0 6px 24px ${colors.glow}`,
+          background: colors.bg,
+          border: isPaid ? "2px solid #10b981" : `1px solid ${colors.border}`,
           opacity: isCancelled ? 0.7 : 1,
           filter: isCancelled ? "grayscale(80%)" : "none",
-          border: isPaid ? "2px solid #10b981" : "none"
+          position: "relative",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          padding: "16px",
+          textAlign: "left"
         }}
         aria-label={`View ${meal.mealType} menu`}
       >
-        <div className="meal-tile-glow" />
-        <div className="meal-tile-icon">{MEAL_ICONS[meal.mealType]}</div>
-        <div className="meal-tile-name">{meal.mealType}</div>
-        <div className="meal-tile-count">
-          {meal.items.length} dish{meal.items.length !== 1 ? "es" : ""}
-          {hasNonVeg && <span className="meal-tile-nonveg-dot" title="Non-veg available" />}
+        <div className="meal-tile-icon" style={{ color: colors.icon, marginBottom: "8px" }}>{MEAL_ICONS[meal.mealType]}</div>
+        <div className="meal-tile-name" style={{ color: colors.text, fontWeight: 700, fontSize: "1.1rem" }}>{meal.mealType}</div>
+        <div className="meal-tile-count" style={{ color: colors.text, opacity: 0.8, fontSize: "0.85rem" }}>
+          {meal.items.length} dishes
+          {hasNonVeg && <span className="meal-tile-nonveg-dot" style={{ background: "#ef4444" }} title="Non-veg available" />}
         </div>
-        {isCancelled && <div className="meal-tile-status" style={{color:"#ffefef", fontSize:"0.7rem", marginTop:"2px"}}>Cancelled</div>}
-        {isPaid && <div className="meal-tile-status paid" style={{color:"#ecfdf5", fontSize:"0.7rem", marginTop:"2px"}}>Purchased</div>}
-        <div className="meal-tile-hint">Tap to view menu →</div>
+        {isCancelled && <div className="meal-tile-status" style={{color:"#b91c1c", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Cancelled</div>}
+        {isPaid && <div className="meal-tile-status paid" style={{color:"#047857", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Purchased</div>}
+        <div className="meal-tile-hint" style={{ marginTop: "auto", color: colors.text, opacity: 0.6, fontSize: "0.75rem" }}>View menu →</div>
       </button>
 
       {open && (

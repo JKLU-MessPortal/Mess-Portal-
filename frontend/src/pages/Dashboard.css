@@ -137,8 +137,8 @@
 }
 
 .qr-frame:hover {
-    box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 40px #00ffcc;
-    transform: scale(1.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
 }
 
 .id-card-email {
@@ -253,17 +253,12 @@
 .meal-tile {
     position: relative;
     overflow: hidden;
-    border: none;
-    border-radius: 22px;
-    padding: 28px 20px 22px;
+    border-radius: 16px;
+    padding: 20px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease;
-    min-height: 150px;
+    transition: all 0.2s ease;
+    min-height: 140px;
 }
 .meal-tile:hover {
     transform: translateY(-6px) scale(1.03);
@@ -284,38 +279,28 @@
 }
 
 .meal-tile-icon {
-    font-size: 2.4rem;
-    margin-bottom: 6px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+    font-size: 1.5rem;
+    margin-bottom: 8px;
 }
 .meal-tile-name {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: white;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 .meal-tile-count {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.85);
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 .meal-tile-nonveg-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: white;
     display: inline-block;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.4);
 }
 .meal-tile-hint {
     margin-top: auto;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.7);
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-size: 0.75rem;
 }
 
 .modal-backdrop {

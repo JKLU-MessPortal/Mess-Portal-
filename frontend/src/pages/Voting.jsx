@@ -1,6 +1,22 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { 
+  Vote, 
+  Plus, 
+  MessageSquare, 
+  TrendingUp, 
+  Clock, 
+  ArrowUp, 
+  ArrowDown, 
+  CheckCircle2, 
+  Wrench, 
+  Trash2, 
+  Search, 
+  X,
+  History,
+  UserCircle
+} from "lucide-react";
 import Navbar from "../components/Navbar";
 import "./Voting.css";
 
@@ -86,8 +102,8 @@ function CreateModal({ onClose, onCreated, studentId }) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>✏️ New Poll Post</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <h2 style={{ display: "flex", alignItems: "center", gap: "10px" }}><Plus size={20} /> New Poll Post</h2>
+          <button className="modal-close" onClick={onClose}><X size={20} /></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-field">
@@ -112,8 +128,8 @@ function CreateModal({ onClose, onCreated, studentId }) {
           {err && <div className="modal-err">{err}</div>}
           <div className="modal-actions">
             <button type="button" className="modal-btn-cancel" onClick={onClose}>Cancel</button>
-            <button type="submit" className="modal-btn-submit" disabled={loading}>
-              {loading ? "Posting..." : "🚀 Post"}
+            <button type="submit" className="modal-btn-submit" disabled={loading} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {loading ? "Posting..." : <><Plus size={16} /> Post</>}
             </button>
           </div>
         </form>
@@ -135,7 +151,7 @@ function DetailPanel({ post, currentUser, isAdmin, isArchive, onVote, onAdminRes
   return (
     <div className="detail-panel">
       <div className="detail-panel-header">
-        <button className="detail-close" onClick={onClose}>✕ Close</button>
+        <button className="detail-close" onClick={onClose} style={{ display: "flex", alignItems: "center", gap: "6px" }}><X size={16} /> Close</button>
       </div>
 
       {/* Category + Status */}
@@ -144,9 +160,9 @@ function DetailPanel({ post, currentUser, isAdmin, isArchive, onVote, onAdminRes
           {post.category}
         </span>
         {post.adminResolved && post.status === "active" && (
-          <span className="badge-admin-resolved">✅ Admin Fixed — Awaiting Confirmation</span>
+          <span className="badge-admin-resolved"><CheckCircle2 size={14} /> Admin Fixed — Awaiting Confirmation</span>
         )}
-        {post.status === "resolved" && <span className="badge-resolved">🏁 Resolved</span>}
+        {post.status === "resolved" && <span className="badge-resolved"><CheckCircle2 size={14} /> Resolved</span>}
       </div>
 
       <h2 className="detail-title">{post.title}</h2>
@@ -171,16 +187,16 @@ function DetailPanel({ post, currentUser, isAdmin, isArchive, onVote, onAdminRes
 
       {/* Archive resolved info */}
       {isArchive && post.resolvedAt && (
-        <div className="archive-resolved-info">
-          <span>🏁</span>
+        <div className="archive-resolved-info" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <CheckCircle2 size={16} color="#10b981" />
           <span>Resolved on <strong>{new Date(post.resolvedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</strong></span>
         </div>
       )}
 
       {/* Admin resolve button */}
       {isAdmin && !isArchive && post.status === "active" && !post.adminResolved && (
-        <button className="btn-admin-resolve" onClick={() => onAdminResolve(post._id)}>
-          🔧 Mark as Fixed (Admin)
+        <button className="btn-admin-resolve" onClick={() => onAdminResolve(post._id)} style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+          <Wrench size={18} /> Mark as Fixed (Admin)
         </button>
       )}
 
@@ -196,7 +212,9 @@ function DetailPanel({ post, currentUser, isAdmin, isArchive, onVote, onAdminRes
 
       {/* Delete (creator only, active only, not archive) */}
       {!isAdmin && !isArchive && isCreator && post.status === "active" && (
-        <button className="btn-delete" onClick={() => onDelete(post._id)}>🗑️ Delete My Post</button>
+        <button className="btn-delete" onClick={() => onDelete(post._id)} style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+          <Trash2 size={16} /> Delete My Post
+        </button>
       )}
     </div>
   );
@@ -319,7 +337,7 @@ export default function Voting() {
         {/* Header */}
         <div className="voting-header">
           <div className="voting-header-left">
-            <div className="voting-header-icon">🗳️</div>
+            <div className="voting-header-icon"><Vote size={28} color="white" /></div>
             <div>
               <h1 className="voting-title">Mess Issues & Polls</h1>
               <p className="voting-subtitle">
@@ -328,8 +346,8 @@ export default function Voting() {
             </div>
           </div>
           {isHosteller && !isAdmin && (
-            <button className="btn-create-post" onClick={() => setShowCreate(true)}>
-              + New Post
+            <button className="btn-create-post" onClick={() => setShowCreate(true)} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Plus size={18} /> New Post
             </button>
           )}
         </div>
@@ -339,18 +357,20 @@ export default function Voting() {
           <div className="view-mode-tabs">
             <button
               className={`view-tab ${viewMode === "active" ? "view-tab--active" : ""}`}
-              onClick={() => { setViewMode("active"); setSelectedPost(null); setSearchInput(""); }}>
-              🗳️ Active Posts
+              onClick={() => { setViewMode("active"); setSelectedPost(null); setSearchInput(""); }}
+              style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Vote size={16} /> Active Posts
             </button>
             <button
               className={`view-tab ${viewMode === "archive" ? "view-tab--archive" : ""}`}
-              onClick={() => { setViewMode("archive"); setSelectedPost(null); setSort("recent"); setShowMine(false); setSearchInput(""); }}>
-              🏁 Archive
+              onClick={() => { setViewMode("archive"); setSelectedPost(null); setSort("recent"); setShowMine(false); setSearchInput(""); }}
+              style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <History size={16} /> Archive
             </button>
           </div>
           {/* Search Bar */}
           <div className="search-wrapper">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><Search size={18} /></span>
             <input
               type="text"
               className="search-input"
@@ -359,7 +379,7 @@ export default function Voting() {
               onChange={e => setSearchInput(e.target.value)}
             />
             {searchInput && (
-              <button className="search-clear" onClick={() => setSearchInput("")}>✕</button>
+              <button className="search-clear" onClick={() => setSearchInput("")}><X size={16} /></button>
             )}
           </div>
         </div>
@@ -368,9 +388,9 @@ export default function Voting() {
         {viewMode === "active" && (
         <div className="filter-bar">
           <div className="sort-tabs">
-            {[["recent", "🕒 Recent"], ["trending", "🔥 Trending"], ["top", "⬆️ Top"]].map(([val, label]) => (
+            {[[ "recent", <Clock size={14} />, "Recent"], ["trending", <TrendingUp size={14} />, "Trending"], ["top", <ArrowUp size={14} />, "Top"]].map(([val, icon, label]) => (
               <button key={val} className={`sort-tab ${sort === val ? "sort-tab--active" : ""}`}
-                onClick={() => setSort(val)}>{label}</button>
+                onClick={() => setSort(val)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>{icon} {label}</button>
             ))}
           </div>
           <div className="filter-right">
@@ -422,9 +442,9 @@ export default function Voting() {
                     <div className="post-vote-col" onClick={e => e.stopPropagation()}>
                       {viewMode === "active" && !isAdmin ? (
                         <>
-                          <button onClick={() => handleVote(post._id, "up")} className={`vote-sm up ${hasUp ? "voted" : ""}`}>▲</button>
+                          <button onClick={() => handleVote(post._id, "up")} className={`vote-sm up ${hasUp ? "voted" : ""}`}><ArrowUp size={14} /></button>
                           <span className={`net-sm ${net > 0 ? "pos" : net < 0 ? "neg" : ""}`}>{net}</span>
-                          <button onClick={() => handleVote(post._id, "down")} className={`vote-sm down ${hasDown ? "voted" : ""}`}>▼</button>
+                          <button onClick={() => handleVote(post._id, "down")} className={`vote-sm down ${hasDown ? "voted" : ""}`}><ArrowDown size={14} /></button>
                         </>
                       ) : (
                         <span className={`net-sm ${net > 0 ? "pos" : net < 0 ? "neg" : ""}`}>{net > 0 ? "+" : ""}{net}</span>
@@ -442,11 +462,11 @@ export default function Voting() {
                       <h3 className="post-title">{post.title}</h3>
                       <p className="post-excerpt">{post.description.slice(0, 120)}{post.description.length > 120 ? "…" : ""}</p>
                       <div className="post-footer">
-                        <span>👤 {post.createdByName}</span>
-                        <span>🕒 {timeAgo(post.createdAt)}</span>
-                        <span>▲ {post.upvotedBy?.length ?? 0} · ▼ {post.downvotedBy?.length ?? 0}</span>
+                        <span><UserCircle size={12} /> {post.createdByName}</span>
+                        <span><Clock size={12} /> {timeAgo(post.createdAt)}</span>
+                        <span><ArrowUp size={12} /> {post.upvotedBy?.length ?? 0} · <ArrowDown size={12} /> {post.downvotedBy?.length ?? 0}</span>
                         {viewMode === "archive" && post.resolvedAt && (
-                          <span>✅ Resolved {timeAgo(post.resolvedAt)}</span>
+                          <span><CheckCircle2 size={12} /> Resolved {timeAgo(post.resolvedAt)}</span>
                         )}
                       </div>
                     </div>
