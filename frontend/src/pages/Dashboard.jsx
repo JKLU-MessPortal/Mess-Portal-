@@ -41,7 +41,7 @@ function NutritionBar({ label, value, max, color, unit = "g" }) {
 }
 
 // ─── Dish Row ──────────────────────────────────────────────────────
-function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
+function DishRow({ dishName, nutritionMap, isNonVeg = false, isPaid = false }) {
   const [open, setOpen] = useState(false);
   const query = dishName.toLowerCase().trim();
   const match =
@@ -66,9 +66,16 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
           fontFamily: "inherit", textAlign: "left"
         }}
       >
-        <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
-          {isNonVeg ? <UtensilsCrossed size={16} /> : <Utensils size={16} />} {dishName}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+           <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+            {isNonVeg ? <UtensilsCrossed size={16} /> : <Utensils size={16} />} {dishName}
+          </span>
+          {isNonVeg && isPaid && (
+            <span style={{ fontSize: "0.65rem", background: "#10b981", color: "white", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
+              PAID
+            </span>
+          )}
+        </div>
         {match && (
           <span style={{
             fontSize: "0.68rem", fontWeight: 700,
@@ -114,7 +121,7 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
 }
 
 // ─── Meal Modal (popup with blur) ──────────────────────────────────
-function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal }) {
+function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, nonVegBookings }) {
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
   const filterNonVeg = (items = []) => {
@@ -214,27 +221,38 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
               <p className="modal-nonveg-warning">
                 <AlertTriangle size={14} style={{ flexShrink: 0 }} /> Non-veg dishes are prepared separately and charged additionally.
               </p>
-              {visibleNonVeg.map((item, i) => (
-                <div key={i} style={{ marginBottom: "6px" }}>
-                  <DishRow dishName={item} nutritionMap={nutritionMap} isNonVeg={true} />
-                  {isTomorrow && !isStaff && !isCancelled && (
-                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "-4px", marginBottom: "8px" }}>
-                       <button
-                          onClick={() => setNvModal({ item: item, mealType: meal.mealType, tomorrowDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] })}
-                          style={{
-                            background: '#ef4444',
-                            color: 'white', border: 'none', borderRadius: '6px',
-                            padding: '6px 12px', fontSize: '0.72rem', fontWeight: 700,
-                            cursor: 'pointer', fontFamily: 'inherit',
-                            display: 'flex', alignItems: 'center', gap: '4px'
-                          }}
-                        >
-                          <ShoppingCart size={12} /> Book {item} (₹{item.toLowerCase().includes('egg') || ['omelette','omlette','anda','bhurji'].some(k => item.toLowerCase().includes(k)) ? 30 : 120})
-                        </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+              {visibleNonVeg.map((item, i) => {
+                const isPaidItem = nonVegBookings?.some(b => b.mealType === meal.mealType && b.item === item && new Date(b.date).toDateString() === (isTomorrow ? new Date(Date.now() + 86400000).toDateString() : new Date().toDateString()));
+
+                return (
+                  <div key={i} style={{ marginBottom: "6px" }}>
+                    <DishRow dishName={item} nutritionMap={nutritionMap} isNonVeg={true} isPaid={isPaidItem} />
+                    {isTomorrow && !isStaff && !isCancelled && !isPaidItem && (
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "-4px", marginBottom: "8px" }}>
+                         <button
+                            onClick={() => setNvModal({ item: item, mealType: meal.mealType, tomorrowDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] })}
+                            style={{
+                              background: '#ef4444',
+                              color: 'white', border: 'none', borderRadius: '6px',
+                              padding: '6px 12px', fontSize: '0.72rem', fontWeight: 700,
+                              cursor: 'pointer', fontFamily: 'inherit',
+                              display: 'flex', alignItems: 'center', gap: '4px'
+                            }}
+                          >
+                            <ShoppingCart size={12} /> Book {item} (₹{item.toLowerCase().includes('egg') || ['omelette','omlette','anda','bhurji'].some(k => item.toLowerCase().includes(k)) ? 30 : 120})
+                          </button>
+                      </div>
+                    )}
+                    {isPaidItem && (
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "-4px", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "0.72rem", color: "#10b981", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>
+                          <CheckCircle2 size={12} /> Confirmed & Paid
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -244,7 +262,7 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
 }
 
 // ─── Today's & Tomorrow Meal Tile ─────────────────────────────────────────────
-function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal }) {
+function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, nonVegBookings }) {
   const [open, setOpen] = useState(false);
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
@@ -302,6 +320,7 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
           isHosteller={isHosteller}
           handleToggleMeal={handleToggleMeal}
           setNvModal={setNvModal}
+          nonVegBookings={nonVegBookings}
         />
       )}
     </>
@@ -355,6 +374,7 @@ export default function Dashboard() {
     tomorrowName: "Tomorrow",
     skipStats: null,
     tomorrowBookings: [],
+    nonVegBookings: [],
   });
 
   useEffect(() => {
@@ -408,6 +428,7 @@ export default function Dashboard() {
           tomorrowName: res.data.tomorrowName,
           skipStats: res.data.skipStats,
           tomorrowBookings: res.data.tomorrowBookings,
+          nonVegBookings: res.data.nonVegBookings || [],
         });
       }
     } catch (error) {
@@ -498,6 +519,24 @@ export default function Dashboard() {
                   </div>
                   <h2 className="id-card-name">{userName}</h2>
                   <p className="id-card-email">{userEmail}</p>
+
+                  {/* --- Today's Special Orders for Staff Verification --- */}
+                  {menuData.nonVegBookings?.some(b => new Date(b.date).toDateString() === new Date().toDateString()) && (
+                    <div style={{ marginTop: "15px", padding: "10px", background: "white", borderRadius: "12px", border: "1px dashed #ee8310", textAlign: "left" }}>
+                      <p style={{ margin: "0 0 5px 0", fontSize: "0.7rem", fontWeight: 800, color: "#9a3412", textTransform: "uppercase" }}>
+                        ✨ Today's Special Orders
+                      </p>
+                      {menuData.nonVegBookings
+                        .filter(b => new Date(b.date).toDateString() === new Date().toDateString())
+                        .map((b, i) => (
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.8rem", color: "#1e293b", fontWeight: 600, padding: "2px 0" }}>
+                            <span>{b.mealType}: {b.item}</span>
+                            <span style={{ color: "#10b981" }}>✅ PAID</span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
                   <button onClick={handleSharePass} className="btn-share-pass" style={{marginTop:'15px',background:'#f1f5f9',border:'1px solid #cbd5e1',padding:'8px 16px',borderRadius:'8px',cursor:'pointer',fontWeight:'bold',color:'#475569',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',width:'100%'}}>📤 Share Pass</button>
                 </div>
 
@@ -572,6 +611,7 @@ export default function Dashboard() {
                         dietaryPref={dietaryPref}
                         nutritionMap={nutritionMap}
                         isTomorrow={false}
+                        nonVegBookings={menuData.nonVegBookings}
                       />
                     ))
                 ) : (
@@ -607,6 +647,7 @@ export default function Dashboard() {
                           isHosteller={isHosteller}
                           handleToggleMeal={handleToggleMeal}
                           setNvModal={setNvModal}
+                          nonVegBookings={menuData.nonVegBookings}
                         />
                       );
                     })

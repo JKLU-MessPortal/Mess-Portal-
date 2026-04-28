@@ -40,7 +40,7 @@ function NutritionBar({ label, value, max, color, unit = "g" }) {
 }
 
 // ─── Dish Row ──────────────────────────────────────────────────────
-function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
+function DishRow({ dishName, nutritionMap, isNonVeg = false, isPaid = false }) {
   const [open, setOpen] = useState(false);
   const query = dishName.toLowerCase().trim();
   const match =
@@ -65,9 +65,16 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
           fontFamily: "inherit", textAlign: "left"
         }}
       >
-        <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
-          {isNonVeg ? <UtensilsCrossed size={16} /> : <Utensils size={16} />} {dishName}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "0.86rem", color: textColor, fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+            {isNonVeg ? <UtensilsCrossed size={16} /> : <Utensils size={16} />} {dishName}
+          </span>
+          {isNonVeg && isPaid && (
+            <span style={{ fontSize: "0.65rem", background: "#10b981", color: "white", padding: "2px 8px", borderRadius: "99px", fontWeight: 700 }}>
+              PAID
+            </span>
+          )}
+        </div>
         {match && (
           <span style={{
             fontSize: "0.68rem", fontWeight: 700,
@@ -75,7 +82,7 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
             transition: "color 0.2s",
             display: "flex", alignItems: "center", gap: "3px"
           }}>
-            {open ? "▲ Hide" : "ℹ️ Nutrition"}
+            {open ? <ChevronUp size={14} /> : <Info size={14} />} {open ? "Hide" : "Nutrition"}
           </span>
         )}
       </button>
@@ -113,7 +120,7 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false }) {
 }
 
 // ─── Meal Modal (popup with blur) ──────────────────────────────────
-function MealModal({ meal, dietaryPref, nutritionMap, onClose }) {
+function MealModal({ meal, dietaryPref, nutritionMap, onClose, nonVegBookings, selectedDay }) {
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
   const filterNonVeg = (items = []) => {
@@ -191,9 +198,10 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose }) {
               <p className="modal-nonveg-warning">
                 <AlertTriangle size={14} style={{ flexShrink: 0 }} /> Non-veg dishes are prepared separately and charged additionally.
               </p>
-              {visibleNonVeg.map((item, i) => (
-                <DishRow key={i} dishName={item} nutritionMap={nutritionMap} isNonVeg={true} />
-              ))}
+              {visibleNonVeg.map((item, i) => {
+                const isPaidItem = nonVegBookings?.some(b => b.mealType === meal.mealType && b.item === item && b.dayOfWeek === selectedDay);
+                return <DishRow key={i} dishName={item} nutritionMap={nutritionMap} isNonVeg={true} isPaid={isPaidItem} />;
+              })}
             </div>
           )}
         </div>
@@ -203,7 +211,7 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose }) {
 }
 
 // ─── Today's Meal Tile ─────────────────────────────────────────────
-function MealTile({ meal, dietaryPref, nutritionMap }) {
+function MealTile({ meal, dietaryPref, nutritionMap, nonVegBookings, selectedDay }) {
   const [open, setOpen] = useState(false);
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
@@ -248,6 +256,8 @@ function MealTile({ meal, dietaryPref, nutritionMap }) {
           dietaryPref={dietaryPref}
           nutritionMap={nutritionMap}
           onClose={() => setOpen(false)}
+          nonVegBookings={nonVegBookings}
+          selectedDay={selectedDay}
         />
       )}
     </>
@@ -255,7 +265,7 @@ function MealTile({ meal, dietaryPref, nutritionMap }) {
 }
 
 // ─── Expandable Meal Card (for non-today days) ────────────────────
-function MealCard({ meal, dietaryPref, nutritionMap, isToday }) {
+function MealCard({ meal, dietaryPref, nutritionMap, isToday, nonVegBookings, selectedDay }) {
   const [expanded, setExpanded] = useState(false);
 
   const filterNonVeg = (items = []) => {
@@ -346,9 +356,10 @@ function MealCard({ meal, dietaryPref, nutritionMap, isToday }) {
               <p style={{ fontSize: "0.72rem", color: "#9f1239", background: "#ffe4e6", borderRadius: "8px", padding: "6px 10px", marginBottom: "10px" }}>
                 ⚠️ Non-veg dishes are prepared separately and charged additionally.
               </p>
-              {visibleNonVeg.map((item, i) => (
-                <DishRow key={i} dishName={item} nutritionMap={nutritionMap} isNonVeg={true} />
-              ))}
+              {visibleNonVeg.map((item, i) => {
+                const isPaidItem = nonVegBookings?.some(b => b.mealType === meal.mealType && b.item === item && b.dayOfWeek === selectedDay);
+                return <DishRow key={i} dishName={item} nutritionMap={nutritionMap} isNonVeg={true} isPaid={isPaidItem} />;
+              })}
             </div>
           )}
         </div>
@@ -360,6 +371,7 @@ function MealCard({ meal, dietaryPref, nutritionMap, isToday }) {
 // ─── Main MenuPage ─────────────────────────────────────────────────
 export default function MenuPage() {
   const [fullMenu, setFullMenu] = useState([]);
+  const [nonVegBookings, setNonVegBookings] = useState([]);
   const [nutritionMap, setNutritionMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState("");
@@ -378,8 +390,21 @@ export default function MenuPage() {
 
   const fetchMenu = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/dashboard/data");
-      if (res.data.success) setFullMenu(res.data.fullMenu || []);
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const studentId = storedUser.id || storedUser._id;
+      const res = await axios.get(`http://localhost:5000/api/dashboard/data?studentId=${studentId}`);
+      if (res.data.success) {
+        setFullMenu(res.data.fullMenu || []);
+        // Non-veg bookings from server only contain today/tomorrow. 
+        // For menu page we might need more but let's at least show those.
+        // We'll map the dates to dayNames for the nonVegBookings if the backend didn't.
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const bookingsWithDay = res.data.nonVegBookings?.map(b => ({
+          ...b,
+          dayOfWeek: days[new Date(b.date).getDay()]
+        })) || [];
+        setNonVegBookings(bookingsWithDay);
+      }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -479,6 +504,8 @@ export default function MenuPage() {
                     meal={meal}
                     dietaryPref={dietaryPref}
                     nutritionMap={nutritionMap}
+                    nonVegBookings={nonVegBookings}
+                    selectedDay={selectedDay}
                   />
                 ))}
               </div>
@@ -492,6 +519,8 @@ export default function MenuPage() {
                 dietaryPref={dietaryPref}
                 nutritionMap={nutritionMap}
                 isToday={false}
+                nonVegBookings={nonVegBookings}
+                selectedDay={selectedDay}
               />
             ))
           )}
