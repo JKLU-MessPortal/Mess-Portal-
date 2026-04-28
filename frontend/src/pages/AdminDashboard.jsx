@@ -19,6 +19,7 @@ export default function AdminDashboard() {
   // Data State
   const [stats, setStats] = useState({ Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 });
   const [totalSaved, setTotalSaved] = useState(0);
+  const [nonVegBookings, setNonVegBookings] = useState([]);
   const [ledger, setLedger] = useState([]);
   const [openStudentIndex, setOpenStudentIndex] = useState(null);
 
@@ -65,7 +66,11 @@ export default function AdminDashboard() {
   const fetchAdminData = async (role) => {
     try {
       const resStats = await axios.get("http://localhost:5000/api/admin/headcount");
-      if (resStats.data.success) { setStats(resStats.data.stats); setTotalSaved(resStats.data.totalSaved); }
+      if (resStats.data.success) { 
+        setStats(resStats.data.stats); 
+        setTotalSaved(resStats.data.totalSaved); 
+        setNonVegBookings(resStats.data.nonVegBookings || []);
+      }
 
       const resLedger = await axios.get("http://localhost:5000/api/admin/ledger");
       if (resLedger.data.success) setLedger(resLedger.data.ledger);
@@ -239,6 +244,7 @@ export default function AdminDashboard() {
           {/* ══ KITCHEN HEADCOUNT ══ */}
           {activeSection === "headcount" && canSeeKitchenControls && (
             <div className="admin-card card-orange-top">
+              <h3 className="card-title" style={{marginBottom: "20px"}}>Cancellations (Regular Meals)</h3>
               <div className="stats-grid">
                 {Object.keys(stats).map((mealType) => (
                   <div key={mealType} className="stat-box">
@@ -252,8 +258,62 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
-              <div className="stat-saved-banner">
+              <div className="stat-saved-banner" style={{ marginBottom: "40px" }}>
                 🥗 Total Meals Saved Tomorrow: {totalSaved}
+              </div>
+
+              {/* NON-VEG BOOKINGS SECTION */}
+              <div style={{ paddingTop: "20px", borderTop: "2px solid #f1f5f9" }}>
+                <h3 className="card-title">Non-Veg Orders</h3>
+                <p className="card-subtitle">Extra items to prepare for students who have booked and paid.</p>
+
+                {nonVegBookings.length === 0 ? (
+                  <p className="empty-msg">No non-veg bookings for tomorrow.</p>
+                ) : (
+                  <div className="non-veg-summary">
+                    {/* Summary grouped by item */}
+                    {(() => {
+                        const itemCounts = {};
+                        nonVegBookings.forEach(b => {
+                          itemCounts[b.item] = (itemCounts[b.item] || 0) + 1;
+                        });
+                        return (
+                          <div className="non-veg-grid">
+                            {Object.entries(itemCounts).map(([item, count]) => (
+                              <div key={item} className="non-veg-box">
+                                <h4>{item}</h4>
+                                <span className="non-veg-count">{count}</span>
+                                <span className="non-veg-label">Orders</span>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                    })()}
+
+                    {/* List of students */}
+                    <h4 style={{ marginTop: "30px", marginBottom: "15px", fontSize: "15px", color: "#334155" }}>Student List:</h4>
+                    <div className="student-table-wrap">
+                        <table className="student-table">
+                          <thead>
+                            <tr>
+                              <th>Student</th>
+                              <th>Item</th>
+                              <th>Meal Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {nonVegBookings.map((b, i) => (
+                              <tr key={i}>
+                                <td className="student-name-cell">{b.studentName || b.studentEmail || b.studentId}</td>
+                                <td><span style={{ fontWeight: 600, color: "#b91c1c" }}>{b.item}</span></td>
+                                <td>{b.mealType}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

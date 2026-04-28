@@ -3,6 +3,7 @@ const Menu = require('../models/Menu');
 const MealBooking = require('../models/MealBooking');
 const Notice = require('../models/Notice');
 const HostellerRegistry = require('../models/HostellerRegistry');
+const NonVegBooking = require('../models/NonVegBooking');
 
 
 // 1. Update the Menu
@@ -42,11 +43,20 @@ exports.getHeadcount = async (req, res) => {
       }
     });
 
+    const endOfTomorrow = new Date(tomorrow);
+    endOfTomorrow.setHours(23, 59, 59, 999);
+
+    const nonVegBookings = await NonVegBooking.find({
+      date: { $gte: tomorrow, $lte: endOfTomorrow },
+      status: 'paid'
+    });
+
     res.status(200).json({ 
       success: true, 
       stats, 
       totalHostellers,
-      totalSaved: cancellations.length 
+      totalSaved: cancellations.length,
+      nonVegBookings
     });
   } catch (error) {
     console.error("Headcount Error:", error);

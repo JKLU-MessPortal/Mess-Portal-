@@ -829,6 +829,55 @@
 }
 
 /* ===========================
+   NON-VEG BOOKINGS SUMMARY
+=========================== */
+.non-veg-summary {
+    margin-top: 15px;
+}
+
+.non-veg-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.non-veg-box {
+    background-color: #fff1f2;
+    border: 1.5px solid #fecdd3;
+    padding: 16px 20px;
+    border-radius: 12px;
+    text-align: center;
+    flex: 1;
+    min-width: 140px;
+    box-shadow: 0 2px 8px rgba(225, 29, 72, 0.04);
+}
+
+.non-veg-box h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #9f1239;
+    margin-bottom: 8px;
+}
+
+.non-veg-count {
+    display: block;
+    font-size: 32px;
+    font-weight: 800;
+    color: #e11d48;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.non-veg-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fb7185;
+}
+
+/* ===========================
    LOADING STATE
 =========================== */
 
