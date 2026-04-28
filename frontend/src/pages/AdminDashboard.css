@@ -11,7 +11,7 @@
 =========================== */
 .admin-container {
     min-height: 100vh;
-    background-color: #e1e0de;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fff7ed 100%);
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 

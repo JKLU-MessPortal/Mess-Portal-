@@ -4,7 +4,7 @@
 
 .history-page {
     min-height: 100vh;
-    background-color: #f4f7f6;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fff7ed 100%);
     padding: 30px 20px;
     font-family: sans-serif;
 }
