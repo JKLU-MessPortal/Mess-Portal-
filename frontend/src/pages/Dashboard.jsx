@@ -384,6 +384,18 @@ export default function Dashboard() {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       fetchMenu(parsedUser.id || parsedUser._id);
+      
+      // Fetch latest settings to keep role and residencyStatus in sync with admin changes
+      axios.get(`http://localhost:5000/api/auth/settings?studentId=${parsedUser.id || parsedUser._id}`)
+        .then(res => {
+          if (res.data.success && res.data.settings) {
+            const updatedUser = { ...parsedUser, ...res.data.settings };
+            setUser(updatedUser);
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+          }
+        })
+        .catch(err => console.error("Error fetching latest user details:", err));
+
       axios.get("http://localhost:5000/api/nutrition").then(res => {
         if (res.data.success) {
           const map = {};

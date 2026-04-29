@@ -243,12 +243,42 @@ export default function Voting() {
     const stored = localStorage.getItem("user");
     if (!stored) { navigate("/"); return; }
     const u = JSON.parse(stored);
-    const admin = ["admin", "contractor", "accountant"].includes(u.role);
-    const hosteller = u.residencyStatus === "Hosteller";
-    if (!admin && !hosteller) { navigate("/dashboard"); return; } // Day-scholars blocked
-    setCurrentUser(u);
-    setIsAdmin(admin);
-    setIsHosteller(hosteller);
+    
+    // Check initial local storage
+    let admin = ["admin", "contractor", "accountant"].includes(u.role);
+    let hosteller = u.residencyStatus === "Hosteller";
+    
+    // Try to fetch latest settings to ensure we don't block them if they just became a hosteller
+    axios.get(`http://localhost:5000/api/auth/settings?studentId=${u.id || u._id}`)
+      .then(res => {
+        if (res.data.success && res.data.settings) {
+          const updatedUser = { ...u, ...res.data.settings };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          const updatedAdmin = ["admin", "contractor", "accountant"].includes(updatedUser.role);
+          const updatedHosteller = updatedUser.residencyStatus === "Hosteller";
+          
+          if (!updatedAdmin && !updatedHosteller) {
+            navigate("/dashboard");
+          } else {
+            setCurrentUser(updatedUser);
+            setIsAdmin(updatedAdmin);
+            setIsHosteller(updatedHosteller);
+          }
+        }
+      })
+      .catch(() => {
+        if (!admin && !hosteller) { navigate("/dashboard"); return; } // Day-scholars blocked
+        setCurrentUser(u);
+        setIsAdmin(admin);
+        setIsHosteller(hosteller);
+      });
+
+    // Optimistically set while fetching
+    if (admin || hosteller) {
+      setCurrentUser(u);
+      setIsAdmin(admin);
+      setIsHosteller(hosteller);
+    }
   }, [navigate]);
 
   // Debounce searchInput → search (300 ms)
