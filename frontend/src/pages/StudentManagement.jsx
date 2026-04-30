@@ -4,7 +4,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import "./StudentManagement.css";
 
-const API = "https://mess-portal-server.onrender.com/api/admin";
+const API = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin`;
 
 
 

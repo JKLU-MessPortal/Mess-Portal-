@@ -392,7 +392,7 @@ export default function MenuPage() {
     try {
       const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
       const studentId = storedUser.id || storedUser._id;
-      const res = await axios.get(`https://mess-portal-server.onrender.com/api/dashboard/data?studentId=${studentId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dashboard/data?studentId=${studentId}`);
       if (res.data.success) {
         setFullMenu(res.data.fullMenu || []);
         // Non-veg bookings from server only contain today/tomorrow. 
@@ -411,7 +411,7 @@ export default function MenuPage() {
 
   const fetchNutrition = async () => {
     try {
-      const res = await axios.get("https://mess-portal-server.onrender.com/api/nutrition");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/nutrition`);
       if (res.data.success) {
         const map = {};
         res.data.nutrition.forEach(d => { map[d.name.toLowerCase()] = d; });

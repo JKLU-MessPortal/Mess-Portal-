@@ -37,7 +37,7 @@ export default function AuthGate() {
       console.log("Microsoft Login Success. Sending to Backend...");
 
       // 3. SEND TO BACKEND (The Bridge)
-      const res = await axios.post("https://mess-portal-server.onrender.com/api/auth/microsoft-login", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/microsoft-login`, {
         name: account.name,
         email: email,
         // UPDATE: rollNumber yahan se hata diya kyunki DB se delete kar diya tha

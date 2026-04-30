@@ -21,7 +21,7 @@ export default function History() {
 
   const fetchHistory = async (studentId) => {
     try {
-      const res = await axios.get(`https://mess-portal-server.onrender.com/api/dashboard/history?studentId=${studentId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dashboard/history?studentId=${studentId}`);
       if (res.data.success) {
         setHistory(res.data.history);
       }

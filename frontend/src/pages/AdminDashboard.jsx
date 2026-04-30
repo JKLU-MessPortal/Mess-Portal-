@@ -54,7 +54,7 @@ export default function AdminDashboard() {
       if (search.trim()) params.append("search", search.trim());
       if (from) params.append("from", from);
       if (to)   params.append("to",   to);
-      const res = await axios.get(`https://mess-portal-server.onrender.com/api/complaints?${params}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints?${params}`);
       if (res.data.success) setComplaints(res.data.complaints);
     } catch (e) { console.error(e); }
     finally { setComplaintLoading(false); }
@@ -82,14 +82,14 @@ export default function AdminDashboard() {
 
   const fetchAdminData = async (role) => {
     try {
-      const resStats = await axios.get("https://mess-portal-server.onrender.com/api/admin/headcount");
+      const resStats = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/headcount`);
       if (resStats.data.success) { 
         setStats(resStats.data.stats); 
         setTotalSaved(resStats.data.totalSaved); 
         setNonVegBookings(resStats.data.nonVegBookings || []);
       }
 
-      const resLedger = await axios.get("https://mess-portal-server.onrender.com/api/admin/ledger");
+      const resLedger = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/ledger`);
       if (resLedger.data.success) setLedger(resLedger.data.ledger);
     } catch (error) {
       console.error("Failed to fetch admin data", error);
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
     if (vegDishes.length === 0) { setStatusMsg("❌ Add at least one veg item."); return; }
     setStatusMsg("Updating...");
     try {
-      const res = await axios.post("https://mess-portal-server.onrender.com/api/admin/menu", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/menu`, {
         dayOfWeek: day, mealType: meal,
         items: vegDishes,
         nonVegItems: nonVegDishes,
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
                 e.preventDefault();
                 const msg = e.target.noticeMsg.value;
                 try {
-                  await axios.post("https://mess-portal-server.onrender.com/api/admin/notice", { message: msg });
+                  await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/notice`, { message: msg });
                   alert("✅ Notice sent to all students!");
                   e.target.reset();
                 } catch { alert("❌ Failed to send notice"); }
@@ -455,13 +455,13 @@ export default function AdminDashboard() {
                       <p className="cmp-text">{c.text}</p>
                       {c.image && (
                         <a
-                          href={`https://mess-portal-server.onrender.com/uploads/${c.image}`}
+                          href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${c.image}`}
                           target="_blank" rel="noreferrer"
                           className="cmp-proof-link"
                           title="Click to view full image"
                         >
                           <img
-                            src={`https://mess-portal-server.onrender.com/uploads/${c.image}`}
+                            src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${c.image}`}
                             alt="Proof"
                             className="cmp-proof-img"
                           />

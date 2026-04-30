@@ -351,7 +351,7 @@ export default function Dashboard() {
     fd.append("text",        complaintText.trim());
     if (complaintImage) fd.append("image", complaintImage);
     try {
-      const res = await axios.post("https://mess-portal-server.onrender.com/api/complaints", fd, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/complaints`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.success) {
@@ -386,7 +386,7 @@ export default function Dashboard() {
       fetchMenu(parsedUser.id || parsedUser._id);
       
       // Fetch latest settings to keep role and residencyStatus in sync with admin changes
-      axios.get(`https://mess-portal-server.onrender.com/api/auth/settings?studentId=${parsedUser.id || parsedUser._id}`)
+      axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/settings?studentId=${parsedUser.id || parsedUser._id}`)
         .then(res => {
           if (res.data.success && res.data.settings) {
             const updatedUser = { ...parsedUser, ...res.data.settings };
@@ -396,7 +396,7 @@ export default function Dashboard() {
         })
         .catch(err => console.error("Error fetching latest user details:", err));
 
-      axios.get("https://mess-portal-server.onrender.com/api/nutrition").then(res => {
+      axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/nutrition`).then(res => {
         if (res.data.success) {
           const map = {};
           res.data.nutrition.forEach(d => { map[d.name.toLowerCase()] = d; });
@@ -404,7 +404,7 @@ export default function Dashboard() {
         }
       }).catch(() => {});
 
-      axios.get("https://mess-portal-server.onrender.com/api/admin/notice").then((res) => {
+      axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/notice`).then((res) => {
         if (res.data.notice && res.data.notice.message) {
           setNotice(res.data.notice.message);
         }
@@ -414,7 +414,7 @@ export default function Dashboard() {
       const staff = ["admin", "contractor", "accountant"].includes(role);
       
       if (staff) {
-        axios.get("https://mess-portal-server.onrender.com/api/admin/headcount").then(res => {
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/headcount`).then(res => {
           if (res.data.success) {
             setAdminStats({
               stats: res.data.stats,
@@ -430,7 +430,7 @@ export default function Dashboard() {
 
   const fetchMenu = async (studentId) => {
     try {
-      const res = await axios.get(`https://mess-portal-server.onrender.com/api/dashboard/data?studentId=${studentId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dashboard/data?studentId=${studentId}`);
       if (res.data.success) {
         setMenuData({
           todayMenu: res.data.todayMenu,
@@ -456,7 +456,7 @@ export default function Dashboard() {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     try {
-      const res = await axios.post("https://mess-portal-server.onrender.com/api/dashboard/toggle", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dashboard/toggle`, {
         studentId: studentId,
         date: tomorrow,
         mealType: mealType,

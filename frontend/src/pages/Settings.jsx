@@ -46,7 +46,7 @@ export default function Settings() {
 
     // Fetch saved settings from server
     axios
-      .get(`https://mess-portal-server.onrender.com/api/auth/settings?studentId=${studentId}`)
+      .get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/settings?studentId=${studentId}`)
       .then((res) => {
         if (res.data.success) {
           const s = res.data.settings;
@@ -80,7 +80,7 @@ export default function Settings() {
 
     try {
       // Only send editable fields — name, rollNumber and residencyStatus are locked
-      const res = await axios.put("https://mess-portal-server.onrender.com/api/auth/settings", {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/settings`, {
         studentId,
         dietaryPreference: form.dietaryPreference,
         foodAllergies: form.foodAllergies,
