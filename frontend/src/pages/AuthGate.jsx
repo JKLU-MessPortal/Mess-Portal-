@@ -61,7 +61,7 @@ export default function AuthGate() {
       } else {
         // MSAL popup close karne par jo error aata hai usko silent rakha hai
         if (error.name !== "BrowserAuthError") {
-            alert("Network Error: Ensure your Backend (node index.js) is running on Port 5000.");
+            alert("Network Error: Could not connect to the backend server. Please wait a moment for it to wake up or check your console for details.");
         }
       }
     } finally {
