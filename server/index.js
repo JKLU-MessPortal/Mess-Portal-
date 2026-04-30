@@ -17,7 +17,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: "http://localhost:5173", // Updated to match your Vite frontend port
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Use env variable in production, fallback to local
     methods: "GET,POST,PUT,DELETE",
     credentials: true
 }));

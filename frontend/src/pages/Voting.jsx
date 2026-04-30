@@ -20,7 +20,7 @@ import {
 import Navbar from "../components/Navbar";
 import "./Voting.css";
 
-const API = "http://localhost:5000/api/polls";
+const API = "https://mess-portal-server.onrender.com/api/polls";
 const CATEGORIES = ["All", "Food Quality", "Hygiene", "Service", "Timing", "Cleanliness", "Other"];
 const CATEGORY_COLORS = {
   "Food Quality": "#f59e0b", Hygiene: "#10b981", Service: "#3b82f6",
@@ -249,7 +249,7 @@ export default function Voting() {
     let hosteller = u.residencyStatus === "Hosteller";
     
     // Try to fetch latest settings to ensure we don't block them if they just became a hosteller
-    axios.get(`http://localhost:5000/api/auth/settings?studentId=${u.id || u._id}`)
+    axios.get(`https://mess-portal-server.onrender.com/api/auth/settings?studentId=${u.id || u._id}`)
       .then(res => {
         if (res.data.success && res.data.settings) {
           const updatedUser = { ...u, ...res.data.settings };

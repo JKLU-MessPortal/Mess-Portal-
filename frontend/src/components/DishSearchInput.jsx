@@ -44,7 +44,7 @@ export default function DishSearchInput({ label, selectedDishes, onAdd, onRemove
     if (!q.trim()) { setResults([]); return; }
     setLoading(true);
     try {
-      const url = `http://localhost:5000/api/nutrition/search?q=${encodeURIComponent(q)}${nonVeg ? '&nonVeg=true' : ''}`;
+      const url = `https://mess-portal-server.onrender.com/api/nutrition/search?q=${encodeURIComponent(q)}${nonVeg ? '&nonVeg=true' : ''}`;
       const res = await axios.get(url);
       if (res.data.success) setResults(res.data.dishes);
     } catch (e) { console.error(e); }
@@ -85,7 +85,7 @@ export default function DishSearchInput({ label, selectedDishes, onAdd, onRemove
         byquantity:    customDish.byquantity,
         quantity_unit: customDish.quantity_unit || "per serving",
       };
-      const res = await axios.post("http://localhost:5000/api/nutrition", payload);
+      const res = await axios.post("https://mess-portal-server.onrender.com/api/nutrition", payload);
       if (res.data.success) {
         onAdd(res.data.dish.name);
         setShowCustomForm(false);

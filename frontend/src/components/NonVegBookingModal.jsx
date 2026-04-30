@@ -31,7 +31,7 @@ export default function NonVegBookingModal({ item, mealType, tomorrowDate, user,
     const checkBooking = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/payment/status?studentId=${user.id}&date=${tomorrowDate}`
+          `https://mess-portal-server.onrender.com/api/payment/status?studentId=${user.id}&date=${tomorrowDate}`
         );
         if (res.data.success) {
           const found = res.data.bookings.find(
@@ -56,7 +56,7 @@ export default function NonVegBookingModal({ item, mealType, tomorrowDate, user,
     }
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/payment/create-order", {
+      const { data } = await axios.post("https://mess-portal-server.onrender.com/api/payment/create-order", {
         studentId: user.id, studentName: user.name, studentEmail: user.email,
         date: tomorrowDate, mealType, item
       });
@@ -71,7 +71,7 @@ export default function NonVegBookingModal({ item, mealType, tomorrowDate, user,
         theme: { color: "#f59e0b" },
         handler: async (response) => {
           try {
-            const verifyRes = await axios.post("http://localhost:5000/api/payment/verify", {
+            const verifyRes = await axios.post("https://mess-portal-server.onrender.com/api/payment/verify", {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
@@ -94,7 +94,7 @@ export default function NonVegBookingModal({ item, mealType, tomorrowDate, user,
   const handleMockPay = async () => {
     setStep("paying");
     try {
-      const res = await axios.post("http://localhost:5000/api/payment/mock-success", {
+      const res = await axios.post("https://mess-portal-server.onrender.com/api/payment/mock-success", {
         studentId: user.id, studentName: user.name, studentEmail: user.email,
         date: tomorrowDate, mealType, item
       });
