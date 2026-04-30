@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const path = require('path');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes'); 
@@ -24,7 +25,7 @@ app.use(cors({
 app.use(express.json());
 
 // Allow Frontend to access the 'uploads' folder for photos
-app.use('/uploads', express.static('uploads')); 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 
 // Connect to MongoDB
 const connectDB = async () => {

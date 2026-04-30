@@ -4,11 +4,39 @@ const multer   = require('multer');
 const path     = require('path');
 const Complaint = require('../models/Complaint');
 
-// ── Multer — save to /uploads ────────────────────────────────
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename:    (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
+const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// Configure Cloudinary if keys are present
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
+
+let storage;
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'mess-portal-complaints',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    },
+  });
+} else {
+  const uploadDir = path.join(__dirname, '../uploads/');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadDir),
+    filename:    (req, file, cb) => cb(null, `${Date.now()}-${file.originalname.replace(/\\s+/g, '_')}`),
+  });
+}
+
 const upload = multer({ storage, limits: { fileSize: 8 * 1024 * 1024 } }); // 8 MB max
 
 // ── POST /api/complaints — submit a complaint ─────────────────
@@ -22,7 +50,7 @@ router.post('/', upload.single('image'), async (req, res) => {
       studentId,
       studentName,
       text: text.trim(),
-      image: req.file ? req.file.filename : '',
+      image: req.file ? (process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : req.file.filename) : '',
     });
     res.status(201).json({ success: true, complaint });
   } catch (err) {

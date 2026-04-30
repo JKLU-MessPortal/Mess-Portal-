@@ -455,13 +455,13 @@ export default function AdminDashboard() {
                       <p className="cmp-text">{c.text}</p>
                       {c.image && (
                         <a
-                          href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${c.image}`}
+                          href={c.image.startsWith('http') ? c.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${encodeURIComponent(c.image)}`}
                           target="_blank" rel="noreferrer"
                           className="cmp-proof-link"
                           title="Click to view full image"
                         >
                           <img
-                            src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${c.image}`}
+                            src={c.image.startsWith('http') ? c.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${encodeURIComponent(c.image)}`}
                             alt="Proof"
                             className="cmp-proof-img"
                           />
