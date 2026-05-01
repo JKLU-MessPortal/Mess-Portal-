@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import messImage from "../images/mess.jpeg";
 import jkluLogo from "../images/JK_Lakshmipat_University_Logo.jpg";
 import { Button, Container, Typography, Paper, Box } from "@mui/material";
@@ -15,59 +15,63 @@ export default function AuthGate() {
   //  NAYA STATE: Double-click rokne ke liye
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const handleLogin = async () => {
-    // Agar process pehle se chal raha hai, toh wapas return kar do
-    if (isLoggingIn) return;
+  // Effect to handle the redirect response after coming back from Microsoft
+  useEffect(() => {
+    instance.handleRedirectPromise()
+      .then((response) => {
+        if (response && response.account) {
+          processLogin(response.account);
+        }
+      })
+      .catch((error) => {
+        console.error("Redirect Login Error:", error);
+      });
+  }, [instance]);
 
-    setIsLoggingIn(true); // Button ko disable mode mein daalo
+  const processLogin = async (account) => {
+    const email = account.username.toLowerCase();
 
+    // 2. CHECK DOMAIN (Frontend Security)
+    if (!email.endsWith("@jklu.edu.in")) {
+      alert("Access Denied: Only @jklu.edu.in emails are allowed.");
+      instance.logoutRedirect();
+      return;
+    }
+
+    setIsLoggingIn(true);
     try {
-      // 1. OPEN MICROSOFT POPUP
-      const response = await instance.loginPopup(loginRequest);
-      const { account } = response;
-      const email = account.username.toLowerCase();
-
-      // 2. CHECK DOMAIN (Frontend Security)
-      if (!email.endsWith("@jklu.edu.in")) {
-        alert("Access Denied: Only @jklu.edu.in emails are allowed.");
-        await instance.logoutPopup();
-        setIsLoggingIn(false);
-        return;
-      }
-
       console.log("Microsoft Login Success. Sending to Backend...");
 
       // 3. SEND TO BACKEND (The Bridge)
       const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/microsoft-login`, {
         name: account.name,
         email: email,
-        // UPDATE: rollNumber yahan se hata diya kyunki DB se delete kar diya tha
       });
 
       // 4. SAVE & REDIRECT
       if (res.status === 200) {
         console.log("Database Saved:", res.data);
-
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("isAuthenticated", "true");
-
-        // alert(`Welcome, ${res.data.user.name}!`);
         navigate("/dashboard");
       }
-
     } catch (error) {
-      console.error("Login Error:", error);
-      if (error.response) {
-        alert(`Server Error: ${error.response.status} - ${error.response.data.message || "Unknown Error"}`);
-      } else {
-        // MSAL popup close karne par jo error aata hai usko silent rakha hai
-        if (error.name !== "BrowserAuthError") {
-          alert("Network Error: Could not connect to the backend server. Please wait a moment for it to wake up or check your console for details.");
-        }
-      }
+      console.error("Backend Auth Error:", error);
+      alert("Auth Error: Could not verify with backend. Please try again.");
     } finally {
-      // Success ho ya Error, aakhir mein button ko wapas enable kar do
       setIsLoggingIn(false);
+    }
+  };
+
+  const handleLogin = async () => {
+    if (isLoggingIn) return;
+    
+    try {
+      // Switch to Redirect flow for better mobile compatibility
+      await instance.loginRedirect(loginRequest);
+    } catch (error) {
+      console.error("Login Initiation Error:", error);
+      alert("Could not start login process. Please check your internet connection.");
     }
   };
 
