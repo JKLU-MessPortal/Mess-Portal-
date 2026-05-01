@@ -17,12 +17,16 @@ const MealBookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Booked', 'Cancelled', 'Paid'],
+    enum: ['Booked', 'Cancelled', 'Paid', 'pending', 'failed'],
     default: 'Booked'
-  }
-});
+  },
+  // Razorpay fields for Day Scholar meal purchases
+  razorpayOrderId: { type: String, default: '' },
+  razorpayPaymentId: { type: String, default: '' },
+  razorpaySignature: { type: String, default: '' },
+}, { timestamps: true });
 
 // This ensures a student can only have ONE booking record per meal per day
 MealBookingSchema.index({ studentId: 1, date: 1, mealType: 1 }, { unique: true });
 
-module.exports = mongoose.model('MealBooking', MealBookingSchema);
+module.exports = mongoose.model('MealBooking', MealBookingSchema);

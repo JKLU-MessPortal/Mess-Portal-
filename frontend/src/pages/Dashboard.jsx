@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import NonVegBookingModal from "../components/NonVegBookingModal";
+import DayScholarBookingModal from "../components/DayScholarBookingModal";
 import "./Dashboard.css";
 
 import { Coffee, Sun, Utensils, Moon, Info, ChevronUp, Share2, AlertTriangle, CheckCircle2, ShoppingCart, UtensilsCrossed } from "lucide-react";
@@ -121,7 +122,7 @@ function DishRow({ dishName, nutritionMap, isNonVeg = false, isPaid = false }) {
 }
 
 // ─── Meal Modal (popup with blur) ──────────────────────────────────
-function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, nonVegBookings }) {
+function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, setDsModal, nonVegBookings }) {
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
   const filterNonVeg = (items = []) => {
@@ -186,10 +187,10 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
                   </button>
                 </>
               ) : (
-                <>
+                 <>
                    <span style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: 600 }}>Purchase Day-Scholar Meal</span>
                   <button
-                    onClick={() => { if (!isPaid && window.confirm(`Purchase ${meal.mealType} for ₹50?`)) handleToggleMeal(meal.mealType, "Paid"); }}
+                    onClick={() => { if (!isPaid) setDsModal({ mealType: meal.mealType, tomorrowDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] }); }}
                     disabled={isPaid}
                     className="btn-skip"
                     style={isPaid ? { background: '#10b981', color: 'white', cursor: 'default', border: 'none' } : { background: '#3b82f6', color: 'white' }}
@@ -262,7 +263,7 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
 }
 
 // ─── Today's & Tomorrow Meal Tile ─────────────────────────────────────────────
-function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, nonVegBookings }) {
+function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, setDsModal, nonVegBookings }) {
   const [open, setOpen] = useState(false);
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
@@ -320,6 +321,7 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
           isHosteller={isHosteller}
           handleToggleMeal={handleToggleMeal}
           setNvModal={setNvModal}
+          setDsModal={setDsModal}
           nonVegBookings={nonVegBookings}
         />
       )}
@@ -334,6 +336,7 @@ export default function Dashboard() {
   const [adminStats, setAdminStats] = useState(null);
   const [nutritionMap, setNutritionMap] = useState({});
   const [nvModal, setNvModal] = useState(null);
+  const [dsModal, setDsModal] = useState(null);
 
   const [complaintText, setComplaintText]   = useState("");
   const [complaintImage, setComplaintImage] = useState(null);
@@ -623,6 +626,8 @@ export default function Dashboard() {
                         dietaryPref={dietaryPref}
                         nutritionMap={nutritionMap}
                         isTomorrow={false}
+                        setNvModal={setNvModal}
+                        setDsModal={setDsModal}
                         nonVegBookings={menuData.nonVegBookings}
                       />
                     ))
@@ -659,6 +664,7 @@ export default function Dashboard() {
                           isHosteller={isHosteller}
                           handleToggleMeal={handleToggleMeal}
                           setNvModal={setNvModal}
+                          setDsModal={setDsModal}
                           nonVegBookings={menuData.nonVegBookings}
                         />
                       );
@@ -679,6 +685,16 @@ export default function Dashboard() {
             user={user}
             onClose={() => setNvModal(null)}
             onSuccess={() => setNvModal(null)}
+          />
+        )}
+
+        {dsModal && user && (
+          <DayScholarBookingModal
+            mealType={dsModal.mealType}
+            tomorrowDate={dsModal.tomorrowDate}
+            user={user}
+            onClose={() => setDsModal(null)}
+            onSuccess={() => { setDsModal(null); fetchMenu(user.id || user._id); }}
           />
         )}
 

@@ -1,7 +1,7 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const NonVegBooking = require('../models/NonVegBooking');
-
+const MealBooking = require('../models/MealBooking');
 // Pricing rules
 const EGG_KEYWORDS = ['egg', 'omelette', 'omlette', 'boiled egg', 'anda', 'bhurji'];
 const isEggItem = (name) => EGG_KEYWORDS.some(kw => name.toLowerCase().includes(kw));
@@ -156,6 +156,126 @@ exports.mockSuccess = async (req, res) => {
     res.json({ success: true, message: 'Mock payment successful! Booking confirmed.' });
   } catch (error) {
     console.error('mockSuccess error:', error);
+    res.status(500).json({ success: false, message: 'Mock payment failed' });
+  }
+};
+
+// --- Day Scholar Meal Payment Endpoints ---
+
+// POST /api/payment/create-meal-order
+exports.createMealOrder = async (req, res) => {
+  try {
+    const { studentId, date, mealType } = req.body;
+    if (!studentId || !date || !mealType) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    // Check if already booked
+    const existing = await MealBooking.findOne({
+      studentId,
+      date: startOfDay,
+      mealType,
+      status: 'Paid'
+    });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'You have already purchased this meal.' });
+    }
+
+    const amountPaise = 50 * 100; // Rs 50 for regular meal
+
+    const order = await razorpay.orders.create({
+      amount: amountPaise,
+      currency: 'INR',
+      receipt: `meal_${String(studentId).slice(-8)}_${Date.now().toString().slice(-10)}`,
+      notes: { studentId: String(studentId), mealType, date: String(date) }
+    });
+
+    const booking = await MealBooking.findOneAndUpdate(
+      { studentId, date: startOfDay, mealType },
+      {
+        razorpayOrderId: order.id,
+        status: 'pending'
+      },
+      { new: true, upsert: true }
+    );
+
+    res.json({
+      success: true,
+      orderId: order.id,
+      amount: amountPaise,
+      currency: 'INR',
+      bookingId: booking._id,
+      keyId: process.env.RAZORPAY_KEY_ID
+    });
+  } catch (error) {
+    console.error('createMealOrder error:', error);
+    res.status(500).json({ success: false, message: 'Failed to create payment order', error: error.message });
+  }
+};
+
+// POST /api/payment/verify-meal
+exports.verifyMealPayment = async (req, res) => {
+  try {
+    const { razorpayOrderId, razorpayPaymentId, razorpaySignature, bookingId } = req.body;
+
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+      .digest('hex');
+
+    if (expectedSignature !== razorpaySignature) {
+      await MealBooking.findByIdAndUpdate(bookingId, { status: 'failed' });
+      return res.status(400).json({ success: false, message: 'Payment verification failed. Invalid signature.' });
+    }
+
+    await MealBooking.findByIdAndUpdate(bookingId, {
+      razorpayPaymentId,
+      razorpaySignature,
+      status: 'Paid'
+    });
+
+    res.json({ success: true, message: 'Payment verified! Meal purchased successfully.' });
+  } catch (error) {
+    console.error('verifyMealPayment error:', error);
+    res.status(500).json({ success: false, message: 'Verification failed', error: error.message });
+  }
+};
+
+// POST /api/payment/mock-meal-success
+exports.mockMealSuccess = async (req, res) => {
+  try {
+    const { studentId, date, mealType } = req.body;
+    if (!studentId || !date || !mealType) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const existing = await MealBooking.findOne({
+      studentId, date: startOfDay, mealType, status: 'Paid'
+    });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Already purchased.' });
+    }
+
+    await MealBooking.findOneAndUpdate(
+      { studentId, date: startOfDay, mealType },
+      {
+        razorpayOrderId: `mock_order_${Date.now()}`,
+        razorpayPaymentId: `mock_pay_${Date.now()}`,
+        razorpaySignature: 'mock_signature',
+        status: 'Paid'
+      },
+      { new: true, upsert: true }
+    );
+
+    res.json({ success: true, message: 'Mock payment successful! Meal purchased.' });
+  } catch (error) {
+    console.error('mockMealSuccess error:', error);
     res.status(500).json({ success: false, message: 'Mock payment failed' });
   }
 };

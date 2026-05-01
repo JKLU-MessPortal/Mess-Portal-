@@ -51,12 +51,18 @@ exports.getHeadcount = async (req, res) => {
       status: 'paid'
     });
 
+    const dayScholarBookings = await MealBooking.find({
+      date: tomorrow,
+      status: 'Paid'
+    }).populate('studentId', 'name email rollNumber');
+
     res.status(200).json({ 
       success: true, 
       stats, 
       totalHostellers,
       totalSaved: cancellations.length,
-      nonVegBookings
+      nonVegBookings,
+      dayScholarBookings
     });
   } catch (error) {
     console.error("Headcount Error:", error);

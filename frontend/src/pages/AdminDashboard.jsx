@@ -37,6 +37,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 });
   const [totalSaved, setTotalSaved] = useState(0);
   const [nonVegBookings, setNonVegBookings] = useState([]);
+  const [dayScholarBookings, setDayScholarBookings] = useState([]);
   const [ledger, setLedger] = useState([]);
   const [openStudentIndex, setOpenStudentIndex] = useState(null);
 
@@ -87,6 +88,7 @@ export default function AdminDashboard() {
         setStats(resStats.data.stats); 
         setTotalSaved(resStats.data.totalSaved); 
         setNonVegBookings(resStats.data.nonVegBookings || []);
+        setDayScholarBookings(resStats.data.dayScholarBookings || []);
       }
 
       const resLedger = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/ledger`);
@@ -327,6 +329,38 @@ export default function AdminDashboard() {
                                 <td className="student-name-cell">{b.studentName || b.studentEmail || b.studentId}</td>
                                 <td><span style={{ fontWeight: 600, color: "#b91c1c" }}>{b.item}</span></td>
                                 <td>{b.mealType}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* DAY SCHOLAR BOOKINGS SECTION */}
+              <div style={{ paddingTop: "20px", marginTop: "20px", borderTop: "2px solid #f1f5f9" }}>
+                <h3 className="card-title">Day Scholar Orders</h3>
+                <p className="card-subtitle">Regular meals purchased by day scholars.</p>
+
+                {dayScholarBookings.length === 0 ? (
+                  <p className="empty-msg">No day scholar bookings for tomorrow.</p>
+                ) : (
+                  <div className="non-veg-summary">
+                    <h4 style={{ marginTop: "10px", marginBottom: "15px", fontSize: "15px", color: "#334155" }}>Student List:</h4>
+                    <div className="student-table-wrap">
+                        <table className="student-table">
+                          <thead>
+                            <tr>
+                              <th>Student</th>
+                              <th>Meal Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {dayScholarBookings.map((b, i) => (
+                              <tr key={i}>
+                                <td className="student-name-cell">{b.studentId?.name || b.studentId?.email || 'Unknown'}</td>
+                                <td><span style={{ fontWeight: 600, color: "#3b82f6" }}>{b.mealType}</span></td>
                               </tr>
                             ))}
                           </tbody>
