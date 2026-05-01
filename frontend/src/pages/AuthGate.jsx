@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import jkluLogo from "../assets/JK_Lakshmipat_University_Logo.jpg";
+import jkluLogo from "../images/JK_Lakshmipat_University_Logo.jpg";
 import { Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
@@ -108,7 +108,7 @@ export default function AuthGate() {
             fullWidth
             variant="contained"
             onClick={handleLogin}
-            disabled={isLoggingIn} 
+            disabled={isLoggingIn}
             className="authgate-btn"
             sx={{
               "&:hover": {
