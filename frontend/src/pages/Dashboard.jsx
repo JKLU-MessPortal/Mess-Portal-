@@ -277,6 +277,8 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
   const visibleNonVeg = filterNonVeg(meal.nonVegItems);
   const hasNonVeg = visibleNonVeg.length > 0;
 
+  const isGrayedOut = isCancelled || (!isHosteller && !isTomorrow && !isPaid);
+
   return (
     <>
       <button
@@ -285,8 +287,8 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
         style={{
           background: colors.bg,
           border: isPaid ? "2px solid #10b981" : `1px solid ${colors.border}`,
-          opacity: isCancelled ? 0.7 : 1,
-          filter: isCancelled ? "grayscale(80%)" : "none",
+          opacity: isGrayedOut ? 0.7 : 1,
+          filter: isGrayedOut ? "grayscale(80%)" : "none",
           position: "relative",
           overflow: "hidden",
           display: "flex",
@@ -305,6 +307,9 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
         </div>
         {isCancelled && <div className="meal-tile-status" style={{color:"#b91c1c", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Cancelled</div>}
         {isPaid && <div className="meal-tile-status paid" style={{color:"#047857", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Purchased</div>}
+        {!isHosteller && !isTomorrow && !isPaid && (
+          <div className="meal-tile-status" style={{color:"#64748b", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Not Purchased</div>
+        )}
         <div className="meal-tile-hint" style={{ marginTop: "auto", color: colors.text, opacity: 0.6, fontSize: "0.75rem" }}>View menu →</div>
       </button>
 
@@ -376,6 +381,7 @@ export default function Dashboard() {
     todayName: "Today",
     tomorrowName: "Tomorrow",
     skipStats: null,
+    todayBookings: [],
     tomorrowBookings: [],
     nonVegBookings: [],
   });
@@ -442,6 +448,7 @@ export default function Dashboard() {
           todayName: res.data.todayName,
           tomorrowName: res.data.tomorrowName,
           skipStats: res.data.skipStats,
+          todayBookings: res.data.todayBookings || [],
           tomorrowBookings: res.data.tomorrowBookings,
           nonVegBookings: res.data.nonVegBookings || [],
         });
@@ -619,18 +626,28 @@ export default function Dashboard() {
                 {menuData.todayMenu.length > 0 ? (
                   [...menuData.todayMenu]
                     .sort((a, b) => MEAL_ORDER[a.mealType] - MEAL_ORDER[b.mealType])
-                    .map((meal, index) => (
-                      <MealTile
-                        key={index}
-                        meal={meal}
-                        dietaryPref={dietaryPref}
-                        nutritionMap={nutritionMap}
-                        isTomorrow={false}
-                        setNvModal={setNvModal}
-                        setDsModal={setDsModal}
-                        nonVegBookings={menuData.nonVegBookings}
-                      />
-                    ))
+                    .map((meal, index) => {
+                      const isCancelled = menuData.todayBookings.some(b => b.mealType === meal.mealType && b.status === "Cancelled");
+                      const isPaid = menuData.todayBookings.some(b => b.mealType === meal.mealType && b.status === "Paid");
+
+                      return (
+                        <MealTile
+                          key={index}
+                          meal={meal}
+                          dietaryPref={dietaryPref}
+                          nutritionMap={nutritionMap}
+                          isTomorrow={false}
+                          isCancelled={isCancelled}
+                          isPaid={isPaid}
+                          isStaff={isStaff}
+                          isHosteller={isHosteller}
+                          handleToggleMeal={handleToggleMeal}
+                          setNvModal={setNvModal}
+                          setDsModal={setDsModal}
+                          nonVegBookings={menuData.nonVegBookings}
+                        />
+                      );
+                    })
                 ) : (
                   <p className="menu-empty">No menu uploaded for today.</p>
                 )}

@@ -233,10 +233,6 @@ export default function StudentManagement() {
                 <span className="sm-stat-num">{hostellers.length}</span>
                 <span className="sm-stat-label">Registered Hostellers</span>
               </div>
-              <div className="sm-stat">
-                <span className="sm-stat-num sm-stat-num--blue">∞</span>
-                <span className="sm-stat-label">Day-Scholars (all others)</span>
-              </div>
             </div>
           </div>
         )}

@@ -57,9 +57,13 @@ exports.getDashboardData = async (req, res) => {
         date: tomorrow
       });
 
-      // --- New: Fetch Non-Veg Bookings for Today & Tomorrow ---
       const startOfToday = new Date(today);
       startOfToday.setHours(0,0,0,0);
+      const todayBookings = await MealBooking.find({
+        studentId: studentId,
+        date: startOfToday
+      });
+
       const endOfTomorrow = new Date(tomorrow);
       endOfTomorrow.setHours(23,59,59,999);
 
@@ -78,6 +82,7 @@ exports.getDashboardData = async (req, res) => {
         tomorrowMenu,
         fullMenu,
         skipStats,
+        todayBookings,
         tomorrowBookings,
         nonVegBookings // Include this
       });
@@ -92,6 +97,7 @@ exports.getDashboardData = async (req, res) => {
       tomorrowMenu,
       fullMenu,
       skipStats: {},
+      todayBookings: [],
       tomorrowBookings: [],
       nonVegBookings: []
     });
