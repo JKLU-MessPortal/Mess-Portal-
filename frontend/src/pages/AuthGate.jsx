@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import messImage from "../images/mess.jpeg";
+import React, { useState } from "react";
+import jkluLogo from "../assets/JK_Lakshmipat_University_Logo.jpg";
 import { Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
@@ -8,73 +8,64 @@ import axios from "axios";
 import "./AuthGate.css";
 
 export default function AuthGate() {
-  const { instance, accounts, inProgress } = useMsal();
+  const { instance } = useMsal();
   const navigate = useNavigate();
-  
+
   //  NAYA STATE: Double-click rokne ke liye
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  useEffect(() => {
-    const handleBackendAuthentication = async () => {
-      // If MSAL has finished processing and we have an account, but haven't saved to backend yet
-      if (inProgress === "none" && accounts.length > 0 && !localStorage.getItem("isAuthenticated")) {
-        setIsLoggingIn(true);
-        const account = accounts[0];
-        const email = account.username.toLowerCase();
-
-        if (!email.endsWith("@jklu.edu.in")) {
-          alert("Access Denied: Only @jklu.edu.in emails are allowed.");
-          await instance.logoutRedirect();
-          setIsLoggingIn(false);
-          return;
-        }
-
-        console.log("Microsoft Login Success. Sending to Backend...");
-
-        try {
-          const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/microsoft-login`, {
-            name: account.name,
-            email: email,
-          });
-
-          if (res.status === 200) {
-            console.log("Database Saved:", res.data);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
-            localStorage.setItem("isAuthenticated", "true");
-            alert(`Welcome, ${res.data.user.name}!`);
-            navigate("/dashboard");
-          }
-        } catch (error) {
-          console.error("Backend Error:", error);
-          if (error.response) {
-            alert(`Server Error: ${error.response.status} - ${error.response.data.message || "Unknown Error"}`);
-          } else {
-            alert("Network Error: Could not connect to the backend server. Please wait a moment or check your console.");
-          }
-          await instance.logoutRedirect();
-        } finally {
-          setIsLoggingIn(false);
-        }
-      } else if (localStorage.getItem("isAuthenticated")) {
-        // If already authenticated, redirect to dashboard immediately
-        navigate("/dashboard");
-      }
-    };
-
-    handleBackendAuthentication();
-  }, [inProgress, accounts, instance, navigate]);
-
   const handleLogin = async () => {
     // Agar process pehle se chal raha hai, toh wapas return kar do
-    if (isLoggingIn) return; 
-    
+    if (isLoggingIn) return;
+
     setIsLoggingIn(true); // Button ko disable mode mein daalo
 
     try {
-      // 1. OPEN MICROSOFT REDIRECT (Better for Mobile Browsers)
-      await instance.loginRedirect(loginRequest);
+      // 1. OPEN MICROSOFT POPUP
+      const response = await instance.loginPopup(loginRequest);
+      const { account } = response;
+      const email = account.username.toLowerCase();
+
+      // 2. CHECK DOMAIN (Frontend Security)
+      if (!email.endsWith("@jklu.edu.in")) {
+        alert("Access Denied: Only @jklu.edu.in emails are allowed.");
+        await instance.logoutPopup();
+        setIsLoggingIn(false);
+        return;
+      }
+
+      console.log("Microsoft Login Success. Sending to Backend...");
+
+      // 3. SEND TO BACKEND (The Bridge)
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/microsoft-login`, {
+        name: account.name,
+        email: email,
+        // UPDATE: rollNumber yahan se hata diya kyunki DB se delete kar diya tha
+      });
+
+      // 4. SAVE & REDIRECT
+      if (res.status === 200) {
+        console.log("Database Saved:", res.data);
+
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        localStorage.setItem("isAuthenticated", "true");
+
+        alert(`Welcome, ${res.data.user.name}!`);
+        navigate("/dashboard");
+      }
+
     } catch (error) {
       console.error("Login Error:", error);
+      if (error.response) {
+        alert(`Server Error: ${error.response.status} - ${error.response.data.message || "Unknown Error"}`);
+      } else {
+        // MSAL popup close karne par jo error aata hai usko silent rakha hai
+        if (error.name !== "BrowserAuthError") {
+          alert("Network Error: Could not connect to the backend server. Please wait a moment for it to wake up or check your console for details.");
+        }
+      }
+    } finally {
+      // Success ho ya Error, aakhir mein button ko wapas enable kar do
       setIsLoggingIn(false);
     }
   };
@@ -83,7 +74,7 @@ export default function AuthGate() {
     <Box
       className="authgate-page"
       sx={{
-        backgroundImage: `url(${messImage})`,
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(${jkluLogo})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -94,11 +85,14 @@ export default function AuthGate() {
           elevation={10}
           className="authgate-card"
           sx={{
-            backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyOyKn5i71GaoKjTcL3sBWriHa_NRPQio_Mw&s')`,
+            backgroundImage: `url(${jkluLogo})`,
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
             "&:hover": {
-              transform: "scale(1.10)",
-              boxShadow: "0 20px 100px black",
-              border: "2px solid black",
+              transform: "scale(1.05)",
+              boxShadow: "0 20px 100px rgba(0,0,0,0.5)",
+              border: "2px solid orange",
             },
           }}
         >
