@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const HostellerRegistry = require('../models/HostellerRegistry');
-
+const jwt = require('jsonwebtoken');
 // --- 1. Microsoft Login Logic ---
 exports.microsoftLogin = async (req, res) => {
   try {
@@ -42,6 +42,21 @@ exports.microsoftLogin = async (req, res) => {
       // Re-fetch the user so we always return the LATEST data from DB (including role changes)
       user = await User.findById(user._id);
     }
+
+    // Sign JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET || 'default_fallback_secret',
+      { expiresIn: '7d' }
+    );
+
+    // Set HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
     res.status(200).json({
       success: true,
@@ -103,4 +118,36 @@ exports.updateSettings = async (req, res) => {
     console.error('updateSettings Error:', error);
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
+};
+
+// --- 5. Get Current User (Hydration) ---
+exports.me = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        residencyStatus: user.residencyStatus,
+        dietaryPreference: user.dietaryPreference || '',
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// --- 6. Logout ---
+exports.logout = (req, res) => {
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+  res.status(200).json({ success: true, message: 'Logged out successfully' });
 };

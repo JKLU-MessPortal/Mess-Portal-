@@ -1,6 +1,10 @@
 import { Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
 export default function PrivateRoute({ children }) {
-  const isAuth = localStorage.getItem("isAuthenticated");
-  return isAuth ? children : <Navigate to="/" />;
+  const { user, loading } = useAuth();
+  
+  if (loading) return null; // Or a loading spinner
+
+  return user ? children : <Navigate to="/" />;
 }
