@@ -3,7 +3,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const path = require('path');
-
+const cookieParser = require('cookie-parser');
+const { csrfProtection } = require('./middleware/csrfMiddleware');
 // Import Routes
 const authRoutes = require('./routes/authRoutes'); 
 const adminRoutes = require('./routes/adminRoutes');
@@ -13,6 +14,7 @@ const pollRoutes = require('./routes/pollRoutes');
 const nutritionRoutes = require('./routes/nutritionRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const { authenticateToken } = require('./middleware/authMiddleware');
 
 const app = express();
 
@@ -23,7 +25,8 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-
+app.use(cookieParser());
+app.use(csrfProtection);
 // Allow Frontend to access the 'uploads' folder for photos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 
@@ -41,14 +44,16 @@ const connectDB = async () => {
 connectDB();
 
 // Use Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/mess', messRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/polls', pollRoutes);
-app.use('/api/nutrition', nutritionRoutes);
-app.use('/api/complaints', complaintRoutes);
-app.use('/api/payment', paymentRoutes);
+app.use('/api/auth', authRoutes); // Auth routes manage their own protection
+
+// Protected Routes
+app.use('/api/mess', authenticateToken, messRoutes);
+app.use('/api/dashboard', authenticateToken, dashboardRoutes);
+app.use('/api/admin', authenticateToken, adminRoutes);
+app.use('/api/polls', authenticateToken, pollRoutes);
+app.use('/api/nutrition', authenticateToken, nutritionRoutes);
+app.use('/api/complaints', authenticateToken, complaintRoutes);
+app.use('/api/payment', authenticateToken, paymentRoutes);
 
 // Simple Test Route
 app.get('/', (req, res) => {

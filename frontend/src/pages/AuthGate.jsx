@@ -6,11 +6,13 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 import "./AuthGate.css";
 
 export default function AuthGate() {
   const { instance } = useMsal();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   //  NAYA STATE: Double-click rokne ke liye
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -51,8 +53,7 @@ export default function AuthGate() {
       // 4. SAVE & REDIRECT
       if (res.status === 200) {
         console.log("Database Saved:", res.data);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        localStorage.setItem("isAuthenticated", "true");
+        login(res.data.user);
         navigate("/dashboard");
       }
     } catch (error) {

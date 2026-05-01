@@ -1,22 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
-  // Get user from local storage
-  const user = JSON.parse(localStorage.getItem("user"));
+  // Get user from context
   const userName = user ? user.name.split(" ")[0] : "Student";
   const userRole = user ? user.role : "student";
   const isStaff = ["admin", "contractor", "accountant"].includes(userRole);
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+    logout();
   };
 
   // Helper to check active route
