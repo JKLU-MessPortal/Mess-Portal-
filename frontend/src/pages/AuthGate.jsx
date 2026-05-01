@@ -51,7 +51,7 @@ export default function AuthGate() {
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("isAuthenticated", "true");
 
-        alert(`Welcome, ${res.data.user.name}!`);
+        // alert(`Welcome, ${res.data.user.name}!`);
         navigate("/dashboard");
       }
 
@@ -79,76 +79,104 @@ export default function AuthGate() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Container maxWidth="xs">
-        <Paper
-          elevation={10}
-          className="authgate-card"
+      <Paper
+        elevation={10}
+        className="authgate-card"
+        sx={{
+          position: "relative",
+          overflow: "hidden",
+          backgroundColor: "#f9f9f9 !important",
+          "&:hover": {
+            transform: "scale(1.05)",
+            boxShadow: "0 20px 100px rgba(0,0,0,0.5)",
+            border: "2px solid orange",
+          },
+        }}
+      >
+        {/* Blurred Background Logo */}
+        <Box
           sx={{
-            position: "relative",
-            overflow: "hidden",
-            backgroundColor: "#f9f9f9 !important",
-            "&:hover": {
-              transform: "scale(1.05)",
-              boxShadow: "0 20px 100px rgba(0,0,0,0.5)",
-              border: "2px solid orange",
-            },
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${jkluLogo})`,
+            backgroundSize: "80%",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            filter: "blur(6px)",
+            opacity: 0.25,
+            zIndex: 0,
+            pointerEvents: "none",
           }}
-        >
-          {/* Blurred Background Logo */}
-          <Box
+        />
+
+        <Box sx={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}>
+          <Typography variant="h4" className="authgate-title" sx={{ fontSize: { xs: "1.8rem", sm: "2.125rem" } }}>
+            Login
+          </Typography>
+
+          <Typography variant="h6" className="authgate-subtitle" sx={{ mb: 4 }}>
+            JKLU Mess Portal
+          </Typography>
+
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleLogin}
+            disabled={isLoggingIn}
+            className="authgate-btn"
             sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `url(${jkluLogo})`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              filter: "blur(4px)",
-              opacity: 0.35,
-              zIndex: 0,
-              pointerEvents: "none",
+              borderRadius: "10px",
+              textTransform: "none",
+              fontSize: "1.1rem",
+              py: 1.5,
+              mb: 2,
+              "&:hover": {
+                backgroundColor: "black",
+                color: "orange",
+                transform: "translateY(-2px)",
+                boxShadow: "0 10px 20px rgba(255, 165, 0, 0.4)",
+                border: "2px solid orange",
+              },
             }}
-          />
+          >
+            {isLoggingIn ? "Redirecting..." : "Sign in with Outlook"}
+          </Button>
 
-          <Box sx={{ position: "relative", zIndex: 1 }}>
-            <Typography variant="h4" className="authgate-title">
-              Login
-            </Typography>
-
-            <Typography variant="h6" className="authgate-subtitle">
-              JKLU Mess Portal
-            </Typography>
-
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleLogin}
-              disabled={isLoggingIn}
-              className="authgate-btn"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "black",
-                  color: "orange",
-                  transform: "translateX(5px)",
-                  boxShadow: "0 5px 15px orange",
-                  border: "2px solid orange",
-                },
-              }}
-            >
-              {isLoggingIn ? "Redirecting..." : "Sign in with Outlook"}
-            </Button>
-
-            <Typography variant="caption" className="authgate-caption">
+          <Box sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
+            mt: 2,
+            opacity: 0.9
+          }}>
+            {/* <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Microsoft_Azure.svg" 
+                alt="Azure" 
+                style={{ width: "16px", height: "16px" }} 
+              /> */}
+            <Typography variant="caption" className="authgate-caption" sx={{ mt: "0 !important" }}>
               Secure Authentication via Microsoft Azure
             </Typography>
           </Box>
-        </Paper>
-      </Container>
+        </Box>
+      </Paper>
     </Box>
   );
 }
