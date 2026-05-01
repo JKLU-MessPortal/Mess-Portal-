@@ -24,7 +24,7 @@ exports.scanQRCode = async (req, res) => {
     const currentHour = new Date().getHours();
     let mealType = "Unknown";
 
-    if (currentHour >= 8 && currentHour < 9) mealType = "Breakfast";
+    if (currentHour >= 0 && currentHour < 9) mealType = "Breakfast";
     else if (currentHour >= 12 && currentHour < 14) mealType = "Lunch";
     else if (currentHour >= 17 && currentHour < 18) mealType = "Snacks";
     else if (currentHour >= 20 && currentHour < 22) mealType = "Dinner";
