@@ -98,45 +98,64 @@
     border: 2px solid rgb(220, 100, 100);
 }
 
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1e293b;
+    padding: 5px;
+    transition: all 0.2s;
+}
+
+.mobile-menu-toggle:hover {
+    color: #ee8310;
+}
+
 @media screen and (max-width: 768px) {
     .navbar {
-        flex-direction: column; /* Stack Profile and Buttons up & down */
-        align-items: stretch; /* Take full width */
-        gap: 15px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
         padding: 15px 20px;
     }
 
     .navbar-left {
-        justify-content: center; /* Center the Logo and Name */
-        width: 100%;
+        justify-content: flex-start;
+        width: auto;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
     }
 
     .navbar-right {
+        display: none;
         width: 100%;
-        justify-content: flex-start;
+        flex-direction: column;
+        align-items: stretch;
         gap: 10px;
-        /* Make buttons horizontally scrollable on small screens */
-        overflow-x: auto; 
-        padding-bottom: 5px; /* Breathing room for scroll */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch; /* Smooth scroll on iPhones */
+        margin-top: 15px;
+        padding-bottom: 5px;
     }
 
-    /* Hide the ugly scrollbar but keep the scroll functionality */
-    .navbar-right::-webkit-scrollbar {
-        display: none;
+    .navbar-right.open {
+        display: flex;
+        animation: fadeInDown 0.3s ease forwards;
     }
 
     .nav-btn, .logout-btn {
-        flex-shrink: 0; /* 🚨 MOST IMPORTANT: Prevents buttons from squishing */
-        white-space: nowrap; /* Prevents text inside buttons from breaking */
-        padding: 8px 15px;
+        width: 100%;
+        text-align: left;
+        padding: 12px 15px;
+        font-size: 15px;
     }
 }
 
 @media screen and (max-width: 480px) {
     .navbar {
-        padding: 15px 12px;
+        padding: 15px 15px;
     }
 
     .navbar-logo {
@@ -153,7 +172,18 @@
     }
 
     .nav-btn, .logout-btn {
-        font-size: 13px;
-        padding: 8px 12px;
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

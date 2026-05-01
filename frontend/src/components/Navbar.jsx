@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import "./Navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get user from local storage
   const user = JSON.parse(localStorage.getItem("user"));
@@ -38,8 +40,17 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* RIGHT: Navigation Links */}
-      <div className="navbar-right">
+      {/* RIGHT: Hamburger Toggle Button (Mobile) */}
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle Menu"
+      >
+        {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+
+      {/* Navigation Links */}
+      <div className={`navbar-right ${isMobileMenuOpen ? "open" : ""}`}>
         
         <button
           onClick={() => navigate("/dashboard")}
