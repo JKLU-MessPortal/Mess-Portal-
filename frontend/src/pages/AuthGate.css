@@ -13,9 +13,7 @@
     height: 400px;
     width: 400px;
     text-align: center;
-    background-size: contain;
-    background-position: center calc(100% + 120px);
-    background-color: rgb(255, 255, 127) !important;
+    background-color: #f9f9f9 !important;
     border-radius: 15px !important;
     border: 2px solid orange !important;
     box-shadow: 0 10px 30px orange !important;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import messImage from "../images/mess.jpeg";
 import jkluLogo from "../images/JK_Lakshmipat_University_Logo.jpg";
 import { Button, Container, Typography, Paper, Box } from "@mui/material";
 import { useMsal } from "@azure/msal-react";
@@ -74,7 +75,7 @@ export default function AuthGate() {
     <Box
       className="authgate-page"
       sx={{
-        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(${jkluLogo})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${messImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -85,10 +86,9 @@ export default function AuthGate() {
           elevation={10}
           className="authgate-card"
           sx={{
-            backgroundImage: `url(${jkluLogo})`,
-            backgroundSize: "contain",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
+            position: "relative",
+            overflow: "hidden",
+            backgroundColor: "#f9f9f9 !important",
             "&:hover": {
               transform: "scale(1.05)",
               boxShadow: "0 20px 100px rgba(0,0,0,0.5)",
@@ -96,36 +96,57 @@ export default function AuthGate() {
             },
           }}
         >
-          <Typography variant="h4" className="authgate-title">
-            Login
-          </Typography>
-
-          <Typography variant="h6" className="authgate-subtitle">
-            JKLU Mess Portal
-          </Typography>
-
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleLogin}
-            disabled={isLoggingIn}
-            className="authgate-btn"
+          {/* Blurred Background Logo */}
+          <Box
             sx={{
-              "&:hover": {
-                backgroundColor: "black",
-                color: "orange",
-                transform: "translateX(5px)",
-                boxShadow: "0 5px 15px orange",
-                border: "2px solid orange",
-              },
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `url(${jkluLogo})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              filter: "blur(4px)",
+              opacity: 0.35,
+              zIndex: 0,
+              pointerEvents: "none",
             }}
-          >
-            {isLoggingIn ? "Redirecting..." : "Sign in with Outlook"}
-          </Button>
+          />
 
-          <Typography variant="caption" className="authgate-caption">
-            Secure Authentication via Microsoft Azure
-          </Typography>
+          <Box sx={{ position: "relative", zIndex: 1 }}>
+            <Typography variant="h4" className="authgate-title">
+              Login
+            </Typography>
+
+            <Typography variant="h6" className="authgate-subtitle">
+              JKLU Mess Portal
+            </Typography>
+
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+              className="authgate-btn"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "black",
+                  color: "orange",
+                  transform: "translateX(5px)",
+                  boxShadow: "0 5px 15px orange",
+                  border: "2px solid orange",
+                },
+              }}
+            >
+              {isLoggingIn ? "Redirecting..." : "Sign in with Outlook"}
+            </Button>
+
+            <Typography variant="caption" className="authgate-caption">
+              Secure Authentication via Microsoft Azure
+            </Typography>
+          </Box>
         </Paper>
       </Container>
     </Box>
