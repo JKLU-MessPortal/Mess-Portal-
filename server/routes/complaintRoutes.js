@@ -6,7 +6,7 @@ const Complaint = require('../models/Complaint');
 
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const  CloudinaryStorage  = require('multer-storage-cloudinary');
 
 // Configure Cloudinary if keys are present
 if (process.env.CLOUDINARY_CLOUD_NAME) {
