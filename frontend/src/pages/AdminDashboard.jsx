@@ -34,10 +34,12 @@ export default function AdminDashboard() {
   const [statusMsg, setStatusMsg] = useState("");
 
   // Data State
-  const [stats, setStats] = useState({ Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 });
-  const [totalSaved, setTotalSaved] = useState(0);
-  const [nonVegBookings, setNonVegBookings] = useState([]);
-  const [dayScholarBookings, setDayScholarBookings] = useState([]);
+  const [headcountData, setHeadcountData] = useState({
+    today: { stats: { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 }, totalSaved: 0, nonVegBookings: [], dayScholarBookings: [] },
+    tomorrow: { stats: { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 }, totalSaved: 0, nonVegBookings: [], dayScholarBookings: [] }
+  });
+  const [headcountTab, setHeadcountTab] = useState("tomorrow"); // "today" | "tomorrow"
+
   const [ledger, setLedger] = useState([]);
   const [openStudentIndex, setOpenStudentIndex] = useState(null);
 
@@ -85,10 +87,10 @@ export default function AdminDashboard() {
     try {
       const resStats = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/headcount`);
       if (resStats.data.success) { 
-        setStats(resStats.data.stats); 
-        setTotalSaved(resStats.data.totalSaved); 
-        setNonVegBookings(resStats.data.nonVegBookings || []);
-        setDayScholarBookings(resStats.data.dayScholarBookings || []);
+        setHeadcountData({
+          today: resStats.data.today || { stats: { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 }, totalSaved: 0, nonVegBookings: [], dayScholarBookings: [] },
+          tomorrow: resStats.data.tomorrow || { stats: { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 }, totalSaved: 0, nonVegBookings: [], dayScholarBookings: [] }
+        });
       }
 
       const resLedger = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/ledger`);
@@ -142,7 +144,7 @@ export default function AdminDashboard() {
   const sectionMeta = {
     broadcast:  { title: "Broadcast Notice",           sub: "Send an alert message to all students' dashboards.", icon: <Megaphone size={22} /> },
     menu:       { title: "Update Mess Menu",            sub: "Change today's food offerings for any day.", icon: <Utensils size={22} /> },
-    headcount:  { title: "Tomorrow's Kitchen Headcount", sub: "Live headcount of meals skipped to help avoid food wastage.", icon: <BarChart3 size={22} /> },
+    headcount:  { title: "Kitchen Headcount", sub: "Live headcount of meals skipped and extra orders.", icon: <BarChart3 size={22} /> },
     ledger:     { title: "Monthly Refund Ledger",      sub: "List of students who cancelled meals this month.", icon: <Wallet size={22} /> },
     complaints: { title: "Student Complaints",          sub: "Browse, search and filter complaints raised by students.", icon: <AlertCircle size={22} /> },
   };
@@ -266,109 +268,161 @@ export default function AdminDashboard() {
           {/* ══ KITCHEN HEADCOUNT ══ */}
           {activeSection === "headcount" && canSeeKitchenControls && (
             <div className="admin-card card-orange-top">
-              <h3 className="card-title" style={{marginBottom: "20px"}}>Cancellations (Regular Meals)</h3>
-              <div className="stats-grid">
-                {Object.keys(stats).map((mealType) => (
-                  <div key={mealType} className="stat-box">
-                    <h3>{mealType}</h3>
-                    <span className="stat-value" style={{ color: stats[mealType] > 0 ? "#ef4444" : "#10b981" }}>
-                      {stats[mealType]}
-                    </span>
-                    <span style={{ display: "block", fontSize: "11px", color: "#94a3b8", textTransform: "uppercase", fontWeight: "700", letterSpacing: "1px" }}>
-                      Cancelled
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="stat-saved-banner" style={{ marginBottom: "40px" }}>
-                🥗 Total Meals Saved Tomorrow: {totalSaved}
+              
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', borderBottom: '2px solid #f1f5f9', paddingBottom: '16px' }}>
+                <button 
+                  onClick={() => setHeadcountTab("today")}
+                  style={{
+                    padding: '8px 20px', borderRadius: '8px', fontWeight: 600, border: 'none', cursor: 'pointer',
+                    background: headcountTab === "today" ? "#f59e0b" : "#f1f5f9",
+                    color: headcountTab === "today" ? "white" : "#64748b",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  Today
+                </button>
+                <button 
+                  onClick={() => setHeadcountTab("tomorrow")}
+                  style={{
+                    padding: '8px 20px', borderRadius: '8px', fontWeight: 600, border: 'none', cursor: 'pointer',
+                    background: headcountTab === "tomorrow" ? "#f59e0b" : "#f1f5f9",
+                    color: headcountTab === "tomorrow" ? "white" : "#64748b",
+                    transition: "all 0.2s"
+                  }}
+                >
+                  Tomorrow
+                </button>
               </div>
 
-              {/* NON-VEG BOOKINGS SECTION */}
-              <div style={{ paddingTop: "20px", borderTop: "2px solid #f1f5f9" }}>
-                <h3 className="card-title">Non-Veg Orders</h3>
-                <p className="card-subtitle">Extra items to prepare for students who have booked and paid.</p>
+              {(() => {
+                const currentData = headcountData[headcountTab];
+                return (
+                  <>
+                    <h3 className="card-title" style={{marginBottom: "20px"}}>Cancellations (Regular Meals)</h3>
+                    <div className="stats-grid">
+                      {Object.keys(currentData.stats).map((mealType) => (
+                        <div key={mealType} className="stat-box">
+                          <h3>{mealType}</h3>
+                          <span className="stat-value" style={{ color: currentData.stats[mealType] > 0 ? "#ef4444" : "#10b981" }}>
+                            {currentData.stats[mealType]}
+                          </span>
+                          <span style={{ display: "block", fontSize: "11px", color: "#94a3b8", textTransform: "uppercase", fontWeight: "700", letterSpacing: "1px" }}>
+                            Cancelled
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="stat-saved-banner" style={{ marginBottom: "40px" }}>
+                      🥗 Total Meals Saved: {currentData.totalSaved}
+                    </div>
 
-                {nonVegBookings.length === 0 ? (
-                  <p className="empty-msg">No non-veg bookings for tomorrow.</p>
-                ) : (
-                  <div className="non-veg-summary">
-                    {/* Summary grouped by item */}
-                    {(() => {
-                        const itemCounts = {};
-                        nonVegBookings.forEach(b => {
-                          itemCounts[b.item] = (itemCounts[b.item] || 0) + 1;
-                        });
-                        return (
-                          <div className="non-veg-grid">
-                            {Object.entries(itemCounts).map(([item, count]) => (
-                              <div key={item} className="non-veg-box">
-                                <h4>{item}</h4>
-                                <span className="non-veg-count">{count}</span>
-                                <span className="non-veg-label">Orders</span>
-                              </div>
-                            ))}
+                    {/* NON-VEG BOOKINGS SECTION */}
+                    <div style={{ paddingTop: "20px", borderTop: "2px solid #f1f5f9", marginBottom: "30px" }}>
+                      <h3 className="card-title">Non-Veg Orders</h3>
+                      <p className="card-subtitle">Extra items to prepare for students who have booked and paid.</p>
+
+                      {currentData.nonVegBookings.length === 0 ? (
+                        <p className="empty-msg">No non-veg bookings for {headcountTab}.</p>
+                      ) : (
+                        <div className="non-veg-summary">
+                          {/* Summary grouped by item */}
+                          {(() => {
+                              const itemCounts = {};
+                              currentData.nonVegBookings.forEach(b => {
+                                itemCounts[b.item] = (itemCounts[b.item] || 0) + 1;
+                              });
+                              return (
+                                <div className="non-veg-grid">
+                                  {Object.entries(itemCounts).map(([item, count]) => (
+                                    <div key={item} className="non-veg-box">
+                                      <h4>{item}</h4>
+                                      <span className="non-veg-count">{count}</span>
+                                      <span className="non-veg-label">Orders</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                          })()}
+
+                          {/* List of students */}
+                          <h4 style={{ marginTop: "20px", marginBottom: "15px", fontSize: "15px", color: "#334155" }}>Student List:</h4>
+                          <div className="student-table-wrap">
+                              <table className="student-table">
+                                <thead>
+                                  <tr>
+                                    <th>Student</th>
+                                    <th>Item</th>
+                                    <th>Meal Time</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {currentData.nonVegBookings.map((b, i) => (
+                                    <tr key={i}>
+                                      <td className="student-name-cell">{b.studentName || b.studentEmail || b.studentId}</td>
+                                      <td><span style={{ fontWeight: 600, color: "#b91c1c" }}>{b.item}</span></td>
+                                      <td>{b.mealType}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                           </div>
-                        )
-                    })()}
-
-                    {/* List of students */}
-                    <h4 style={{ marginTop: "30px", marginBottom: "15px", fontSize: "15px", color: "#334155" }}>Student List:</h4>
-                    <div className="student-table-wrap">
-                        <table className="student-table">
-                          <thead>
-                            <tr>
-                              <th>Student</th>
-                              <th>Item</th>
-                              <th>Meal Time</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {nonVegBookings.map((b, i) => (
-                              <tr key={i}>
-                                <td className="student-name-cell">{b.studentName || b.studentEmail || b.studentId}</td>
-                                <td><span style={{ fontWeight: 600, color: "#b91c1c" }}>{b.item}</span></td>
-                                <td>{b.mealType}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
 
-              {/* DAY SCHOLAR BOOKINGS SECTION */}
-              <div style={{ paddingTop: "20px", marginTop: "20px", borderTop: "2px solid #f1f5f9" }}>
-                <h3 className="card-title">Day Scholar Orders</h3>
-                <p className="card-subtitle">Regular meals purchased by day scholars.</p>
+                    {/* DAY SCHOLAR BOOKINGS SECTION */}
+                    <div style={{ paddingTop: "20px", borderTop: "2px solid #f1f5f9" }}>
+                      <h3 className="card-title">Day Scholar Orders</h3>
+                      <p className="card-subtitle">Regular meals purchased by day scholars.</p>
 
-                {dayScholarBookings.length === 0 ? (
-                  <p className="empty-msg">No day scholar bookings for tomorrow.</p>
-                ) : (
-                  <div className="non-veg-summary">
-                    <h4 style={{ marginTop: "10px", marginBottom: "15px", fontSize: "15px", color: "#334155" }}>Student List:</h4>
-                    <div className="student-table-wrap">
-                        <table className="student-table">
-                          <thead>
-                            <tr>
-                              <th>Student</th>
-                              <th>Meal Time</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {dayScholarBookings.map((b, i) => (
-                              <tr key={i}>
-                                <td className="student-name-cell">{b.studentId?.name || b.studentId?.email || 'Unknown'}</td>
-                                <td><span style={{ fontWeight: 600, color: "#3b82f6" }}>{b.mealType}</span></td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                      {currentData.dayScholarBookings.length === 0 ? (
+                        <p className="empty-msg">No day scholar bookings for {headcountTab}.</p>
+                      ) : (
+                        <div className="non-veg-summary">
+                          {/* Summary grouped by mealType */}
+                          {(() => {
+                              const mealCounts = {};
+                              currentData.dayScholarBookings.forEach(b => {
+                                mealCounts[b.mealType] = (mealCounts[b.mealType] || 0) + 1;
+                              });
+                              return (
+                                <div className="non-veg-grid">
+                                  {Object.entries(mealCounts).map(([mType, count]) => (
+                                    <div key={mType} className="non-veg-box" style={{background: '#eff6ff', borderColor: '#bfdbfe'}}>
+                                      <h4 style={{color: '#1d4ed8'}}>{mType}</h4>
+                                      <span className="non-veg-count" style={{color: '#1e3a8a'}}>{count}</span>
+                                      <span className="non-veg-label">Orders</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                          })()}
+
+                          <h4 style={{ marginTop: "20px", marginBottom: "15px", fontSize: "15px", color: "#334155" }}>Student List:</h4>
+                          <div className="student-table-wrap">
+                              <table className="student-table">
+                                <thead>
+                                  <tr>
+                                    <th>Student</th>
+                                    <th>Meal Time</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {currentData.dayScholarBookings.map((b, i) => (
+                                    <tr key={i}>
+                                      <td className="student-name-cell">{b.studentId?.name || b.studentId?.email || 'Unknown'}</td>
+                                      <td><span style={{ fontWeight: 600, color: "#3b82f6" }}>{b.mealType}</span></td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
+                  </>
+                );
+              })()}
             </div>
           )}
 

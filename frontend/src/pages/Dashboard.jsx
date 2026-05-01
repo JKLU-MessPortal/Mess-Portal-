@@ -420,7 +420,7 @@ export default function Dashboard() {
         axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/headcount`).then(res => {
           if (res.data.success) {
             setAdminStats({
-              stats: res.data.stats,
+              stats: res.data.tomorrow ? res.data.tomorrow.stats : res.data.stats,
               totalHostellers: res.data.totalHostellers
             });
           }

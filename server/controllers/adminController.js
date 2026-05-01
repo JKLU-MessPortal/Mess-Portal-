@@ -21,48 +21,63 @@ exports.updateMenu = async (req, res) => {
   }
 };
 
-// 2. Get Tomorrow's Cancellation Headcount
+// 2. Get Headcount for Today and Tomorrow
 exports.getHeadcount = async (req, res) => {
   try {
-    const tomorrow = new Date();
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0,0,0,0);
 
-    const cancellations = await MealBooking.find({
-      date: tomorrow,
-      status: 'Cancelled'
-    });
-
-    // Get total hostellers count from User collection for accurate analytics
-    const totalHostellers = await User.countDocuments({ residencyStatus: 'Hosteller' });
-
-    const stats = { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 };
-    cancellations.forEach(booking => {
-      if (stats[booking.mealType] !== undefined) {
-        stats[booking.mealType]++;
-      }
-    });
+    const endOfToday = new Date(today);
+    endOfToday.setHours(23, 59, 59, 999);
 
     const endOfTomorrow = new Date(tomorrow);
     endOfTomorrow.setHours(23, 59, 59, 999);
 
-    const nonVegBookings = await NonVegBooking.find({
-      date: { $gte: tomorrow, $lte: endOfTomorrow },
-      status: 'paid'
-    });
+    const totalHostellers = await User.countDocuments({ residencyStatus: 'Hosteller' });
 
-    const dayScholarBookings = await MealBooking.find({
-      date: tomorrow,
-      status: 'Paid'
-    }).populate('studentId', 'name email rollNumber');
+    // Function to fetch data for a specific date
+    const fetchDataForDate = async (startDate, endDate) => {
+      const cancellations = await MealBooking.find({
+        date: startDate,
+        status: 'Cancelled'
+      });
+
+      const stats = { Breakfast: 0, Lunch: 0, Snacks: 0, Dinner: 0 };
+      cancellations.forEach(booking => {
+        if (stats[booking.mealType] !== undefined) {
+          stats[booking.mealType]++;
+        }
+      });
+
+      const nonVegBookings = await NonVegBooking.find({
+        date: { $gte: startDate, $lte: endDate },
+        status: 'paid'
+      });
+
+      const dayScholarBookings = await MealBooking.find({
+        date: startDate,
+        status: 'Paid'
+      }).populate('studentId', 'name email rollNumber');
+
+      return {
+        stats,
+        totalSaved: cancellations.length,
+        nonVegBookings,
+        dayScholarBookings
+      };
+    };
+
+    const todayData = await fetchDataForDate(today, endOfToday);
+    const tomorrowData = await fetchDataForDate(tomorrow, endOfTomorrow);
 
     res.status(200).json({ 
       success: true, 
-      stats, 
       totalHostellers,
-      totalSaved: cancellations.length,
-      nonVegBookings,
-      dayScholarBookings
+      today: todayData,
+      tomorrow: tomorrowData
     });
   } catch (error) {
     console.error("Headcount Error:", error);
