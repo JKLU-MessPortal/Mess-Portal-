@@ -1,6 +1,7 @@
 const Menu = require('../models/Menu');
 const MealBooking = require('../models/MealBooking');
 const NonVegBooking = require('../models/NonVegBooking');
+const MealLog = require('../models/MealLog');
 
 // The fixed monthly limits set by the Mess Contractor
 const MONTHLY_LIMITS = {
@@ -59,9 +60,17 @@ exports.getDashboardData = async (req, res) => {
 
       const startOfToday = new Date(today);
       startOfToday.setHours(0,0,0,0);
+      const endOfToday = new Date(today);
+      endOfToday.setHours(23,59,59,999);
+
       const todayBookings = await MealBooking.find({
         studentId: studentId,
         date: startOfToday
+      });
+
+      const todayLogs = await MealLog.find({
+        studentId: studentId,
+        scannedAt: { $gte: startOfToday, $lte: endOfToday }
       });
 
       const endOfTomorrow = new Date(tomorrow);
@@ -84,7 +93,8 @@ exports.getDashboardData = async (req, res) => {
         skipStats,
         todayBookings,
         tomorrowBookings,
-        nonVegBookings // Include this
+        nonVegBookings,
+        todayLogs
       });
       return;
     }
@@ -99,7 +109,8 @@ exports.getDashboardData = async (req, res) => {
       skipStats: {},
       todayBookings: [],
       tomorrowBookings: [],
-      nonVegBookings: []
+      nonVegBookings: [],
+      todayLogs: []
     });
   } catch (error) {
     console.error("Dashboard Error:", error);

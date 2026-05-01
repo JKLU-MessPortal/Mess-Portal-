@@ -263,7 +263,7 @@ function MealModal({ meal, dietaryPref, nutritionMap, onClose, isTomorrow, isCan
 }
 
 // ─── Today's & Tomorrow Meal Tile ─────────────────────────────────────────────
-function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, isPaid, isStaff, isHosteller, handleToggleMeal, setNvModal, setDsModal, nonVegBookings }) {
+function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, isPaid, isEaten, isStaff, isHosteller, handleToggleMeal, setNvModal, setDsModal, nonVegBookings }) {
   const [open, setOpen] = useState(false);
   const colors = MEAL_COLORS[meal.mealType] || MEAL_COLORS.Lunch;
 
@@ -300,14 +300,21 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
         aria-label={`View ${meal.mealType} menu`}
       >
         <div className="meal-tile-icon" style={{ color: colors.icon, marginBottom: "8px" }}>{MEAL_ICONS[meal.mealType]}</div>
-        <div className="meal-tile-name" style={{ color: colors.text, fontWeight: 700, fontSize: "1.1rem" }}>{meal.mealType}</div>
+        <div className="meal-tile-name" style={{ 
+          color: colors.text, 
+          fontWeight: 700, 
+          fontSize: "1.1rem",
+          textDecoration: isEaten ? "line-through" : "none",
+          opacity: isEaten ? 0.6 : 1
+        }}>{meal.mealType}</div>
         <div className="meal-tile-count" style={{ color: colors.text, opacity: 0.8, fontSize: "0.85rem" }}>
           {meal.items.length} dishes
           {hasNonVeg && <span className="meal-tile-nonveg-dot" style={{ background: "#ef4444" }} title="Non-veg available" />}
         </div>
         {isCancelled && <div className="meal-tile-status" style={{color:"#b91c1c", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Cancelled</div>}
         {isPaid && <div className="meal-tile-status paid" style={{color:"#047857", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Purchased</div>}
-        {!isHosteller && !isTomorrow && !isPaid && (
+        {isEaten && <div className="meal-tile-status eaten" style={{color:"#475569", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Eaten</div>}
+        {!isHosteller && !isTomorrow && !isPaid && !isEaten && (
           <div className="meal-tile-status" style={{color:"#64748b", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Not Purchased</div>
         )}
         <div className="meal-tile-hint" style={{ marginTop: "auto", color: colors.text, opacity: 0.6, fontSize: "0.75rem" }}>View menu →</div>
@@ -384,6 +391,7 @@ export default function Dashboard() {
     todayBookings: [],
     tomorrowBookings: [],
     nonVegBookings: [],
+    todayLogs: [],
   });
 
   useEffect(() => {
@@ -451,6 +459,7 @@ export default function Dashboard() {
           todayBookings: res.data.todayBookings || [],
           tomorrowBookings: res.data.tomorrowBookings,
           nonVegBookings: res.data.nonVegBookings || [],
+          todayLogs: res.data.todayLogs || [],
         });
       }
     } catch (error) {
@@ -629,6 +638,7 @@ export default function Dashboard() {
                     .map((meal, index) => {
                       const isCancelled = menuData.todayBookings.some(b => b.mealType === meal.mealType && b.status === "Cancelled");
                       const isPaid = menuData.todayBookings.some(b => b.mealType === meal.mealType && b.status === "Paid");
+                      const isEaten = menuData.todayLogs?.some(log => log.mealType === meal.mealType);
 
                       return (
                         <MealTile
@@ -639,6 +649,7 @@ export default function Dashboard() {
                           isTomorrow={false}
                           isCancelled={isCancelled}
                           isPaid={isPaid}
+                          isEaten={isEaten}
                           isStaff={isStaff}
                           isHosteller={isHosteller}
                           handleToggleMeal={handleToggleMeal}
