@@ -13,7 +13,7 @@ exports.updateMenu = async (req, res) => {
     const updatedMenu = await Menu.findOneAndUpdate(
       { dayOfWeek, mealType },
       { items, nonVegItems: nonVegItems || [] },
-      { new: true, upsert: true } 
+      { returnDocument: 'after', upsert: true } 
     );
     res.status(200).json({ success: true, message: `${mealType} for ${dayOfWeek} updated!`, menu: updatedMenu });
   } catch (error) {
@@ -174,7 +174,7 @@ exports.toggleBlockStatus = async (req, res) => {
     const updatedStudent = await User.findByIdAndUpdate(
       studentId, 
       { isBlocked: isBlocked }, 
-      { new: true } 
+      { returnDocument: 'after' } 
     ).select('-password');
 
     if (!updatedStudent) {
@@ -226,7 +226,7 @@ exports.registerHosteller = async (req, res) => {
     const entry = await HostellerRegistry.findOneAndUpdate(
       { email: email.toLowerCase() },
       { email: email.toLowerCase(), rollNumber, addedBy: addedBy || 'admin' },
-      { new: true, upsert: true, runValidators: true }
+      { returnDocument: 'after', upsert: true, runValidators: true }
     );
 
     // If the student has already logged in before, update their residencyStatus too
@@ -290,7 +290,7 @@ exports.updateUserRole = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: { role } },
-      { new: true, strict: false }
+      { returnDocument: 'after', strict: false }
     ).select('name email role');
 
     if (!updatedUser) {

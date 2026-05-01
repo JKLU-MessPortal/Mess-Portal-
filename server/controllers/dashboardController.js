@@ -130,7 +130,7 @@ exports.toggleMeal = async (req, res) => {
     const booking = await MealBooking.findOneAndUpdate(
       { studentId, date: new Date(date).setHours(0,0,0,0), mealType },
       { status },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
 
     res.status(200).json({ 

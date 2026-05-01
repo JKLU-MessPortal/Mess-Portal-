@@ -37,7 +37,7 @@ exports.microsoftLogin = async (req, res) => {
       await User.findByIdAndUpdate(
         user._id,
         { $set: { residencyStatus } },
-        { new: false, strict: false }
+        { returnDocument: 'before', strict: false }
       );
       // Re-fetch the user so we always return the LATEST data from DB (including role changes)
       user = await User.findById(user._id);
@@ -93,7 +93,7 @@ exports.updateSettings = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       studentId,
       { dietaryPreference, foodAllergies },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).select('name email rollNumber dietaryPreference residencyStatus foodAllergies');
 
     if (!updatedUser) return res.status(404).json({ message: 'User not found.' });

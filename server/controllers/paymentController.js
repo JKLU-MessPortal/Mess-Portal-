@@ -199,7 +199,7 @@ exports.createMealOrder = async (req, res) => {
         razorpayOrderId: order.id,
         status: 'pending'
       },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
 
     res.json({
@@ -270,7 +270,7 @@ exports.mockMealSuccess = async (req, res) => {
         razorpaySignature: 'mock_signature',
         status: 'Paid'
       },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
 
     res.json({ success: true, message: 'Mock payment successful! Meal purchased.' });

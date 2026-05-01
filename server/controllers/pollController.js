@@ -97,7 +97,7 @@ exports.vote = async (req, res) => {
         ? { $pull: { downvotedBy: uid } }
         : { $addToSet: { downvotedBy: uid }, $pull: { upvotedBy: uid } };
     }
-    const updated = await PollPost.findByIdAndUpdate(id, update, { new: true });
+    const updated = await PollPost.findByIdAndUpdate(id, update, { returnDocument: 'after' });
     res.json({
       success: true,
       upvotes:     updated.upvotedBy.length,
@@ -117,7 +117,7 @@ exports.adminResolve = async (req, res) => {
     const post = await PollPost.findByIdAndUpdate(
       req.params.id,
       { adminResolved: true, adminResolvedAt: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!post) return res.status(404).json({ success: false, message: 'Post not found.' });
     res.json({ success: true, message: 'Marked as resolved by admin.', post });
