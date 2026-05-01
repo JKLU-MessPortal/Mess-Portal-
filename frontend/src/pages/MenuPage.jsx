@@ -470,8 +470,7 @@ export default function MenuPage() {
                 disabled={!hasMeals}
               >
                 <span className="day-tab-abbr">{DAY_ABBR[i]}</span>
-                {isToday && <span className="day-tab-dot day-tab-dot--today" />}
-                {hasNonVeg && !isToday && <span className="day-tab-dot day-tab-dot--nonveg" title="Non-veg available" />}
+                {hasNonVeg && <span className="day-tab-dot day-tab-dot--nonveg" title="Non-veg available" />}
               </button>
             );
           })}
@@ -490,39 +489,26 @@ export default function MenuPage() {
               <p>No menu uploaded for {selectedDay} yet.</p>
               <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>Ask the admin to update it.</p>
             </div>
-          ) : isViewingToday ? (
-            /* ── Today: tile grid with blur-modal ── */
-            <>
-              <div className="today-label">
-                <span className="today-dot" />
-                Today · {todayName}
-              </div>
-              <div className="meal-tiles-grid">
-                {selectedMeals.map((meal, idx) => (
-                  <MealTile
-                    key={idx}
-                    meal={meal}
-                    dietaryPref={dietaryPref}
-                    nutritionMap={nutritionMap}
-                    nonVegBookings={nonVegBookings}
-                    selectedDay={selectedDay}
-                  />
-                ))}
-              </div>
-            </>
           ) : (
-            /* ── Other days: expandable cards ── */
-            selectedMeals.map((meal, idx) => (
-              <MealCard
-                key={idx}
-                meal={meal}
-                dietaryPref={dietaryPref}
-                nutritionMap={nutritionMap}
-                isToday={false}
-                nonVegBookings={nonVegBookings}
-                selectedDay={selectedDay}
-              />
-            ))
+            <>
+              {isViewingToday && (
+                <div className="today-label">
+                  <span className="today-dot" />
+                  Today · {todayName}
+                </div>
+              )}
+              {selectedMeals.map((meal, idx) => (
+                <MealCard
+                  key={idx}
+                  meal={meal}
+                  dietaryPref={dietaryPref}
+                  nutritionMap={nutritionMap}
+                  isToday={isViewingToday}
+                  nonVegBookings={nonVegBookings}
+                  selectedDay={selectedDay}
+                />
+              ))}
+            </>
           )}
         </div>
       </div>
