@@ -53,6 +53,9 @@ export default function AuthGate() {
       // 4. SAVE & REDIRECT
       if (res.status === 200) {
         console.log("Database Saved:", res.data);
+        if (res.data.token) {
+          localStorage.setItem("token", res.data.token);
+        }
         login(res.data.user);
         navigate("/dashboard");
       }
