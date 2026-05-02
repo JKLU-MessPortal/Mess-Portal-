@@ -777,6 +777,14 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* --- COOL FOOTER --- */}
+        <footer className="dashboard-footer">
+          <p className="footer-text">
+            Made with <span className="footer-heart">❤️</span> by <span className="footer-authors">Aman, Anjisht, Ayush</span>
+          </p>
+          <p className="footer-location">Designed in Jaipur</p>
+        </footer>
+
       </div>
     </div>
   );
