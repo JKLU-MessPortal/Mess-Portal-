@@ -23,7 +23,15 @@ exports.csrfProtection = (req, res, next) => {
   const tokenFromCookie = req.cookies['XSRF-TOKEN'];
   const tokenFromHeader = req.headers['x-xsrf-token'];
 
-  if (!tokenFromCookie || !tokenFromHeader || tokenFromCookie !== tokenFromHeader) {
+  // Origin Validation (OWASP recommended defense) - crucial for cross-domain setups like Vercel + Render
+  const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+  const requestOrigin = req.headers.origin;
+
+  const isOriginValid = requestOrigin === allowedOrigin;
+  const isTokenValid = tokenFromCookie && tokenFromHeader && tokenFromCookie === tokenFromHeader;
+
+  // Accept either valid Origin OR valid token match (for same-domain/local setups)
+  if (!isOriginValid && !isTokenValid) {
     return res.status(403).json({ message: 'CSRF token validation failed' });
   }
 
