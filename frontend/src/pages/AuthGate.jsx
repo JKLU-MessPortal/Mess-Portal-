@@ -115,7 +115,7 @@ export default function AuthGate() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: `url(/icon.png)`,
+            backgroundImage: `url(${jkluLogo})`,
             backgroundSize: "80%",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
