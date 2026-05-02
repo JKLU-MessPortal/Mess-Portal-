@@ -28,7 +28,7 @@ export default function Navbar() {
       {/* LEFT: Logo & Name */}
       <div className="navbar-left">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyOyKn5i71GaoKjTcL3sBWriHa_NRPQio_Mw&s"
+          src="/icon.png"
           alt="Logo"
           className="navbar-logo border"
         />
