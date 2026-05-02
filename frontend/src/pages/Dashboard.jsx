@@ -277,7 +277,19 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
   const visibleNonVeg = filterNonVeg(meal.nonVegItems);
   const hasNonVeg = visibleNonVeg.length > 0;
 
-  const isGrayedOut = isCancelled || (!isHosteller && !isTomorrow && !isPaid);
+  const isPassed = (() => {
+    if (isTomorrow) return false;
+    const currentHour = new Date().getHours();
+    switch(meal.mealType) {
+      case "Breakfast": return currentHour >= 9;
+      case "Lunch": return currentHour >= 14;
+      case "Snacks": return currentHour >= 18;
+      case "Dinner": return currentHour >= 22;
+      default: return false;
+    }
+  })();
+
+  const isGrayedOut = isCancelled || (!isHosteller && !isTomorrow && !isPaid) || isEaten || isPassed;
 
   return (
     <>
@@ -314,7 +326,10 @@ function MealTile({ meal, dietaryPref, nutritionMap, isTomorrow, isCancelled, is
         {isCancelled && <div className="meal-tile-status" style={{color:"#b91c1c", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Cancelled</div>}
         {isPaid && <div className="meal-tile-status paid" style={{color:"#047857", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Purchased</div>}
         {isEaten && <div className="meal-tile-status eaten" style={{color:"#475569", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Eaten</div>}
-        {!isHosteller && !isTomorrow && !isPaid && !isEaten && (
+        {isPassed && !isEaten && !isCancelled && (
+          <div className="meal-tile-status" style={{color:"#64748b", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Time Passed</div>
+        )}
+        {!isHosteller && !isTomorrow && !isPaid && !isEaten && !isPassed && (
           <div className="meal-tile-status" style={{color:"#64748b", fontSize:"0.7rem", marginTop:"4px", fontWeight: 700}}>Not Purchased</div>
         )}
         <div className="meal-tile-hint" style={{ marginTop: "auto", color: colors.text, opacity: 0.6, fontSize: "0.75rem" }}>View menu →</div>
