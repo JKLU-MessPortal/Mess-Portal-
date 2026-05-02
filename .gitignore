@@ -54,3 +54,8 @@ out/
 *.tmp
 *.temp
 mess-portal-usage-guide.pdf
+
+############################
+# Extra folder
+############################
+extra/
