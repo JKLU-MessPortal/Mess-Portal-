@@ -10,7 +10,7 @@ exports.csrfProtection = (req, res, next) => {
     res.cookie('XSRF-TOKEN', token, {
       httpOnly: false, // Needs to be false so Axios can read it
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     req.cookies['XSRF-TOKEN'] = token; // Add to current request
   }
