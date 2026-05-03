@@ -91,7 +91,7 @@ router.post('/', async (req, res) => {
         fat: fat ?? 0, free_sugar: free_sugar ?? 0, fibre: fibre ?? 0,
         byweight: byweight ?? false, byquantity: byquantity ?? true,
         quantity_unit: quantity_unit || 'per serving' },
-      { returnDocument: 'after', upsert: true, setDefaultsOnInsert: true }
+      { new: true, upsert: true, setDefaultsOnInsert: true }
     );
     res.status(201).json({ success: true, dish });
   } catch (error) {

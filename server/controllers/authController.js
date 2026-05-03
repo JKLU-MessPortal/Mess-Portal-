@@ -34,10 +34,10 @@ exports.microsoftLogin = async (req, res) => {
       // Refresh residency status on every login so registry changes take immediate effect
       // Use $set with strict:false to bypass enum validation for existing invalid values,
       // then re-fetch the full fresh document so the returned role is always current.
-      await User.findByIdAndUpdate(
-        user._id,
+      await User.updateOne(
+        { _id: user._id },
         { $set: { residencyStatus } },
-        { returnDocument: 'before', strict: false }
+        { strict: false }
       );
       // Re-fetch the user so we always return the LATEST data from DB (including role changes)
       user = await User.findById(user._id);
@@ -108,11 +108,12 @@ exports.updateSettings = async (req, res) => {
     const { studentId, dietaryPreference, foodAllergies } = req.body;
     if (!studentId) return res.status(400).json({ message: 'studentId is required.' });
 
-    const updatedUser = await User.findByIdAndUpdate(
-      studentId,
+    await User.updateOne(
+      { _id: studentId },
       { dietaryPreference, foodAllergies },
-      { returnDocument: 'after', runValidators: true }
-    ).select('name email rollNumber dietaryPreference residencyStatus foodAllergies');
+      { runValidators: true }
+    );
+    const updatedUser = await User.findById(studentId).select('name email rollNumber dietaryPreference residencyStatus foodAllergies');
 
     if (!updatedUser) return res.status(404).json({ message: 'User not found.' });
 
